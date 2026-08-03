@@ -138,7 +138,6 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .card-word.he-word{color:var(--green-l);direction:rtl;}
 .card-phonetic{display:none;color:var(--teal-l);font-size:1.05rem;letter-spacing:2px;direction:ltr;background:rgba(0,137,123,.1);border-radius:8px;padding:6px 16px;text-align:center;}
 .card-phonetic.vis{display:block;}
-.card-ex{font-size:.9rem;color:var(--muted);font-style:italic;text-align:center;display:none;max-width:90%;line-height:1.5;}
 .card-hint{position:absolute;bottom:14px;right:16px;font-size:.8rem;color:var(--muted);}
 .c-ph-btn{background:rgba(46,120,50,.2);border:1px solid rgba(76,175,80,.4);color:#a5d6a7;border-radius:20px;padding:10px 28px;font-size:.9rem;font-weight:600;transition:all .2s;margin-top:8px;}
 .c-ph-btn:hover{background:rgba(46,120,50,.35);border-color:rgba(76,175,80,.7);}
@@ -251,6 +250,39 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .badge-home{background:rgba(206,147,216,.2);color:#e1bee7;}
 .badge-patterns{background:rgba(240,98,146,.2);color:#f48fb1;}
 
+/* ─── TALK TAB ─── */
+@keyframes talkPulse{0%{box-shadow:0 0 0 0 rgba(229,57,53,.5);}70%{box-shadow:0 0 0 16px rgba(229,57,53,0);}100%{box-shadow:0 0 0 0 rgba(229,57,53,0);}}
+/* live conversation layout with side notes */
+@media(max-width:820px){.talk-live-row{flex-direction:column;}.talk-notes{width:100%;max-height:none;}}
+/* corrections notebook on start screen */
+
+/* ─── LEVEL LADDER ─── */
+.lvl-ladder{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+.lvl-ladder.compact{padding:11px 13px;}
+.lvl-title{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.4px;margin-bottom:10px;}
+.lvl-bar{height:8px;background:var(--bg4);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.lvl-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--orange),var(--gold),var(--green));border-radius:6px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+.lvl-pills{display:flex;gap:4px;margin-bottom:10px;}
+.lvl-pill{flex:1;text-align:center;padding:5px 2px;border-radius:8px;background:var(--bg3);border:1px solid transparent;}
+.lvl-pill b{display:block;font-size:.72rem;color:var(--muted);}
+.lvl-pill span{display:block;font-size:.52rem;color:var(--muted);opacity:.7;margin-top:1px;}
+.lvl-pill.active{background:rgba(201,168,76,.16);border-color:var(--gold-d);}
+.lvl-pill.active b{color:var(--gold-l);}
+.lvl-pill.active span{color:var(--gold-l);opacity:.95;}
+.lvl-caption{font-size:.85rem;color:var(--text);}
+.lvl-caption b{color:var(--gold-l);}
+.lvl-score{color:var(--muted);font-size:.78rem;margin-left:4px;}
+.lvl-caption.lvl-none{color:var(--muted);cursor:pointer;}
+.lvl-caption.lvl-none b{color:var(--gold);}
+.lvl-delta{margin-top:8px;font-size:.8rem;font-weight:700;}
+.lvl-delta.up{color:var(--green-l);}
+.lvl-delta.down{color:var(--red-l);}
+.lvl-delta.same{color:var(--muted);}
+.lvl-feedback{margin-top:12px;font-size:.85rem;line-height:1.6;}
+.lvl-fb-row{margin-top:8px;}
+.lvl-fb-label{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.lvl-fb-text{color:var(--text);}
+
 /* ─── LOGIN SCREEN ─── */
 .login-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
 .login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:20px;}
@@ -334,7 +366,6 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
             <div class="c-status-dot" id="cStatusDot"></div>
             <div class="card-word" id="cWord"></div>
             <div class="card-phonetic" id="cPhonetic"></div>
-            <div class="card-ex" id="cEx"></div>
             <button class="c-ph-btn" id="cPhBtn" onclick="togglePh(event)">🔤 Phonetic</button>
             <div class="card-hint" id="cHint">Tap to reveal →</div>
             <button class="c-speak-btn" id="cSpeakBtn" onclick="speakCurrent(event)">
@@ -509,8 +540,8 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
         <label class="toggle"><input type="checkbox" id="stSpeakFlip" onchange="saveSetting('speakAfterFlip',this.checked)"><span class="tslider"></span></label></div>
     </div>
     <div class="sg"><div class="sg-title">Display</div>
-      <div class="sr"><div><div class="sr-l">Show examples</div><div class="sr-d">Example sentences on cards</div></div>
-        <label class="toggle"><input type="checkbox" id="stShowEx" onchange="saveSetting('showExamples',this.checked)"><span class="tslider"></span></label></div>
+      <div class="sr"><div><div class="sr-l">Show examples</div><div class="sr-d">Example sentences panel next to the card</div></div>
+        <label class="toggle"><input type="checkbox" id="stShowEx" onchange="saveSetting('showExamples',this.checked);if(session)renderCard()"><span class="tslider"></span></label></div>
       <div class="sr"><div><div class="sr-l">Show phonetic button</div><div class="sr-d">Hebrew pronunciation help</div></div>
         <label class="toggle"><input type="checkbox" id="stShowPh" onchange="saveSetting('showPhonetic',this.checked)"><span class="tslider"></span></label></div>
     </div>
@@ -1050,7 +1081,6 @@ const WORDS = [
   {en:"Innovation",he:"חדשנות",emoji:"💡",cat:"concepts",type:"word",ph:"אִי-נוֹ-וֵי-שֶׁן",ex:"Innovation drives growth."},
   {en:"Leadership",he:"מנהיגות",emoji:"👑",cat:"concepts",type:"word",ph:"לִי-דֶר-שִׁיפּ",ex:"Good leadership is essential."},
   {en:"Teamwork",he:"עבודת צוות",emoji:"🤝",cat:"concepts",type:"word",ph:"טִים-וֶרְק",ex:"Teamwork makes the dream work."},
-  {en:"Deadline",he:"מועד אחרון",emoji:"⏰",cat:"concepts",type:"word",ph:"דֶד-לַיין",ex:"The deadline is Friday."},
   {en:"Responsibility",he:"אחריות",emoji:"💪",cat:"concepts",type:"word",ph:"רִי-סְפּוֹן-סִי-בִּי-לִי-טִי",ex:"Take responsibility for your actions."},
   {en:"Initiative",he:"יוזמה",emoji:"🚀",cat:"concepts",type:"word",ph:"אִי-נִישִׁי-אַ-טִיב",ex:"She always takes initiative."},
   {en:"Commitment",he:"מחויבות",emoji:"🔒",cat:"concepts",type:"word",ph:"קוֹ-מִיט-מֶנְט",ex:"Show commitment to your goals."},
@@ -1107,6 +1137,222 @@ const WORDS = [
   {en:"Step by step",he:"צעד אחר צעד",emoji:"👣",cat:"phrases",type:"phrase",ph:"סְטֶפּ בַּיי סְטֶפּ",ex:"Let's go step by step."},
   {en:"In the long run",he:"בטווח הארוך",emoji:"🔮",cat:"phrases",type:"phrase",ph:"אִין דֶ לוֹנְג רַאן",ex:"In the long run, it will pay off."},
   {en:"Bottom line",he:"שורה תחתונה",emoji:"📊",cat:"phrases",type:"phrase",ph:"בוֹ-טֶם לַיין",ex:"The bottom line is we need more sales."},
+  // ═══ תוספת 2026-08-03 — טיולים, טיסות, מלון, תחבורה, מסעדות, קניות, בית ═══
+  // travel — תכנון טיול
+  {prio:1,en:"Itinerary",he:"מסלול טיול מתוכנן",emoji:"🗺️",cat:"travel",type:"word",ph:"אַיי-טִי-נֶ-רֶ-רִי",ex:"Can you send me the itinerary for the trip?"},
+  {prio:1,en:"Destination",he:"יעד",emoji:"📍",cat:"travel",type:"word",ph:"דֶס-טִי-נֵיי-שֶׁן",ex:"Our next destination is Rome."},
+  {prio:1,en:"Accommodation",he:"מקום לינה",emoji:"🏨",cat:"travel",type:"word",ph:"אַ-קוֹ-מֶ-דֵיי-שֶׁן",ex:"Have you booked the accommodation yet?"},
+  {prio:1,en:"Availability",he:"זמינות",emoji:"📅",cat:"travel",type:"word",ph:"אַ-וֵיי-לֶ-בִּי-לִי-טִי",ex:"Let me check availability for those dates."},
+  {prio:1,en:"Confirmation",he:"אישור",emoji:"✅",cat:"travel",type:"word",ph:"קוֹן-פֶר-מֵיי-שֶׁן",ex:"I got the confirmation email this morning."},
+  {prio:1,en:"Cancellation",he:"ביטול",emoji:"❌",cat:"travel",type:"word",ph:"קַאן-סֶ-לֵיי-שֶׁן",ex:"Is there a cancellation fee?"},
+  {prio:1,en:"Recommendation",he:"המלצה",emoji:"👍",cat:"travel",type:"word",ph:"רֶ-קֶ-מֶן-דֵיי-שֶׁן",ex:"Do you have a recommendation for a good hotel?"},
+  {prio:1,en:"Attraction",he:"אטרקציה",emoji:"🎡",cat:"travel",type:"word",ph:"אַ-טְרַאק-שֶׁן",ex:"What's the main attraction in this city?"},
+  {prio:1,en:"Landmark",he:"אתר מפורסם / נקודת ציון",emoji:"🗼",cat:"travel",type:"word",ph:"לַאנְד-מַארְק",ex:"What's the main landmark here?"},
+  {prio:1,en:"Sightseeing",he:"סיור באתרים",emoji:"📸",cat:"travel",type:"word",ph:"סַייט-סִי-אִינְג",ex:"We spent the whole day sightseeing."},
+  {prio:1,en:"Excursion",he:"טיול קצר ומאורגן",emoji:"🚌",cat:"travel",type:"word",ph:"אֶקְס-קֶר-ז'ֶן",ex:"We booked a day excursion to the islands."},
+  {prio:1,en:"Guided tour",he:"סיור מודרך",emoji:"🧭",cat:"travel",type:"phrase",ph:"גַּיי-דֶד טוּר",ex:"Let's take a guided tour of the old city."},
+  {prio:1,en:"Travel insurance",he:"ביטוח נסיעות",emoji:"🛡️",cat:"travel",type:"phrase",ph:"טְרַא-וֶל אִין-שׁוּ-רֶנְס",ex:"Don't forget to buy travel insurance."},
+  {prio:1,en:"Peak season",he:"עונת השיא",emoji:"📈",cat:"travel",type:"phrase",ph:"פִּיק סִי-זֶן",ex:"Prices double during peak season."},
+  {prio:1,en:"Off-season",he:"מחוץ לעונת התיירות",emoji:"📉",cat:"travel",type:"word",ph:"אוֹף-סִי-זֶן",ex:"It's much quieter in the off-season."},
+  {prio:1,en:"Convenient",he:"נוח ומתאים",emoji:"👌",cat:"travel",type:"word",ph:"קֶן-וִי-נְיֶנְט",ex:"Is Tuesday convenient for you?"},
+  {prio:1,en:"Worthwhile",he:"שווה את הזמן או הכסף",emoji:"💰",cat:"travel",type:"word",ph:"וֶרְת'-וַוייל",ex:"The trip was expensive but worthwhile."},
+  // travel — טיסות ושדה תעופה
+  {prio:1,en:"Boarding pass",he:"כרטיס עלייה למטוס",emoji:"🎫",cat:"travel",type:"phrase",ph:"בּוֹר-דִינְג פַּאס",ex:"Please have your boarding pass ready."},
+  {prio:1,en:"Check-in counter",he:"דלפק צ'ק-אין",emoji:"🛄",cat:"travel",type:"phrase",ph:"צֶ'ק-אִין קַאוְן-טֶר",ex:"The check-in counter closes an hour before the flight."},
+  {prio:1,en:"Carry-on",he:"תיק שעולה למטוס",emoji:"🎒",cat:"travel",type:"word",ph:"קֶ-רִי-אוֹן",ex:"I only travel with a carry-on."},
+  {prio:1,en:"Checked baggage",he:"מזוודה שנשלחת לבטן המטוס",emoji:"🧳",cat:"travel",type:"phrase",ph:"צֶ'קְט בַּא-גִיג'",ex:"How much extra is checked baggage?"},
+  {prio:1,en:"Baggage allowance",he:"כמות המטען המותרת",emoji:"⚖️",cat:"travel",type:"phrase",ph:"בַּא-גִיג' אַ-לַאו-אֶנְס",ex:"What's the baggage allowance on this flight?"},
+  {prio:1,en:"Overweight baggage",he:"מטען במשקל עודף",emoji:"🏋️",cat:"travel",type:"phrase",ph:"אוֹ-וֶר-וֵוייט בַּא-גִיג'",ex:"They charged me for overweight baggage."},
+  {prio:1,en:"Security screening",he:"בידוק ביטחוני",emoji:"🔍",cat:"travel",type:"phrase",ph:"סִי-קְיוּ-רִי-טִי סְקְרִי-נִינְג",ex:"Security screening took almost an hour."},
+  {prio:1,en:"Customs declaration",he:"הצהרה במכס",emoji:"📋",cat:"travel",type:"phrase",ph:"קַאס-טֶמְז דֶק-לֶ-רֵיי-שֶׁן",ex:"Please fill out the customs declaration."},
+  {prio:1,en:"Immigration officer",he:"פקיד ביקורת גבולות",emoji:"👮",cat:"travel",type:"phrase",ph:"אִי-מִי-גְרֵיי-שֶׁן אוֹ-פִי-סֶר",ex:"The immigration officer asked about my trip."},
+  {prio:1,en:"Connecting flight",he:"טיסת המשך",emoji:"🔗",cat:"travel",type:"phrase",ph:"קֶ-נֶק-טִינְג פְלַייט",ex:"I have a connecting flight in Paris."},
+  {prio:1,en:"Layover",he:"המתנה בין טיסות",emoji:"⏳",cat:"travel",type:"word",ph:"לֵיי-אוֹ-וֶר",ex:"We have a three-hour layover."},
+  {prio:1,en:"Stopover",he:"עצירת ביניים ארוכה",emoji:"🛑",cat:"travel",type:"word",ph:"סְטוֹפּ-אוֹ-וֶר",ex:"We planned a two-day stopover in London."},
+  {prio:1,en:"Delayed",he:"מתעכב",emoji:"⏰",cat:"travel",type:"word",ph:"דִי-לֵייד",ex:"Our flight is delayed again."},
+  {prio:1,en:"Rescheduled",he:"נקבע מחדש",emoji:"🔄",cat:"travel",type:"word",ph:"רִי-סְקֶ-ג'וּלְד",ex:"The meeting was rescheduled for Monday."},
+  {prio:1,en:"Overbooked",he:"בהזמנת יתר",emoji:"📚",cat:"travel",type:"word",ph:"אוֹ-וֶר-בּוּקְט",ex:"The flight was overbooked, so they offered us a later one."},
+  {prio:1,en:"Aisle seat",he:"מושב ליד המעבר",emoji:"💺",cat:"travel",type:"phrase",ph:"אַייל סִיט",ex:"I'd prefer an aisle seat, please."},
+  {prio:1,en:"Window seat",he:"מושב ליד החלון",emoji:"🪟",cat:"travel",type:"phrase",ph:"וִוינְ-דוֹ סִיט",ex:"She always asks for a window seat."},
+  {prio:1,en:"Emergency exit",he:"יציאת חירום",emoji:"🚪",cat:"travel",type:"phrase",ph:"אִי-מֶר-גֶ'נְ-סִי אֶק-סִיט",ex:"We were sitting right by the emergency exit."},
+  // travel — מלון ולינה
+  {prio:1,en:"Vacancy",he:"חדר פנוי",emoji:"🔑",cat:"travel",type:"word",ph:"וֵיי-קֶן-סִי",ex:"Do you have any vacancies for tonight?"},
+  {prio:1,en:"Fully booked",he:"בתפוסה מלאה",emoji:"🚫",cat:"travel",type:"phrase",ph:"פוּ-לִי בּוּקְט",ex:"Sorry, we're fully booked this weekend."},
+  {prio:1,en:"Front desk",he:"דלפק הקבלה",emoji:"🛎️",cat:"travel",type:"phrase",ph:"פְרַאנְט דֶסְק",ex:"Ask the front desk for a map."},
+  {prio:1,en:"Housekeeping",he:"שירות ניקיון החדרים",emoji:"🧹",cat:"travel",type:"word",ph:"הַאוּס-קִי-פִּינְג",ex:"Housekeeping comes every morning."},
+  {prio:1,en:"Room service",he:"שירות חדרים",emoji:"🍽️",cat:"travel",type:"phrase",ph:"רוּם סֶר-וִיס",ex:"Let's just order room service tonight."},
+  {prio:1,en:"Complimentary",he:"ניתן בחינם מטעם המלון",emoji:"🎁",cat:"travel",type:"word",ph:"קוֹם-פְּלִי-מֶן-טֶ-רִי",ex:"Breakfast is complimentary."},
+  {prio:1,en:"Amenities",he:"מתקנים ושירותים",emoji:"🏊",cat:"travel",type:"word",ph:"אַ-מֶ-נִי-טִיז",ex:"The hotel has great amenities."},
+  {prio:1,en:"Private bathroom",he:"חדר רחצה פרטי",emoji:"🚿",cat:"travel",type:"phrase",ph:"פְּרַיי-וֶט בַּאת'-רוּם",ex:"Does the room have a private bathroom?"},
+  {prio:1,en:"Shared bathroom",he:"חדר רחצה משותף",emoji:"🚻",cat:"travel",type:"phrase",ph:"שֵׁרְד בַּאת'-רוּם",ex:"It's cheaper, but with a shared bathroom."},
+  {prio:1,en:"Twin room",he:"חדר עם שתי מיטות נפרדות",emoji:"🛏️",cat:"travel",type:"phrase",ph:"טְוִוין רוּם",ex:"We booked a twin room for the kids."},
+  {prio:1,en:"Double room",he:"חדר זוגי",emoji:"🛌",cat:"travel",type:"phrase",ph:"דַא-בֶּל רוּם",ex:"We'd like a double room, please."},
+  {prio:1,en:"Suite",he:"סוויטה",emoji:"🏩",cat:"travel",type:"word",ph:"סְוִויט",ex:"They upgraded us to a suite!"},
+  {prio:1,en:"Deposit",he:"פיקדון",emoji:"💵",cat:"travel",type:"word",ph:"דִי-פּוֹ-זִיט",ex:"They asked for a deposit at check-in."},
+  {prio:1,en:"Additional charge",he:"תשלום נוסף",emoji:"➕",cat:"travel",type:"phrase",ph:"אַ-דִי-שֶׁ-נֶל צַ'ארְג'",ex:"Late checkout is an additional charge."},
+  {prio:1,en:"Late checkout",he:"עזיבה מאוחרת",emoji:"🕐",cat:"travel",type:"phrase",ph:"לֵייט צֶ'ק-אַאוּט",ex:"Can we request a late checkout?"},
+  {prio:1,en:"Wake-up call",he:"שיחת השכמה",emoji:"☎️",cat:"travel",type:"phrase",ph:"וֵוייק-אַפּ קוֹל",ex:"Could I get a wake-up call at six?"},
+  {prio:1,en:"Air conditioning",he:"מיזוג אוויר",emoji:"❄️",cat:"travel",type:"phrase",ph:"אֶר קֶן-דִי-שֶׁ-נִינְג",ex:"The air conditioning isn't working."},
+  {prio:1,en:"Soundproof",he:"מבודד מרעש",emoji:"🔇",cat:"travel",type:"word",ph:"סַאונְד-פְּרוּף",ex:"The windows are soundproof, so it's very quiet."},
+  {prio:1,en:"Spacious",he:"מרווח",emoji:"📐",cat:"travel",type:"word",ph:"סְפֵּיי-שֶׁס",ex:"The room was surprisingly spacious."},
+  {prio:1,en:"Overlooking",he:"משקיף על",emoji:"🌅",cat:"travel",type:"word",ph:"אוֹ-וֶר-לוּ-קִינְג",ex:"We got a room overlooking the sea."},
+  // travel — תחבורה והתמצאות
+  {prio:1,en:"Public transportation",he:"תחבורה ציבורית",emoji:"🚇",cat:"travel",type:"phrase",ph:"פַּא-בְּלִיק טְרַאנְס-פּוֹר-טֵיי-שֶׁן",ex:"Public transportation here is excellent."},
+  {prio:1,en:"Rental vehicle",he:"רכב שכור",emoji:"🚗",cat:"travel",type:"phrase",ph:"רֶן-טֶל וִי-אִי-קֶל",ex:"We picked up the rental vehicle at the airport."},
+  {prio:1,en:"One-way ticket",he:"כרטיס לכיוון אחד",emoji:"➡️",cat:"travel",type:"phrase",ph:"וַואן-וֵוי טִי-קֶט",ex:"I only need a one-way ticket."},
+  {prio:1,en:"Round-trip ticket",he:"כרטיס הלוך ושוב",emoji:"🔁",cat:"travel",type:"phrase",ph:"רַאונְד-טְרִיפּ טִי-קֶט",ex:"A round-trip ticket is usually cheaper."},
+  {prio:1,en:"Fare",he:"מחיר נסיעה",emoji:"💳",cat:"travel",type:"word",ph:"פֵר",ex:"The fare is about ten dollars."},
+  {prio:1,en:"Timetable",he:"לוח זמני נסיעות",emoji:"🕒",cat:"travel",type:"word",ph:"טַיים-טֵיי-בֶּל",ex:"Check the timetable before you leave."},
+  {prio:1,en:"Platform",he:"רציף",emoji:"🚉",cat:"travel",type:"word",ph:"פְּלַאט-פוֹרְם",ex:"The train leaves from platform four."},
+  {prio:1,en:"Departure point",he:"נקודת יציאה",emoji:"📌",cat:"travel",type:"phrase",ph:"דִי-פַּאר-צֶ'ר פּוֹיְנְט",ex:"The departure point is in front of the hotel."},
+  {prio:1,en:"Drop-off point",he:"נקודת הורדה",emoji:"🅿️",cat:"travel",type:"phrase",ph:"דְרוֹפּ-אוֹף פּוֹיְנְט",ex:"This is the drop-off point for the tour."},
+  {prio:1,en:"Pick-up point",he:"נקודת איסוף",emoji:"🚏",cat:"travel",type:"phrase",ph:"פִּיק-אַפּ פּוֹיְנְט",ex:"Wait for me at the pick-up point."},
+  {prio:1,en:"Transfer",he:"החלפה בין אמצעי תחבורה",emoji:"🔀",cat:"travel",type:"word",ph:"טְרַאנְס-פֶר",ex:"You need one transfer to get downtown."},
+  {prio:1,en:"Traffic jam",he:"פקק תנועה",emoji:"🚦",cat:"travel",type:"phrase",ph:"טְרַא-פִיק גַ'אם",ex:"We got stuck in a traffic jam."},
+  {prio:1,en:"Pedestrian crossing",he:"מעבר חצייה",emoji:"🚸",cat:"travel",type:"phrase",ph:"פֶּ-דֶס-טְרִי-אֶן קְרוֹ-סִינְג",ex:"Use the pedestrian crossing over there."},
+  {prio:1,en:"Intersection",he:"צומת",emoji:"🛣️",cat:"travel",type:"word",ph:"אִין-טֶר-סֶק-שֶׁן",ex:"Turn right at the next intersection."},
+  {prio:1,en:"Roundabout",he:"כיכר תנועה",emoji:"🔄",cat:"travel",type:"word",ph:"רַאונְד-אַ-בַּאוּט",ex:"Take the second exit at the roundabout."},
+  {prio:1,en:"Detour",he:"דרך חלופית בגלל חסימה",emoji:"↩️",cat:"travel",type:"word",ph:"דִי-טוּר",ex:"There's a detour because of construction."},
+  {prio:1,en:"Shortcut",he:"קיצור דרך",emoji:"✂️",cat:"travel",type:"word",ph:"שׁוֹרְט-קַאט",ex:"I know a shortcut through the park."},
+  {prio:1,en:"Walking distance",he:"מרחק הליכה",emoji:"🚶",cat:"travel",type:"phrase",ph:"וֹו-קִינְג דִיס-טֶנְס",ex:"The beach is within walking distance."},
+  {prio:1,en:"Surrounding area",he:"האזור שמסביב",emoji:"🗺️",cat:"travel",type:"phrase",ph:"סֶ-רַאונְ-דִינְג אֶ-רִי-אַה",ex:"We explored the surrounding area."},
+  {prio:1,en:"Get around",he:"להתנייד ממקום למקום",emoji:"🚲",cat:"travel",type:"phrase",ph:"גֶט אַ-רַאונְד",ex:"It's easy to get around by bike."},
+  // food — מסעדות ואוכל
+  {prio:1,en:"Appetizer",he:"מנה ראשונה",emoji:"🥟",cat:"food",type:"word",ph:"אַ-פֶּ-טַיי-זֶר",ex:"The appetizers were amazing."},
+  {prio:1,en:"Main course",he:"מנה עיקרית",emoji:"🍖",cat:"food",type:"phrase",ph:"מֵיין קוֹרְס",ex:"What are you having for the main course?"},
+  {prio:1,en:"Side dish",he:"תוספת",emoji:"🥗",cat:"food",type:"phrase",ph:"סַייד דִישׁ",ex:"Can I get a side dish of rice?"},
+  {prio:1,en:"Beverage",he:"משקה",emoji:"🥤",cat:"food",type:"word",ph:"בֶּ-וֶ-רִיג'",ex:"Would you like a beverage with that?"},
+  {prio:1,en:"Ingredients",he:"מרכיבים",emoji:"🧂",cat:"food",type:"word",ph:"אִין-גְרִי-דִי-אֶנְטְס",ex:"What are the ingredients in this sauce?"},
+  {prio:1,en:"Seasoning",he:"תיבול",emoji:"🌿",cat:"food",type:"word",ph:"סִי-זֶ-נִינְג",ex:"It needs a little more seasoning."},
+  {prio:1,en:"Portion",he:"גודל מנה",emoji:"🍱",cat:"food",type:"word",ph:"פּוֹר-שֶׁן",ex:"The portions here are huge."},
+  {prio:1,en:"Specialty",he:"מנה מיוחדת של המקום",emoji:"⭐",cat:"food",type:"word",ph:"סְפֶּ-שֶׁל-טִי",ex:"The fish is the specialty of the house."},
+  {prio:1,en:"Dietary restrictions",he:"מגבלות תזונתיות",emoji:"🚫",cat:"food",type:"phrase",ph:"דַיי-אֶ-טֶ-רִי רִיס-טְרִיק-שֶׁנְז",ex:"Do you have any dietary restrictions?"},
+  {prio:1,en:"Allergic",he:"אלרגי",emoji:"🤧",cat:"food",type:"word",ph:"אַ-לֶר-גִ'יק",ex:"I'm allergic to nuts."},
+  {prio:1,en:"Dairy-free",he:"ללא מוצרי חלב",emoji:"🥛",cat:"food",type:"word",ph:"דֵ-רִי-פְרִי",ex:"Is there a dairy-free option?"},
+  {prio:1,en:"Gluten-free",he:"ללא גלוטן",emoji:"🌾",cat:"food",type:"word",ph:"גְלוּ-טֶן-פְרִי",ex:"She eats gluten-free."},
+  {prio:1,en:"Undercooked",he:"לא מבושל מספיק",emoji:"🥩",cat:"food",type:"word",ph:"אַנְ-דֶר-קוּקְט",ex:"The chicken is a little undercooked."},
+  {prio:1,en:"Overcooked",he:"מבושל יותר מדי",emoji:"🔥",cat:"food",type:"word",ph:"אוֹ-וֶר-קוּקְט",ex:"The pasta was overcooked."},
+  {prio:1,en:"Well-done",he:"עשוי היטב",emoji:"🍳",cat:"food",type:"word",ph:"וֶול-דַאן",ex:"I'd like my steak well-done."},
+  {prio:1,en:"Refreshing",he:"מרענן",emoji:"🍋",cat:"food",type:"word",ph:"רִי-פְרֶ-שִׁינְג",ex:"This lemonade is so refreshing."},
+  {prio:1,en:"Flavorful",he:"עשיר בטעם",emoji:"😋",cat:"food",type:"word",ph:"פְלֵיי-וֶר-פוּל",ex:"The soup was really flavorful."},
+  {prio:1,en:"Separate bill",he:"חשבון נפרד",emoji:"🧾",cat:"food",type:"phrase",ph:"סֶ-פֶּ-רֶט בִּיל",ex:"Could we have separate bills, please?"},
+  {prio:1,en:"Service charge",he:"דמי שירות",emoji:"💲",cat:"food",type:"phrase",ph:"סֶר-וִיס צַ'ארְג'",ex:"A service charge is already included."},
+  // concepts — קניות ותשלומים
+  {prio:1,en:"Price range",he:"טווח מחירים",emoji:"💲",cat:"concepts",type:"phrase",ph:"פְּרַייס רֵיינְג'",ex:"What's your price range?"},
+  {prio:1,en:"Affordable",he:"במחיר סביר",emoji:"👍",cat:"concepts",type:"word",ph:"אַ-פוֹר-דֶ-בֶּל",ex:"This place is actually pretty affordable."},
+  {prio:1,en:"Overpriced",he:"יקר מדי ביחס לערך",emoji:"💸",cat:"concepts",type:"word",ph:"אוֹ-וֶר-פְּרַייסְט",ex:"That restaurant is completely overpriced."},
+  {prio:1,en:"Discounted",he:"בהנחה",emoji:"🏷️",cat:"concepts",type:"word",ph:"דִיס-קַאונ-טֶד",ex:"These shoes are discounted this week."},
+  {prio:1,en:"Exchange rate",he:"שער חליפין",emoji:"💱",cat:"concepts",type:"phrase",ph:"אֶקְס-צֵ'יינְג' רֵייט",ex:"What's the exchange rate today?"},
+  {prio:1,en:"Transaction",he:"עסקה כספית",emoji:"💳",cat:"concepts",type:"word",ph:"טְרַאנ-זַאק-שֶׁן",ex:"The transaction didn't go through."},
+  {prio:1,en:"Payment method",he:"אמצעי תשלום",emoji:"💰",cat:"concepts",type:"phrase",ph:"פֵּיי-מֶנְט מֶ-ת'ֶד",ex:"What payment methods do you accept?"},
+  {prio:1,en:"Contactless payment",he:"תשלום ללא מגע",emoji:"📲",cat:"concepts",type:"phrase",ph:"קוֹן-טַאקְט-לֶס פֵּיי-מֶנְט",ex:"Do you take contactless payment?"},
+  {prio:1,en:"Installment",he:"תשלום בתשלומים",emoji:"📆",cat:"concepts",type:"word",ph:"אִינ-סְטוֹל-מֶנְט",ex:"Can I pay in installments?"},
+  {prio:1,en:"Receipt",he:"קבלה",emoji:"🧾",cat:"concepts",type:"word",ph:"רִי-סִיט",ex:"Could I have a receipt, please?"},
+  {prio:1,en:"Refund",he:"החזר כספי",emoji:"↩️",cat:"concepts",type:"word",ph:"רִי-פַאנְד",ex:"I'd like a refund for this."},
+  {prio:1,en:"Return policy",he:"מדיניות החזרה",emoji:"📜",cat:"concepts",type:"phrase",ph:"רִי-טֶרְן פּוֹ-לִי-סִי",ex:"What's your return policy?"},
+  {prio:1,en:"Exchange policy",he:"מדיניות החלפה",emoji:"🔁",cat:"concepts",type:"phrase",ph:"אֶקְס-צֵ'יינְג' פּוֹ-לִי-סִי",ex:"Their exchange policy is thirty days."},
+  {prio:1,en:"Out of stock",he:"אזל מהמלאי",emoji:"📭",cat:"concepts",type:"phrase",ph:"אַאוּט אוֹב סְטוֹק",ex:"Sorry, that size is out of stock."},
+  {prio:1,en:"In stock",he:"נמצא במלאי",emoji:"📦",cat:"concepts",type:"phrase",ph:"אִין סְטוֹק",ex:"Is the blue one in stock?"},
+  {prio:1,en:"Try on",he:"למדוד בגד",emoji:"👕",cat:"concepts",type:"phrase",ph:"טְרַיי אוֹן",ex:"Can I try these on?"},
+  {prio:1,en:"Fits properly",he:"מתאים היטב במידה",emoji:"📏",cat:"concepts",type:"phrase",ph:"פִיטְס פְּרוֹ-פֶּר-לִי",ex:"It fits properly now."},
+  {prio:1,en:"Damaged",he:"פגום",emoji:"💔",cat:"concepts",type:"word",ph:"דַא-מִיג'ְד",ex:"The box arrived damaged."},
+  {prio:1,en:"Replacement",he:"מוצר חלופי",emoji:"🔄",cat:"concepts",type:"word",ph:"רִי-פְּלֵייס-מֶנְט",ex:"They sent me a replacement."},
+  // phrases — ביטויי שיחה
+  {prio:1,en:"Catch up",he:"להתעדכן אחרי שלא נפגשנו",emoji:"☕",cat:"phrases",type:"phrase",ph:"קַאץ' אַפּ",ex:"We should catch up over coffee."},
+  {prio:1,en:"Hang out",he:"לבלות יחד",emoji:"🍻",cat:"phrases",type:"phrase",ph:"הַאנְג אַאוּט",ex:"Let's hang out sometime this week."},
+  {prio:1,en:"Get along",he:"להסתדר עם מישהו",emoji:"🤝",cat:"phrases",type:"phrase",ph:"גֶט אַ-לוֹנְג",ex:"I get along really well with her brother."},
+  {prio:1,en:"Figure out",he:"להבין / למצוא פתרון",emoji:"💡",cat:"phrases",type:"phrase",ph:"פִי-גְיֶר אַאוּט",ex:"Don't worry, I'll figure it out."},
+  {prio:1,en:"Deal with",he:"להתמודד עם",emoji:"🛠️",cat:"phrases",type:"phrase",ph:"דִיל וִית'",ex:"I have to deal with this today."},
+  {prio:1,en:"Keep in touch",he:"לשמור על קשר",emoji:"📞",cat:"phrases",type:"phrase",ph:"קִיפּ אִין טַאץ'",ex:"Let's keep in touch."},
+  {prio:1,en:"Look forward to",he:"לצפות למשהו בהתרגשות",emoji:"🤩",cat:"phrases",type:"phrase",ph:"לוּק פוֹר-וֶרְד טוּ",ex:"I'm really looking forward to the weekend."},
+  {prio:1,en:"Run into someone",he:"לפגוש מישהו במקרה",emoji:"😯",cat:"phrases",type:"phrase",ph:"רַאן אִינְ-טוּ סַאמ-וַואן",ex:"I ran into an old friend downtown."},
+  {prio:1,en:"Show up",he:"להגיע / להופיע",emoji:"🚪",cat:"phrases",type:"phrase",ph:"שׁוֹו אַפּ",ex:"He showed up an hour late."},
+  {prio:1,en:"Turn out",he:"להתברר בסופו של דבר",emoji:"🎬",cat:"phrases",type:"phrase",ph:"טֶרְן אַאוּט",ex:"It turned out to be a great evening."},
+  // verbs — פעלים שימושיים
+  {prio:1,en:"Mention",he:"להזכיר",emoji:"💬",cat:"verbs",type:"word",ph:"מֶן-שֶׁן",ex:"She mentioned you last night."},
+  {prio:1,en:"Suggest",he:"להציע",emoji:"🙋",cat:"verbs",type:"word",ph:"סֶ-גֶ'סְט",ex:"Can I suggest something?"},
+  {prio:1,en:"Assume",he:"להניח",emoji:"🤔",cat:"verbs",type:"word",ph:"אַ-סוּם",ex:"I assumed you already knew."},
+  {prio:1,en:"Realize",he:"להבין פתאום",emoji:"💡",cat:"verbs",type:"word",ph:"רִי-אַ-לַייז",ex:"I didn't realize it was so late."},
+  {prio:1,en:"Notice",he:"לשים לב",emoji:"👀",cat:"verbs",type:"word",ph:"נוֹ-טִיס",ex:"Did you notice the new painting?"},
+  {prio:1,en:"Prefer",he:"להעדיף",emoji:"⭐",cat:"verbs",type:"word",ph:"פְּרִי-פֶר",ex:"I prefer coffee in the morning."},
+  {prio:1,en:"Avoid",he:"להימנע",emoji:"🚫",cat:"verbs",type:"word",ph:"אַ-וֹויְד",ex:"I try to avoid the highway at rush hour."},
+  // adj — רגשות ותיאורים
+  {prio:1,en:"Relieved",he:"חש הקלה",emoji:"😌",cat:"adj",type:"word",ph:"רִי-לִיבְד",ex:"I'm so relieved it went well."},
+  {prio:1,en:"Frustrated",he:"מתוסכל",emoji:"😤",cat:"adj",type:"word",ph:"פְרַאס-טְרֵיי-טֶד",ex:"I get frustrated when I can't find the right word."},
+  {prio:1,en:"Overwhelmed",he:"מוצף",emoji:"🌊",cat:"adj",type:"word",ph:"אוֹ-וֶר-וֶולְמְד",ex:"I felt overwhelmed on the first day."},
+  {prio:1,en:"Impressed",he:"מתרשם",emoji:"😲",cat:"adj",type:"word",ph:"אִים-פְּרֶסְט",ex:"I'm really impressed with your English!"},
+  {prio:1,en:"Curious",he:"סקרן",emoji:"🧐",cat:"adj",type:"word",ph:"קְיוּ-רִי-אֶס",ex:"I'm curious about American culture."},
+  {prio:1,en:"Embarrassed",he:"נבוך",emoji:"😳",cat:"adj",type:"word",ph:"אִים-בַּ-רֶסְט",ex:"I was embarrassed when I made a mistake."},
+  {prio:1,en:"Concerned",he:"מודאג",emoji:"😟",cat:"adj",type:"word",ph:"קֶן-סֶרְנְד",ex:"I'm a little concerned about the weather."},
+  {prio:1,en:"Exhausted",he:"מותש",emoji:"😴",cat:"adj",type:"word",ph:"אֶג-זוֹס-טֶד",ex:"I was exhausted after the flight."},
+  {prio:1,en:"Peaceful",he:"שלֵו",emoji:"🕊️",cat:"adj",type:"word",ph:"פִּיס-פוּל",ex:"It's so peaceful out here."},
+  {prio:1,en:"Crowded",he:"צפוף",emoji:"👥",cat:"adj",type:"word",ph:"קְרַאו-דֶד",ex:"The market was really crowded."},
+  {prio:1,en:"Lively",he:"תוסס",emoji:"🎉",cat:"adj",type:"word",ph:"לַייב-לִי",ex:"The neighborhood is lively at night."},
+  {prio:1,en:"Remote",he:"מרוחק",emoji:"🏔️",cat:"adj",type:"word",ph:"רִי-מוֹוט",ex:"They live in a remote village."},
+  {prio:1,en:"Breathtaking",he:"עוצר נשימה",emoji:"😍",cat:"adj",type:"word",ph:"בְּרֶת'-טֵיי-קִינְג",ex:"The view from the hotel was breathtaking."},
+  {prio:1,en:"Unusual",he:"לא רגיל",emoji:"🦄",cat:"adj",type:"word",ph:"אַן-יוּ-ז'וּ-אֶל",ex:"That's an unusual name."},
+  {prio:1,en:"Reasonable",he:"סביר והגיוני",emoji:"⚖️",cat:"adj",type:"word",ph:"רִי-זֶ-נֶ-בֶּל",ex:"The price seems reasonable."},
+  {prio:1,en:"Unexpected",he:"בלתי צפוי",emoji:"🎁",cat:"adj",type:"word",ph:"אַן-אֶקְס-פֶּק-טֶד",ex:"It was a completely unexpected surprise."},
+  {prio:1,en:"Disappointing",he:"מאכזב",emoji:"👎",cat:"adj",type:"word",ph:"דִי-סֶ-פּוֹיְנ-טִינְג",ex:"The movie was a bit disappointing."},
+  {prio:1,en:"Uncomfortable",he:"לא נוח",emoji:"😖",cat:"adj",type:"word",ph:"אַנ-קַאמְפ-טֶ-בֶּל",ex:"The chair was really uncomfortable."},
+  // home — מכשירי חשמל
+  {prio:1,en:"Appliance",he:"מכשיר חשמלי ביתי",emoji:"🔌",cat:"home",type:"word",ph:"אַ-פְּלַיי-אֶנְס",ex:"We need to buy a new appliance for the kitchen."},
+  {prio:1,en:"Dishwasher",he:"מדיח כלים",emoji:"🍽️",cat:"home",type:"word",ph:"דִישׁ-וֹו-שֶׁר",ex:"Can you load the dishwasher?"},
+  {prio:1,en:"Dryer",he:"מייבש כביסה",emoji:"🌀",cat:"home",type:"word",ph:"דְרַיי-אֶר",ex:"Put the towels in the dryer."},
+  {prio:1,en:"Vacuum cleaner",he:"שואב אבק",emoji:"🧹",cat:"home",type:"phrase",ph:"וַא-קְיוּם קְלִי-נֶר",ex:"Where do you keep the vacuum cleaner?"},
+  {prio:1,en:"Microwave",he:"מיקרוגל",emoji:"📡",cat:"home",type:"word",ph:"מַיי-קְרוֹ-וֵייב",ex:"Just heat it up in the microwave."},
+  {prio:1,en:"Toaster",he:"מצנם",emoji:"🍞",cat:"home",type:"word",ph:"טוֹוס-טֶר",ex:"The toaster is next to the kettle."},
+  {prio:1,en:"Electric kettle",he:"קומקום חשמלי",emoji:"☕",cat:"home",type:"phrase",ph:"אִי-לֶק-טְרִיק קֶ-טֶל",ex:"I'll put the electric kettle on."},
+  {prio:1,en:"Blender",he:"בלנדר",emoji:"🥤",cat:"home",type:"word",ph:"בְּלֶנ-דֶר",ex:"I make smoothies in the blender every morning."},
+  {prio:1,en:"Food processor",he:"מעבד מזון",emoji:"🔪",cat:"home",type:"phrase",ph:"פוּד פְּרוֹ-סֶ-סֶר",ex:"Use the food processor for the salad."},
+  {prio:1,en:"Coffee maker",he:"מכונת קפה",emoji:"☕",cat:"home",type:"phrase",ph:"קוֹ-פִי מֵיי-קֶר",ex:"The coffee maker is already on."},
+  {prio:1,en:"Iron",he:"מגהץ",emoji:"👔",cat:"home",type:"word",ph:"אַיי-אֶרְן",ex:"Do you have an iron I could borrow?"},
+  {prio:1,en:"Ironing board",he:"קרש גיהוץ",emoji:"📋",cat:"home",type:"phrase",ph:"אַיי-אֶר-נִינְג בּוֹרְד",ex:"The ironing board is in the closet."},
+  {prio:1,en:"Hair dryer",he:"מייבש שיער",emoji:"💇",cat:"home",type:"phrase",ph:"הֵר דְרַיי-אֶר",ex:"Is there a hair dryer in the room?"},
+  {prio:1,en:"Extension cord",he:"כבל מאריך",emoji:"🔌",cat:"home",type:"phrase",ph:"אֶקְס-טֶן-שֶׁן קוֹרְד",ex:"We need an extension cord for the lamp."},
+  {prio:1,en:"Power outlet",he:"שקע חשמל",emoji:"⚡",cat:"home",type:"phrase",ph:"פַּאו-אֶר אַאוּט-לֶט",ex:"Where's the nearest power outlet?"},
+  {prio:1,en:"Light switch",he:"מתג אור",emoji:"💡",cat:"home",type:"phrase",ph:"לַייט סְוִויץ'",ex:"The light switch is behind the door."},
+  {prio:1,en:"Remote control",he:"שלט רחוק",emoji:"📺",cat:"home",type:"phrase",ph:"רִי-מוֹוט קֶן-טְרוֹל",ex:"Have you seen the remote control?"},
+  {prio:1,en:"Air purifier",he:"מטהר אוויר",emoji:"🌬️",cat:"home",type:"phrase",ph:"אֶר פְּיוּ-רִי-פַיי-אֶר",ex:"We bought an air purifier for the bedroom."},
+  {prio:1,en:"Water heater",he:"מחמם מים / דוד",emoji:"♨️",cat:"home",type:"phrase",ph:"וֹו-טֶר הִי-טֶר",ex:"The water heater takes about twenty minutes."},
+  // home — כלי בית וניקיון
+  {prio:1,en:"Cutting board",he:"קרש חיתוך",emoji:"🔪",cat:"home",type:"phrase",ph:"קַא-טִינְג בּוֹרְד",ex:"Can you pass me the cutting board?"},
+  {prio:1,en:"Frying pan",he:"מחבת",emoji:"🍳",cat:"home",type:"phrase",ph:"פְרַיי-אִינְג פַּאן",ex:"Heat the frying pan first."},
+  {prio:1,en:"Saucepan",he:"סיר קטן",emoji:"🥘",cat:"home",type:"word",ph:"סוֹס-פַּאן",ex:"Boil the rice in a small saucepan."},
+  {prio:1,en:"Lid",he:"מכסה",emoji:"🎩",cat:"home",type:"word",ph:"לִיד",ex:"Put the lid on so it cooks faster."},
+  {prio:1,en:"Spatula",he:"מרית",emoji:"🥄",cat:"home",type:"word",ph:"סְפַּא-צ'וּ-לַה",ex:"Use the spatula to flip it."},
+  {prio:1,en:"Whisk",he:"מטרפה",emoji:"🥚",cat:"home",type:"word",ph:"וִויסְק",ex:"Beat the eggs with a whisk."},
+  {prio:1,en:"Bottle opener",he:"פותחן בקבוקים",emoji:"🍾",cat:"home",type:"phrase",ph:"בּוֹ-טֶל אוֹ-פֶּ-נֶר",ex:"Do you have a bottle opener?"},
+  {prio:1,en:"Storage container",he:"קופסת אחסון",emoji:"📦",cat:"home",type:"phrase",ph:"סְטוֹ-רִיג' קֶן-טֵיי-נֶר",ex:"Put the leftovers in a storage container."},
+  {prio:1,en:"Laundry basket",he:"סל כביסה",emoji:"🧺",cat:"home",type:"phrase",ph:"לוֹנְ-דְרִי בַּאס-קֶט",ex:"The laundry basket is full again."},
+  {prio:1,en:"Clothes hanger",he:"קולב בגדים",emoji:"👔",cat:"home",type:"phrase",ph:"קְלוֹוז הַאנְ-גֶר",ex:"Could I have a few more clothes hangers?"},
+  {prio:1,en:"Bedsheet",he:"סדין",emoji:"🛏️",cat:"home",type:"word",ph:"בֶּד-שִׁיט",ex:"I changed the bedsheets this morning."},
+  {prio:1,en:"Pillowcase",he:"ציפית",emoji:"🛌",cat:"home",type:"word",ph:"פִּי-לוֹו-קֵייס",ex:"The pillowcases are in the drawer."},
+  {prio:1,en:"Duvet cover",he:"ציפה לשמיכה",emoji:"🧣",cat:"home",type:"phrase",ph:"דוּ-וֵיי קַא-וֶר",ex:"We need a new duvet cover."},
+  {prio:1,en:"Cleaning supplies",he:"חומרי ניקוי",emoji:"🧼",cat:"home",type:"phrase",ph:"קְלִי-נִינְג סֶ-פְּלַייז",ex:"The cleaning supplies are under the sink."},
+  {prio:1,en:"Detergent",he:"חומר ניקוי / אבקת כביסה",emoji:"🧴",cat:"home",type:"word",ph:"דִי-טֶר-גֶ'נְט",ex:"We're out of detergent."},
+  {prio:1,en:"Fabric softener",he:"מרכך כביסה",emoji:"🧸",cat:"home",type:"phrase",ph:"פַא-בְּרִיק סוֹ-פְנֶר",ex:"Don't forget the fabric softener."},
+  {prio:1,en:"Dustpan",he:"יעה",emoji:"🧹",cat:"home",type:"word",ph:"דַאסְט-פַּאן",ex:"Grab the dustpan and brush."},
+  {prio:1,en:"Mop",he:"מגב לשטיפת רצפה",emoji:"🧽",cat:"home",type:"word",ph:"מוֹפּ",ex:"I'll mop the kitchen floor."},
+  {prio:1,en:"Toolbox",he:"ארגז כלים",emoji:"🧰",cat:"home",type:"word",ph:"טוּל-בּוֹקְס",ex:"The screwdriver is in the toolbox."},
+  {prio:1,en:"Screwdriver",he:"מברג",emoji:"🪛",cat:"home",type:"word",ph:"סְקְרוּ-דְרַיי-וֶר",ex:"Do you have a small screwdriver?"},
+  {prio:1,en:"Instructor",he:"מדריך / מורה",emoji:"👨‍🏫",cat:"people",type:"word",ph:"אִינ-סְטְרַאק-טֶר",ex:"Our instructor explained it twice."},
+  {prio:1,en:"Blends",he:"מערבב / טוחן",emoji:"🥤",cat:"verbs",type:"word",ph:"בְּלֶנְדְז",ex:"This machine blends fruit in seconds."},
+  {prio:1,en:"Dishes",he:"כלים / מנות",emoji:"🍽️",cat:"things",type:"word",ph:"דִי-שֶׁז",ex:"I'll wash the dishes tonight."},
+  {prio:1,en:"Infomercial",he:"פרסומת מידע ארוכה",emoji:"📺",cat:"things",type:"word",ph:"אִינ-פוֹ-מֶר-שֶׁל",ex:"There was an infomercial on TV at 2 a.m."},
+  {prio:1,en:"Development",he:"התפתחות / פיתוח",emoji:"📈",cat:"concepts",type:"word",ph:"דִי-וֶ-לוֹפּ-מֶנְט",ex:"There's been a lot of development here."},
+  {prio:1,en:"Movement",he:"תנועה",emoji:"🏃",cat:"concepts",type:"word",ph:"מוּב-מֶנְט",ex:"I saw a small movement in the corner."},
+  {prio:1,en:"Management",he:"ניהול",emoji:"💼",cat:"work",type:"word",ph:"מַא-נִיג'-מֶנְט",ex:"The management made a new decision."},
+  {prio:1,en:"Escalate",he:"להסלים / להחמיר",emoji:"🔥",cat:"verbs",type:"word",ph:"אֶס-קֶ-לֵייט",ex:"Let's not escalate this."},
+  {prio:1,en:"Escalator",he:"מדרגות נעות",emoji:"🛗",cat:"things",type:"word",ph:"אֶס-קֶ-לֵיי-טֶר",ex:"Take the escalator to the second floor."},
+  {prio:1,en:"Escalation",he:"הסלמה",emoji:"⚠️",cat:"concepts",type:"word",ph:"אֶס-קֶ-לֵיי-שֶׁן",ex:"We want to avoid any escalation."},
+  {prio:1,en:"De-escalation",he:"הרגעת המצב / הפחתת הסלמה",emoji:"🕊️",cat:"concepts",type:"word",ph:"דִי-אֶס-קֶ-לֵיי-שֶׁן",ex:"De-escalation is always the better option."},
+  {prio:1,en:"Appoint",he:"למנות לתפקיד",emoji:"📋",cat:"verbs",type:"word",ph:"אַ-פּוֹיְנְט",ex:"They will appoint a new manager."},
+  {prio:1,en:"Disappoint",he:"לאכזב",emoji:"😞",cat:"verbs",type:"word",ph:"דִי-סֶ-פּוֹיְנְט",ex:"I don't want to disappoint them."},
+  {prio:1,en:"Disappointment",he:"אכזבה",emoji:"💔",cat:"concepts",type:"word",ph:"דִי-סֶ-פּוֹיְנְט-מֶנְט",ex:"It was a big disappointment."},
+  {prio:1,en:"Margin",he:"מרווח / שוליים / פער רווח",emoji:"📊",cat:"concepts",type:"word",ph:"מַאר-גִ'ין",ex:"We won by a small margin."},
+  {prio:1,en:"Initially",he:"בהתחלה / בתחילה",emoji:"1️⃣",cat:"time",type:"word",ph:"אִי-נִי-שֶׁ-לִי",ex:"Initially I was nervous, but it was fine."},
+  {prio:1,en:"Ultimately",he:"בסופו של דבר",emoji:"🏁",cat:"time",type:"word",ph:"אַל-טִי-מֶט-לִי",ex:"Ultimately, it was the right decision."},
 ];
 
 // ── CATEGORIES ──
@@ -4913,6 +5159,1427 @@ const EXTRA_EXAMPLES = {
     {s:"What do you think about restructuring the team to improve collaboration across departments?",he:"מה אתה חושב על ארגון מחדש של הצוות לשיפור שיתוף הפעולה בין המחלקות?",l:4},
     {s:"What do you think about adopting an agile governance model to accelerate decision-making in an increasingly dynamic regulatory environment?",he:"מה אתה חושב על אימוץ מודל ממשל זריז כדי להאיץ קבלת החלטות בסביבה רגולטורית הולכת ומתפתחת?",l:5},
   ],
+  "Itinerary":[
+    {s:"This is our itinerary.",he:"זה מסלול הטיול שלנו.",l:1},
+    {s:"Can you send me the itinerary for the trip?",he:"תוכל לשלוח לי את מסלול הטיול?",l:2},
+    {s:"We changed the itinerary because of the weather.",he:"שינינו את המסלול בגלל מזג האוויר.",l:3},
+    {s:"I'd rather keep the itinerary flexible so we can decide each morning.",he:"אני מעדיף לשמור על מסלול גמיש כדי שנוכל להחליט כל בוקר.",l:4},
+    {s:"A good itinerary balances the things you must see with enough empty space to actually enjoy them.",he:"מסלול טוב מאזן בין הדברים שחייבים לראות לבין מספיק זמן פנוי כדי באמת ליהנות מהם.",l:5}
+  ],
+  "Destination":[
+    {s:"What is your destination?",he:"מה היעד שלך?",l:1},
+    {s:"Our next destination is Rome.",he:"היעד הבא שלנו הוא רומא.",l:2},
+    {s:"This beach is a popular destination in the summer.",he:"החוף הזה הוא יעד פופולרי בקיץ.",l:3},
+    {s:"We picked the destination together, which made the whole trip feel shared.",he:"בחרנו את היעד ביחד, וזה גרם לכל הטיול להרגיש משותף.",l:4},
+    {s:"Sometimes the destination matters far less than the person sitting next to you on the way there.",he:"לפעמים היעד חשוב הרבה פחות מהאדם שיושב לידך בדרך לשם.",l:5}
+  ],
+  "Accommodation":[
+    {s:"The accommodation is nice.",he:"מקום הלינה נחמד.",l:1},
+    {s:"Have you booked the accommodation yet?",he:"כבר הזמנת מקום לינה?",l:2},
+    {s:"The accommodation includes breakfast and parking.",he:"הלינה כוללת ארוחת בוקר וחניה.",l:3},
+    {s:"We spent a little more on accommodation and it completely changed the trip.",he:"הוצאנו קצת יותר על מקום הלינה וזה שינה לגמרי את הטיול.",l:4},
+    {s:"Accommodation is one of those things where paying slightly more usually buys you sleep, and sleep buys you everything else.",he:"מקום לינה הוא אחד הדברים שבהם תשלום קצת גבוה יותר בדרך כלל קונה לך שינה, ושינה קונה לך את כל השאר.",l:5}
+  ],
+  "Availability":[
+    {s:"Check the availability.",he:"בדוק את הזמינות.",l:1},
+    {s:"Let me check availability for those dates.",he:"תן לי לבדוק זמינות לתאריכים האלה.",l:2},
+    {s:"Availability is limited during the holidays.",he:"הזמינות מוגבלת בחגים.",l:3},
+    {s:"I called ahead to confirm availability before we drove all the way there.",he:"התקשרתי מראש לוודא זמינות לפני שנסענו כל הדרך לשם.",l:4},
+    {s:"Availability tends to disappear the moment you decide to think about it overnight.",he:"הזמינות נוטה להיעלם בדיוק ברגע שאתה מחליט לישון על זה לילה.",l:5}
+  ],
+  "Confirmation":[
+    {s:"I got a confirmation.",he:"קיבלתי אישור.",l:1},
+    {s:"I got the confirmation email this morning.",he:"קיבלתי את מייל האישור הבוקר.",l:2},
+    {s:"Please show your confirmation at the front desk.",he:"אנא הצג את האישור בדלפק הקבלה.",l:3},
+    {s:"I always screenshot the confirmation in case there's no signal when I arrive.",he:"אני תמיד מצלם את האישור למקרה שלא יהיה קליטה כשאגיע.",l:4},
+    {s:"A confirmation number is worth very little until the moment something goes wrong — and then it's worth everything.",he:"מספר אישור שווה מעט מאוד עד לרגע שבו משהו משתבש — ואז הוא שווה הכל.",l:5}
+  ],
+  "Cancellation":[
+    {s:"There is no cancellation.",he:"אין ביטול.",l:1},
+    {s:"Is there a cancellation fee?",he:"יש דמי ביטול?",l:2},
+    {s:"Free cancellation is available up to 24 hours before.",he:"ביטול חינם אפשרי עד 24 שעות מראש.",l:3},
+    {s:"I only book places with free cancellation, because plans change more often than I'd like.",he:"אני מזמין רק מקומות עם ביטול חינם, כי תוכניות משתנות יותר ממה שהייתי רוצה.",l:4},
+    {s:"The cancellation policy is the part everyone skips reading and everyone eventually wishes they had read.",he:"מדיניות הביטול היא החלק שכולם מדלגים על קריאתו, וכולם בסוף מצטערים שלא קראו.",l:5}
+  ],
+  "Recommendation":[
+    {s:"Thanks for the recommendation.",he:"תודה על ההמלצה.",l:1},
+    {s:"Do you have a recommendation for a good hotel?",he:"יש לך המלצה למלון טוב?",l:2},
+    {s:"We went there on my brother's recommendation.",he:"הלכנו לשם לפי המלצת אחי.",l:3},
+    {s:"I trust a recommendation from someone who lives there far more than any review site.",he:"אני סומך על המלצה ממישהו שגר שם הרבה יותר מכל אתר ביקורות.",l:4},
+    {s:"The best recommendation usually comes from someone who has no reason to impress you.",he:"ההמלצה הטובה ביותר בדרך כלל מגיעה ממישהו שאין לו שום סיבה להרשים אותך.",l:5}
+  ],
+  "Attraction":[
+    {s:"It is a big attraction.",he:"זו אטרקציה גדולה.",l:1},
+    {s:"What's the main attraction in this city?",he:"מה האטרקציה המרכזית בעיר הזאת?",l:2},
+    {s:"The attraction gets very crowded after noon.",he:"האטרקציה נעשית צפופה מאוד אחרי הצהריים.",l:3},
+    {s:"We skipped the famous attraction and wandered the side streets instead.",he:"דילגנו על האטרקציה המפורסמת ובמקום זה שוטטנו ברחובות הצדדיים.",l:4},
+    {s:"The biggest attraction in any city is rarely the one printed on the postcards.",he:"האטרקציה הגדולה ביותר בכל עיר היא לעתים רחוקות זו שמודפסת על הגלויות.",l:5}
+  ],
+  "Landmark":[
+    {s:"Look at that landmark.",he:"תראה את האתר הזה.",l:1},
+    {s:"What's the main landmark here?",he:"מה נקודת הציון המרכזית כאן?",l:2},
+    {s:"We used the tower as a landmark to find our way back.",he:"השתמשנו במגדל כנקודת ציון כדי למצוא את הדרך חזרה.",l:3},
+    {s:"Every landmark looked the same to me until I learned a little of the city's history.",he:"כל אתר נראה לי אותו הדבר עד שלמדתי קצת מההיסטוריה של העיר.",l:4},
+    {s:"A landmark is really just a building that enough people agreed to remember.",he:"נקודת ציון היא בעצם רק מבנה שמספיק אנשים הסכימו לזכור.",l:5}
+  ],
+  "Sightseeing":[
+    {s:"We like sightseeing.",he:"אנחנו אוהבים לסייר באתרים.",l:1},
+    {s:"We spent the whole day sightseeing.",he:"בילינו את כל היום בסיור באתרים.",l:2},
+    {s:"Let's do some sightseeing before the flight.",he:"בוא נסייר קצת לפני הטיסה.",l:3},
+    {s:"After three days of sightseeing we were more tired than when we left home.",he:"אחרי שלושה ימי סיורים היינו עייפים יותר מכשיצאנו מהבית.",l:4},
+    {s:"Sightseeing works best in small doses — two hours of curiosity beats eight hours of obligation.",he:"סיור באתרים עובד הכי טוב במנות קטנות — שעתיים של סקרנות עדיפות על שמונה שעות של חובה.",l:5}
+  ],
+  "Excursion":[
+    {s:"It was a short excursion.",he:"זה היה טיול קצר.",l:1},
+    {s:"We booked a day excursion to the islands.",he:"הזמנו טיול יום לאיים.",l:2},
+    {s:"The excursion leaves from the hotel at eight.",he:"הטיול יוצא מהמלון בשמונה.",l:3},
+    {s:"The excursion cost more than we expected, but the guide made it worth it.",he:"הטיול עלה יותר ממה שציפינו, אבל המדריך גרם לזה להיות שווה.",l:4},
+    {s:"A well-run excursion gives you a place you could never have found alone, and a story you'll repeat for years.",he:"טיול מאורגן היטב נותן לך מקום שלעולם לא היית מוצא לבד, וסיפור שתחזור עליו שנים.",l:5}
+  ],
+  "Guided tour":[
+    {s:"We took a guided tour.",he:"לקחנו סיור מודרך.",l:1},
+    {s:"Let's take a guided tour of the old city.",he:"בוא ניקח סיור מודרך בעיר העתיקה.",l:2},
+    {s:"The guided tour lasts about two hours.",he:"הסיור המודרך נמשך כשעתיים.",l:3},
+    {s:"I usually avoid tours, but this guided tour completely changed how I saw the place.",he:"בדרך כלל אני נמנע מסיורים, אבל הסיור המודרך הזה שינה לגמרי את איך שראיתי את המקום.",l:4},
+    {s:"A guided tour is worth it when the guide loves the place — and a waste of time when they're just reciting dates.",he:"סיור מודרך שווה כשהמדריך אוהב את המקום — ובזבוז זמן כשהוא רק מדקלם תאריכים.",l:5}
+  ],
+  "Travel insurance":[
+    {s:"I have travel insurance.",he:"יש לי ביטוח נסיעות.",l:1},
+    {s:"Don't forget to buy travel insurance.",he:"אל תשכח לקנות ביטוח נסיעות.",l:2},
+    {s:"Does the travel insurance cover lost luggage?",he:"הביטוח מכסה מזוודה שאבדה?",l:3},
+    {s:"We never used the travel insurance, and I was happy to have wasted the money.",he:"מעולם לא השתמשנו בביטוח הנסיעות, ושמחתי שבזבזתי את הכסף.",l:4},
+    {s:"Travel insurance is the only purchase where you genuinely hope you've thrown the money away.",he:"ביטוח נסיעות הוא הרכישה היחידה שבה אתה באמת מקווה שזרקת את הכסף.",l:5}
+  ],
+  "Peak season":[
+    {s:"It is peak season now.",he:"עכשיו עונת השיא.",l:1},
+    {s:"Prices double during peak season.",he:"המחירים מכפילים את עצמם בעונת השיא.",l:2},
+    {s:"We avoid traveling in peak season if we can.",he:"אנחנו נמנעים מלטוס בעונת השיא אם אפשר.",l:3},
+    {s:"Peak season means better weather, but you share every view with a hundred other people.",he:"עונת השיא אומרת מזג אוויר טוב יותר, אבל אתה חולק כל נוף עם עוד מאה אנשים.",l:4},
+    {s:"Traveling in peak season is paying twice as much for half as much space.",he:"לטייל בעונת השיא זה לשלם פי שניים על חצי מהמקום.",l:5}
+  ],
+  "Off-season":[
+    {s:"We went in the off-season.",he:"נסענו מחוץ לעונה.",l:1},
+    {s:"It's much quieter in the off-season.",he:"הרבה יותר שקט מחוץ לעונה.",l:2},
+    {s:"Some restaurants close completely in the off-season.",he:"חלק מהמסעדות סוגרות לגמרי מחוץ לעונה.",l:3},
+    {s:"We travel in the off-season now — fewer people, lower prices, and the locals actually talk to you.",he:"אנחנו מטיילים מחוץ לעונה עכשיו — פחות אנשים, מחירים נמוכים יותר, והמקומיים באמת מדברים איתך.",l:4},
+    {s:"The off-season shows you what a place is really like when it isn't performing for tourists.",he:"מחוץ לעונה אתה רואה איך מקום באמת נראה כשהוא לא מופיע בשביל תיירים.",l:5}
+  ],
+  "Convenient":[
+    {s:"It is very convenient.",he:"זה מאוד נוח.",l:1},
+    {s:"Is Tuesday convenient for you?",he:"יום שלישי נוח לך?",l:2},
+    {s:"The hotel is convenient — it's close to everything.",he:"המלון נוח — הוא קרוב להכל.",l:3},
+    {s:"It was more convenient to walk than to wait twenty minutes for a bus.",he:"היה יותר נוח ללכת ברגל מאשר לחכות עשרים דקות לאוטובוס.",l:4},
+    {s:"Convenient and memorable are rarely the same choice, and it's worth knowing which one you're making.",he:"נוח ובלתי נשכח הם לעתים רחוקות אותה בחירה, וכדאי לדעת איזו מהן אתה עושה.",l:5}
+  ],
+  "Worthwhile":[
+    {s:"It was worthwhile.",he:"זה היה שווה.",l:1},
+    {s:"The trip was expensive but worthwhile.",he:"הטיול היה יקר אבל שווה את זה.",l:2},
+    {s:"The long walk up was worthwhile for that view.",he:"ההליכה הארוכה למעלה הייתה שווה בשביל הנוף הזה.",l:3},
+    {s:"It's worthwhile learning a few words of the language before you go.",he:"שווה ללמוד כמה מילים בשפה לפני שנוסעים.",l:4},
+    {s:"Almost nothing worthwhile is convenient, and almost nothing convenient is memorable.",he:"כמעט שום דבר ששווה את זה אינו נוח, וכמעט שום דבר נוח אינו בלתי נשכח.",l:5}
+  ],
+  "Boarding pass":[
+    {s:"Here is my boarding pass.",he:"הנה כרטיס העלייה שלי.",l:1},
+    {s:"Please have your boarding pass ready.",he:"אנא הכן את כרטיס העלייה למטוס.",l:2},
+    {s:"You can save the boarding pass on your phone.",he:"אפשר לשמור את כרטיס העלייה בטלפון.",l:3},
+    {s:"I couldn't find my boarding pass and held up the whole line.",he:"לא מצאתי את כרטיס העלייה שלי ועיכבתי את כל התור.",l:4},
+    {s:"The moment they scan your boarding pass is the moment the trip stops being a plan.",he:"הרגע שבו סורקים את כרטיס העלייה שלך הוא הרגע שבו הטיול מפסיק להיות תוכנית.",l:5}
+  ],
+  "Check-in counter":[
+    {s:"Where is the check-in counter?",he:"איפה דלפק הצ'ק-אין?",l:1},
+    {s:"The check-in counter closes an hour before the flight.",he:"דלפק הצ'ק-אין נסגר שעה לפני הטיסה.",l:2},
+    {s:"There was a long line at the check-in counter.",he:"היה תור ארוך בדלפק הצ'ק-אין.",l:3},
+    {s:"The woman at the check-in counter moved us to seats together without being asked.",he:"האישה בדלפק הצ'ק-אין העבירה אותנו למושבים ביחד בלי שביקשנו.",l:4},
+    {s:"Being kind at the check-in counter has upgraded more people than any loyalty program ever has.",he:"להיות נחמד בדלפק הצ'ק-אין שידרג יותר אנשים מכל מועדון נאמנות אי פעם.",l:5}
+  ],
+  "Carry-on":[
+    {s:"This is my carry-on.",he:"זה התיק שלי למטוס.",l:1},
+    {s:"I only travel with a carry-on.",he:"אני נוסע רק עם תיק יד.",l:2},
+    {s:"Your carry-on has to fit under the seat.",he:"תיק היד שלך צריך להיכנס מתחת למושב.",l:3},
+    {s:"Packing only a carry-on forced me to think about what I actually use.",he:"לארוז רק תיק יד אילץ אותי לחשוב על מה אני באמת משתמש.",l:4},
+    {s:"Traveling with just a carry-on is less about saving money and more about not carrying your whole life around.",he:"לטוס רק עם תיק יד זה פחות עניין של חיסכון בכסף ויותר של לא לסחוב את כל החיים שלך.",l:5}
+  ],
+  "Checked baggage":[
+    {s:"I have checked baggage.",he:"יש לי מזוודה למטען.",l:1},
+    {s:"How much extra is checked baggage?",he:"כמה עולה מזוודה למטען?",l:2},
+    {s:"Our checked baggage arrived on a later flight.",he:"המזוודות שלנו הגיעו בטיסה מאוחרת יותר.",l:3},
+    {s:"I put anything I truly need in my carry-on and everything else in checked baggage.",he:"אני שם כל מה שאני באמת צריך בתיק היד וכל השאר במזוודה.",l:4},
+    {s:"Never put your medication or your documents in checked baggage — the plane and your suitcase don't always land together.",he:"לעולם אל תשים תרופות או מסמכים במזוודה — המטוס והמזוודה שלך לא תמיד נוחתים ביחד.",l:5}
+  ],
+  "Baggage allowance":[
+    {s:"What is the baggage allowance?",he:"מה כמות המטען המותרת?",l:1},
+    {s:"What's the baggage allowance on this flight?",he:"מה כמות המטען המותרת בטיסה הזאת?",l:2},
+    {s:"The baggage allowance is 23 kilos per person.",he:"כמות המטען המותרת היא 23 קילו לאדם.",l:3},
+    {s:"We checked the baggage allowance in advance and repacked at home instead of at the airport.",he:"בדקנו את כמות המטען מראש וארזנו מחדש בבית במקום בשדה התעופה.",l:4},
+    {s:"Every airline defines its baggage allowance a little differently, which is exactly how they make their money.",he:"כל חברת תעופה מגדירה את כמות המטען קצת אחרת, וכך בדיוק הן מרוויחות את כספן.",l:5}
+  ],
+  "Overweight baggage":[
+    {s:"This is overweight baggage.",he:"זה מטען במשקל עודף.",l:1},
+    {s:"They charged me for overweight baggage.",he:"חייבו אותי על משקל עודף.",l:2},
+    {s:"The fee for overweight baggage is very high.",he:"התשלום על משקל עודף גבוה מאוד.",l:3},
+    {s:"I moved my shoes into my carry-on to avoid an overweight baggage fee.",he:"העברתי את הנעליים לתיק היד כדי להימנע מתשלום על משקל עודף.",l:4},
+    {s:"Overweight baggage fees have taught more people to pack light than any packing advice ever could.",he:"קנסות על משקל עודף לימדו יותר אנשים לארוז קל מכל עצה על אריזה.",l:5}
+  ],
+  "Security screening":[
+    {s:"This is security screening.",he:"זה בידוק ביטחוני.",l:1},
+    {s:"Security screening took almost an hour.",he:"הבידוק הביטחוני לקח כמעט שעה.",l:2},
+    {s:"Take your laptop out before security screening.",he:"הוצא את המחשב לפני הבידוק הביטחוני.",l:3},
+    {s:"We arrived early because security screening can be unpredictable.",he:"הגענו מוקדם כי הבידוק הביטחוני יכול להיות בלתי צפוי.",l:4},
+    {s:"Security screening is the one queue where being in a hurry makes absolutely no difference.",he:"הבידוק הביטחוני הוא התור היחיד שבו למהר לא עוזר בכלל.",l:5}
+  ],
+  "Customs declaration":[
+    {s:"Fill the customs declaration.",he:"מלא את ההצהרה במכס.",l:1},
+    {s:"Please fill out the customs declaration.",he:"אנא מלא את ההצהרה במכס.",l:2},
+    {s:"You must declare food on the customs declaration.",he:"חובה להצהיר על מזון בהצהרת המכס.",l:3},
+    {s:"I wasn't sure what to write on the customs declaration, so I asked the officer directly.",he:"לא הייתי בטוח מה לכתוב בהצהרת המכס, אז שאלתי את הפקיד ישירות.",l:4},
+    {s:"Filling in a customs declaration honestly costs a minute; filling it in carelessly can cost your whole afternoon.",he:"למלא הצהרת מכס בכנות עולה דקה; למלא אותה ברשלנות יכול לעלות לך בכל אחר הצהריים.",l:5}
+  ],
+  "Immigration officer":[
+    {s:"The immigration officer is here.",he:"פקיד ביקורת הגבולות כאן.",l:1},
+    {s:"The immigration officer asked about my trip.",he:"פקיד ביקורת הגבולות שאל על הטיול שלי.",l:2},
+    {s:"The immigration officer wanted to see our return ticket.",he:"פקיד ביקורת הגבולות רצה לראות את כרטיס החזרה.",l:3},
+    {s:"I was nervous, but the immigration officer was friendly and it took two minutes.",he:"הייתי לחוץ, אבל פקיד ביקורת הגבולות היה נחמד וזה לקח שתי דקות.",l:4},
+    {s:"An immigration officer asks simple questions on purpose — the answers matter less than how comfortably you give them.",he:"פקיד ביקורת גבולות שואל שאלות פשוטות בכוונה — התשובות חשובות פחות מהנינוחות שבה אתה נותן אותן.",l:5}
+  ],
+  "Connecting flight":[
+    {s:"I have a connecting flight.",he:"יש לי טיסת המשך.",l:1},
+    {s:"I have a connecting flight in Paris.",he:"יש לי טיסת המשך בפריז.",l:2},
+    {s:"We almost missed our connecting flight.",he:"כמעט פספסנו את טיסת ההמשך.",l:3},
+    {s:"I book connecting flights with at least two hours in between, because one hour is a gamble.",he:"אני מזמין טיסות המשך עם לפחות שעתיים ביניהן, כי שעה אחת זה הימור.",l:4},
+    {s:"A cheap ticket with a tight connecting flight isn't cheap — it's just a bill you haven't received yet.",he:"כרטיס זול עם טיסת המשך צפופה אינו זול — הוא פשוט חשבון שעוד לא קיבלת.",l:5}
+  ],
+  "Layover":[
+    {s:"We have a layover.",he:"יש לנו המתנה בין טיסות.",l:1},
+    {s:"We have a three-hour layover.",he:"יש לנו המתנה של שלוש שעות.",l:2},
+    {s:"The layover was long, so we ate a proper meal.",he:"ההמתנה הייתה ארוכה, אז אכלנו ארוחה אמיתית.",l:3},
+    {s:"A short layover sounds efficient until your first flight is thirty minutes late.",he:"המתנה קצרה נשמעת יעילה עד שהטיסה הראשונה שלך מאחרת בשלושים דקות.",l:4},
+    {s:"A long layover is either four wasted hours or a free afternoon in a city you'd never have visited.",he:"המתנה ארוכה היא או ארבע שעות מבוזבזות או אחר צהריים חינם בעיר שלעולם לא היית מבקר בה.",l:5}
+  ],
+  "Stopover":[
+    {s:"We had a stopover.",he:"הייתה לנו עצירת ביניים.",l:1},
+    {s:"We planned a two-day stopover in London.",he:"תכננו עצירת ביניים של יומיים בלונדון.",l:2},
+    {s:"The airline allows a free stopover on the way.",he:"חברת התעופה מאפשרת עצירת ביניים חינם בדרך.",l:3},
+    {s:"We turned a long flight into two shorter ones with a stopover in the middle.",he:"הפכנו טיסה ארוכה לשתי טיסות קצרות עם עצירת ביניים באמצע.",l:4},
+    {s:"A stopover is the cheapest way to see a second country on the budget of one trip.",he:"עצירת ביניים היא הדרך הזולה ביותר לראות מדינה שנייה בתקציב של טיול אחד.",l:5}
+  ],
+  "Delayed":[
+    {s:"The flight is delayed.",he:"הטיסה מתעכבת.",l:1},
+    {s:"Our flight is delayed again.",he:"הטיסה שלנו מתעכבת שוב.",l:2},
+    {s:"The train was delayed by twenty minutes.",he:"הרכבת התעכבה בעשרים דקות.",l:3},
+    {s:"Our flight was delayed so long that the airline paid for a hotel.",he:"הטיסה שלנו התעכבה כל כך שחברת התעופה שילמה על מלון.",l:4},
+    {s:"Being delayed is far easier to accept once you stop treating the schedule as a promise.",he:"הרבה יותר קל לקבל עיכוב ברגע שמפסיקים להתייחס ללוח הזמנים כהבטחה.",l:5}
+  ],
+  "Rescheduled":[
+    {s:"It was rescheduled.",he:"זה נקבע מחדש.",l:1},
+    {s:"The meeting was rescheduled for Monday.",he:"הפגישה נקבעה מחדש ליום שני.",l:2},
+    {s:"They rescheduled our flight without telling us.",he:"הם קבעו מחדש את הטיסה שלנו בלי להודיע לנו.",l:3},
+    {s:"The dinner was rescheduled twice, and by then half the family couldn't come.",he:"ארוחת הערב נדחתה פעמיים, ועד אז חצי מהמשפחה כבר לא יכלה לבוא.",l:4},
+    {s:"Something rescheduled once is a change of plan; something rescheduled three times is usually an answer.",he:"משהו שנדחה פעם אחת הוא שינוי בתוכנית; משהו שנדחה שלוש פעמים הוא בדרך כלל תשובה.",l:5}
+  ],
+  "Overbooked":[
+    {s:"The flight is overbooked.",he:"הטיסה מלאה מדי.",l:1},
+    {s:"The flight was overbooked, so they offered us a later one.",he:"הטיסה הייתה מוזמנת ביתר, אז הציעו לנו טיסה מאוחרת יותר.",l:2},
+    {s:"The hotel was overbooked and moved us to another place.",he:"המלון היה מוזמן ביתר והעביר אותנו למקום אחר.",l:3},
+    {s:"We volunteered to leave the overbooked flight and got a free ticket out of it.",he:"התנדבנו לרדת מהטיסה המוזמנת ביתר וקיבלנו כרטיס חינם בזכות זה.",l:4},
+    {s:"A flight is overbooked because the airline calculated exactly how many people usually don't show up — until the day everyone does.",he:"טיסה מוזמנת ביתר כי חברת התעופה חישבה בדיוק כמה אנשים בדרך כלל לא מגיעים — עד ליום שבו כולם כן.",l:5}
+  ],
+  "Aisle seat":[
+    {s:"I want an aisle seat.",he:"אני רוצה מושב ליד המעבר.",l:1},
+    {s:"I'd prefer an aisle seat, please.",he:"אני מעדיף מושב ליד המעבר, בבקשה.",l:2},
+    {s:"He always takes the aisle seat so he can stand up.",he:"הוא תמיד לוקח מושב ליד המעבר כדי שיוכל לקום.",l:3},
+    {s:"On a long flight I'll take an aisle seat over a window seat every single time.",he:"בטיסה ארוכה אני אקח מושב ליד המעבר על פני מושב חלון בכל פעם מחדש.",l:4},
+    {s:"Choosing an aisle seat says you value freedom; choosing a window says you value sleep.",he:"בחירה במושב ליד המעבר אומרת שאתה מעריך חופש; בחירה בחלון אומרת שאתה מעריך שינה.",l:5}
+  ],
+  "Window seat":[
+    {s:"I like the window seat.",he:"אני אוהב מושב ליד החלון.",l:1},
+    {s:"She always asks for a window seat.",he:"היא תמיד מבקשת מושב ליד החלון.",l:2},
+    {s:"The kids fought over the window seat.",he:"הילדים רבו על מושב החלון.",l:3},
+    {s:"I took the window seat and didn't move for six hours, which was the point.",he:"לקחתי את מושב החלון ולא זזתי שש שעות, וזו בדיוק הייתה הכוונה.",l:4},
+    {s:"The window seat is the only place where you can stare at nothing for an hour and call it a view.",he:"מושב החלון הוא המקום היחיד שבו אפשר לבהות בכלום במשך שעה ולקרוא לזה נוף.",l:5}
+  ],
+  "Emergency exit":[
+    {s:"That is the emergency exit.",he:"זו יציאת החירום.",l:1},
+    {s:"We were sitting right by the emergency exit.",he:"ישבנו בדיוק ליד יציאת החירום.",l:2},
+    {s:"You get more legroom next to the emergency exit.",he:"יש יותר מקום לרגליים ליד יציאת החירום.",l:3},
+    {s:"If you sit at the emergency exit, the crew will ask if you're willing to help.",he:"אם אתה יושב ביציאת החירום, הצוות ישאל אם אתה מוכן לעזור.",l:4},
+    {s:"Everyone wants the extra legroom at the emergency exit, and almost nobody listens to the instructions that come with it.",he:"כולם רוצים את המקום הנוסף לרגליים ביציאת החירום, וכמעט אף אחד לא מקשיב להוראות שמגיעות עם זה.",l:5}
+  ],
+  "Vacancy":[
+    {s:"Is there a vacancy?",he:"יש חדר פנוי?",l:1},
+    {s:"Do you have any vacancies for tonight?",he:"יש לכם חדרים פנויים להיום בערב?",l:2},
+    {s:"They had one vacancy left, so we took it.",he:"נשאר להם חדר פנוי אחד, אז לקחנו אותו.",l:3},
+    {s:"We drove around for an hour looking for a place with a vacancy.",he:"נסענו שעה בחיפוש אחר מקום עם חדר פנוי.",l:4},
+    {s:"A vacancy sign at midnight in a small town is one of the most reassuring things you can see.",he:"שלט \"יש מקום\" בחצות בעיירה קטנה הוא אחד המראות המרגיעים ביותר שאפשר לראות.",l:5}
+  ],
+  "Fully booked":[
+    {s:"We are fully booked.",he:"אנחנו בתפוסה מלאה.",l:1},
+    {s:"Sorry, we're fully booked this weekend.",he:"מצטערים, אנחנו בתפוסה מלאה בסוף השבוע.",l:2},
+    {s:"The restaurant is fully booked until nine.",he:"המסעדה מלאה עד תשע.",l:3},
+    {s:"Every hotel in the area was fully booked because of the festival.",he:"כל המלונות באזור היו בתפוסה מלאה בגלל הפסטיבל.",l:4},
+    {s:"Hearing that a place is fully booked usually means you should have decided a week earlier.",he:"לשמוע שמקום בתפוסה מלאה בדרך כלל אומר שהיית צריך להחליט שבוע קודם.",l:5}
+  ],
+  "Front desk":[
+    {s:"Ask at the front desk.",he:"תשאל בדלפק הקבלה.",l:1},
+    {s:"Ask the front desk for a map.",he:"בקש מפה מדלפק הקבלה.",l:2},
+    {s:"Leave the key at the front desk when you go out.",he:"השאר את המפתח בדלפק הקבלה כשאתה יוצא.",l:3},
+    {s:"The front desk called us a taxi and even negotiated the price.",he:"דלפק הקבלה הזמין לנו מונית ואפילו התמקח על המחיר.",l:4},
+    {s:"The person at the front desk usually knows the city better than any guidebook you brought with you.",he:"האדם בדלפק הקבלה בדרך כלל מכיר את העיר טוב יותר מכל מדריך טיולים שהבאת איתך.",l:5}
+  ],
+  "Housekeeping":[
+    {s:"Housekeeping is here.",he:"שירות הניקיון כאן.",l:1},
+    {s:"Housekeeping comes every morning.",he:"שירות הניקיון מגיע כל בוקר.",l:2},
+    {s:"We asked housekeeping for extra towels.",he:"ביקשנו ממשק הבית מגבות נוספות.",l:3},
+    {s:"I hang the sign on the door so housekeeping knows not to come in.",he:"אני תולה את השלט על הדלת כדי ששירות הניקיון יידע לא להיכנס.",l:4},
+    {s:"Leaving something small for housekeeping is one of the quietest ways to thank someone you'll never meet.",he:"להשאיר משהו קטן לשירות הניקיון היא אחת הדרכים השקטות ביותר להודות למישהו שלעולם לא תפגוש.",l:5}
+  ],
+  "Room service":[
+    {s:"I want room service.",he:"אני רוצה שירות חדרים.",l:1},
+    {s:"Let's just order room service tonight.",he:"בוא פשוט נזמין שירות חדרים הערב.",l:2},
+    {s:"Room service stops at eleven.",he:"שירות החדרים מפסיק באחת עשרה.",l:3},
+    {s:"We were too tired to go out, so room service saved the evening.",he:"היינו עייפים מכדי לצאת, אז שירות החדרים הציל את הערב.",l:4},
+    {s:"Room service always costs twice as much and somehow always feels worth it at the end of a long day.",he:"שירות חדרים תמיד עולה פי שניים, ואיכשהו תמיד מרגיש שווה את זה בסוף יום ארוך.",l:5}
+  ],
+  "Complimentary":[
+    {s:"It is complimentary.",he:"זה בחינם.",l:1},
+    {s:"Breakfast is complimentary.",he:"ארוחת הבוקר בחינם.",l:2},
+    {s:"They gave us a complimentary bottle of wine.",he:"הם נתנו לנו בקבוק יין בחינם.",l:3},
+    {s:"The complimentary breakfast was better than most places we paid for.",he:"ארוחת הבוקר החינמית הייתה טובה יותר מרוב המקומות ששילמנו בהם.",l:4},
+    {s:"Calling something complimentary rather than free is how a hotel reminds you that you already paid for it.",he:"לקרוא למשהו \"מטעם המלון\" במקום \"חינם\" היא הדרך של המלון להזכיר לך שכבר שילמת עליו.",l:5}
+  ],
+  "Amenities":[
+    {s:"The amenities are good.",he:"המתקנים טובים.",l:1},
+    {s:"The hotel has great amenities.",he:"למלון יש מתקנים מצוינים.",l:2},
+    {s:"The amenities include a pool and a gym.",he:"המתקנים כוללים בריכה וחדר כושר.",l:3},
+    {s:"We chose this place for the amenities, but we barely used any of them.",he:"בחרנו במקום הזה בגלל המתקנים, אבל בקושי השתמשנו באף אחד מהם.",l:4},
+    {s:"Long lists of amenities sell rooms, but what actually decides your stay is the bed and the quiet.",he:"רשימות ארוכות של מתקנים מוכרות חדרים, אבל מה שבאמת קובע את השהות שלך הוא המיטה והשקט.",l:5}
+  ],
+  "Private bathroom":[
+    {s:"It has a private bathroom.",he:"יש בו חדר רחצה פרטי.",l:1},
+    {s:"Does the room have a private bathroom?",he:"יש בחדר חדר רחצה פרטי?",l:2},
+    {s:"A room with a private bathroom costs a little more.",he:"חדר עם חדר רחצה פרטי עולה קצת יותר.",l:3},
+    {s:"After two nights in a hostel, a private bathroom felt like real luxury.",he:"אחרי שני לילות באכסניה, חדר רחצה פרטי הרגיש כמו מותרות אמיתיות.",l:4},
+    {s:"A private bathroom is the one upgrade almost nobody regrets paying for.",he:"חדר רחצה פרטי הוא השדרוג היחיד שכמעט אף אחד לא מתחרט ששילם עליו.",l:5}
+  ],
+  "Shared bathroom":[
+    {s:"There is a shared bathroom.",he:"יש חדר רחצה משותף.",l:1},
+    {s:"It's cheaper, but with a shared bathroom.",he:"זה זול יותר, אבל עם חדר רחצה משותף.",l:2},
+    {s:"The shared bathroom is at the end of the hall.",he:"חדר הרחצה המשותף בסוף המסדרון.",l:3},
+    {s:"We didn't mind the shared bathroom because the place was so clean.",he:"לא הפריע לנו חדר הרחצה המשותף כי המקום היה כל כך נקי.",l:4},
+    {s:"A shared bathroom is fine for two nights and a slow test of your patience after five.",he:"חדר רחצה משותף בסדר לשני לילות, ומבחן איטי לסבלנות שלך אחרי חמישה.",l:5}
+  ],
+  "Twin room":[
+    {s:"We want a twin room.",he:"אנחנו רוצים חדר עם שתי מיטות.",l:1},
+    {s:"We booked a twin room for the kids.",he:"הזמנו חדר עם שתי מיטות לילדים.",l:2},
+    {s:"A twin room has two separate beds.",he:"בחדר טווין יש שתי מיטות נפרדות.",l:3},
+    {s:"I asked for a double and they gave us a twin room by mistake.",he:"ביקשתי חדר זוגי והם נתנו לנו חדר עם שתי מיטות בטעות.",l:4},
+    {s:"Always confirm whether you're getting a twin room or a double — the words sound similar and the nights don't.",he:"תמיד ודא אם אתה מקבל חדר עם שתי מיטות או חדר זוגי — המילים נשמעות דומות והלילות לא.",l:5}
+  ],
+  "Double room":[
+    {s:"We want a double room.",he:"אנחנו רוצים חדר זוגי.",l:1},
+    {s:"We'd like a double room, please.",he:"נשמח לחדר זוגי, בבקשה.",l:2},
+    {s:"The double room was small but comfortable.",he:"החדר הזוגי היה קטן אבל נוח.",l:3},
+    {s:"We paid a bit extra for a double room with a balcony.",he:"שילמנו קצת יותר על חדר זוגי עם מרפסת.",l:4},
+    {s:"A double room in a good location beats a suite an hour outside the city almost every time.",he:"חדר זוגי במיקום טוב עדיף על סוויטה שעה מחוץ לעיר כמעט תמיד.",l:5}
+  ],
+  "Suite":[
+    {s:"It is a nice suite.",he:"זו סוויטה יפה.",l:1},
+    {s:"They upgraded us to a suite!",he:"הם שדרגו אותנו לסוויטה!",l:2},
+    {s:"The suite has a small kitchen and a living room.",he:"בסוויטה יש מטבחון וסלון.",l:3},
+    {s:"We took a suite because we were staying for two weeks and needed the space.",he:"לקחנו סוויטה כי נשארנו שבועיים והיינו צריכים את המקום.",l:4},
+    {s:"A suite is worth it only when you plan to actually spend time in the room rather than sleep in it.",he:"סוויטה שווה רק כשאתה מתכנן באמת לבלות בחדר ולא רק לישון בו.",l:5}
+  ],
+  "Deposit":[
+    {s:"I paid a deposit.",he:"שילמתי פיקדון.",l:1},
+    {s:"They asked for a deposit at check-in.",he:"הם ביקשו פיקדון בצ'ק-אין.",l:2},
+    {s:"The deposit is returned when you check out.",he:"הפיקדון מוחזר כשעוזבים.",l:3},
+    {s:"They took a deposit on the card and released it three days later.",he:"הם חסמו פיקדון בכרטיס ושחררו אותו כעבור שלושה ימים.",l:4},
+    {s:"Always ask how and when a deposit is returned, not just how much it is.",he:"תמיד שאל איך ומתי מוחזר הפיקדון, לא רק כמה הוא.",l:5}
+  ],
+  "Additional charge":[
+    {s:"There is an additional charge.",he:"יש תשלום נוסף.",l:1},
+    {s:"Late checkout is an additional charge.",he:"עזיבה מאוחרת כרוכה בתשלום נוסף.",l:2},
+    {s:"Parking comes with an additional charge of ten euros.",he:"החניה כרוכה בתשלום נוסף של עשרה יורו.",l:3},
+    {s:"We were surprised by an additional charge that wasn't mentioned when we booked.",he:"הופתענו מתשלום נוסף שלא הוזכר בהזמנה.",l:4},
+    {s:"Ask about additional charges before you arrive, because nobody enjoys that conversation at checkout.",he:"שאל על תשלומים נוספים לפני שאתה מגיע, כי אף אחד לא נהנה מהשיחה הזאת בעזיבה.",l:5}
+  ],
+  "Late checkout":[
+    {s:"I want a late checkout.",he:"אני רוצה עזיבה מאוחרת.",l:1},
+    {s:"Can we request a late checkout?",he:"אפשר לבקש עזיבה מאוחרת?",l:2},
+    {s:"They gave us a late checkout at no charge.",he:"הם נתנו לנו עזיבה מאוחרת בלי תשלום.",l:3},
+    {s:"A late checkout made our last day feel like a real day instead of a rush.",he:"עזיבה מאוחרת גרמה ליום האחרון שלנו להרגיש כמו יום אמיתי במקום ריצה.",l:4},
+    {s:"Asking politely for a late checkout works far more often than people expect, especially midweek.",he:"לבקש בנימוס עזיבה מאוחרת עובד הרבה יותר ממה שאנשים מצפים, במיוחד באמצע השבוע.",l:5}
+  ],
+  "Wake-up call":[
+    {s:"I need a wake-up call.",he:"אני צריך שיחת השכמה.",l:1},
+    {s:"Could I get a wake-up call at six?",he:"אפשר לקבל שיחת השכמה בשש?",l:2},
+    {s:"The wake-up call never came, so we almost missed the flight.",he:"שיחת ההשכמה לא הגיעה, אז כמעט פספסנו את הטיסה.",l:3},
+    {s:"I set two alarms and still ask for a wake-up call before an early flight.",he:"אני מכוון שתי שעונים מעוררים ועדיין מבקש שיחת השכמה לפני טיסה מוקדמת.",l:4},
+    {s:"A wake-up call is a small backup that costs nothing and occasionally saves an entire trip.",he:"שיחת השכמה היא גיבוי קטן שלא עולה כלום ולפעמים מציל טיול שלם.",l:5}
+  ],
+  "Air conditioning":[
+    {s:"Turn on the air conditioning.",he:"תדליק את המיזוג.",l:1},
+    {s:"The air conditioning isn't working.",he:"המיזוג לא עובד.",l:2},
+    {s:"The air conditioning was too cold, so we turned it down.",he:"המיזוג היה קר מדי, אז הנמכנו אותו.",l:3},
+    {s:"In August I won't book a room without air conditioning, no matter how nice it looks.",he:"באוגוסט אני לא מזמין חדר בלי מיזוג, לא משנה כמה הוא נראה יפה.",l:4},
+    {s:"Air conditioning is invisible when it works and the only thing you can think about when it doesn't.",he:"מיזוג אוויר הוא בלתי נראה כשהוא עובד, והדבר היחיד שאתה חושב עליו כשהוא לא.",l:5}
+  ],
+  "Soundproof":[
+    {s:"The room is soundproof.",he:"החדר מבודד מרעש.",l:1},
+    {s:"The windows are soundproof, so it's very quiet.",he:"החלונות מבודדים מרעש, אז מאוד שקט.",l:2},
+    {s:"The walls are not soundproof at all.",he:"הקירות בכלל לא מבודדים מרעש.",l:3},
+    {s:"We asked for a soundproof room because the street below is busy all night.",he:"ביקשנו חדר מבודד מרעש כי הרחוב למטה סואן כל הלילה.",l:4},
+    {s:"A soundproof room in a loud city is worth more than a view you'll look at twice.",he:"חדר מבודד מרעש בעיר רועשת שווה יותר מנוף שתסתכל עליו פעמיים.",l:5}
+  ],
+  "Spacious":[
+    {s:"The room is spacious.",he:"החדר מרווח.",l:1},
+    {s:"The room was surprisingly spacious.",he:"החדר היה מרווח באופן מפתיע.",l:2},
+    {s:"We wanted something spacious enough for three people.",he:"רצינו משהו מרווח מספיק לשלושה אנשים.",l:3},
+    {s:"The photos made it look spacious, but in person it was quite small.",he:"בתמונות זה נראה מרווח, אבל במציאות זה היה די קטן.",l:4},
+    {s:"Spacious in a listing usually means average, and average usually means small.",he:"\"מרווח\" במודעה בדרך כלל אומר ממוצע, וממוצע בדרך כלל אומר קטן.",l:5}
+  ],
+  "Overlooking":[
+    {s:"A room overlooking the sea.",he:"חדר המשקיף על הים.",l:1},
+    {s:"We got a room overlooking the sea.",he:"קיבלנו חדר המשקיף על הים.",l:2},
+    {s:"The balcony is overlooking the main square.",he:"המרפסת משקיפה על הכיכר המרכזית.",l:3},
+    {s:"We paid extra for a room overlooking the garden and sat there every morning.",he:"שילמנו תוספת על חדר המשקיף על הגן וישבנו שם כל בוקר.",l:4},
+    {s:"A room overlooking something beautiful changes how you start every single morning of the trip.",he:"חדר שמשקיף על משהו יפה משנה את האופן שבו אתה מתחיל כל בוקר בטיול.",l:5}
+  ],
+  "Public transportation":[
+    {s:"I use public transportation.",he:"אני משתמש בתחבורה ציבורית.",l:1},
+    {s:"Public transportation here is excellent.",he:"התחבורה הציבורית כאן מצוינת.",l:2},
+    {s:"Public transportation runs until midnight.",he:"התחבורה הציבורית פועלת עד חצות.",l:3},
+    {s:"We used public transportation all week and never needed a taxi once.",he:"השתמשנו בתחבורה ציבורית כל השבוע ולא נזקקנו למונית אפילו פעם אחת.",l:4},
+    {s:"Good public transportation tells you more about a city than any museum in it.",he:"תחבורה ציבורית טובה מספרת עליך יותר על עיר מכל מוזיאון שבה.",l:5}
+  ],
+  "Rental vehicle":[
+    {s:"We have a rental vehicle.",he:"יש לנו רכב שכור.",l:1},
+    {s:"We picked up the rental vehicle at the airport.",he:"אספנו את הרכב השכור בשדה התעופה.",l:2},
+    {s:"The rental vehicle has to be returned with a full tank.",he:"צריך להחזיר את הרכב השכור עם מיכל מלא.",l:3},
+    {s:"We photographed the rental vehicle from every side before driving off.",he:"צילמנו את הרכב השכור מכל צד לפני שנסענו.",l:4},
+    {s:"Take a video of the rental vehicle before you leave the lot — it costs two minutes and settles every argument later.",he:"צלם וידאו של הרכב השכור לפני שאתה יוצא מהמגרש — זה עולה שתי דקות ומיישב כל ויכוח אחר כך.",l:5}
+  ],
+  "One-way ticket":[
+    {s:"I want a one-way ticket.",he:"אני רוצה כרטיס לכיוון אחד.",l:1},
+    {s:"I only need a one-way ticket.",he:"אני צריך רק כרטיס לכיוון אחד.",l:2},
+    {s:"A one-way ticket is cheaper if you're not sure when you're coming back.",he:"כרטיס לכיוון אחד זול יותר אם אתה לא בטוח מתי אתה חוזר.",l:3},
+    {s:"He bought a one-way ticket and decided he'd figure out the rest later.",he:"הוא קנה כרטיס לכיוון אחד והחליט שיסתדר עם השאר אחר כך.",l:4},
+    {s:"Buying a one-way ticket feels different from buying a return, even when the plan is exactly the same.",he:"לקנות כרטיס לכיוון אחד מרגיש שונה מלקנות הלוך ושוב, גם כשהתוכנית זהה לחלוטין.",l:5}
+  ],
+  "Round-trip ticket":[
+    {s:"I bought a round-trip ticket.",he:"קניתי כרטיס הלוך ושוב.",l:1},
+    {s:"A round-trip ticket is usually cheaper.",he:"כרטיס הלוך ושוב בדרך כלל זול יותר.",l:2},
+    {s:"The round-trip ticket includes one checked bag.",he:"כרטיס ההלוך ושוב כולל מזוודה אחת.",l:3},
+    {s:"Some countries won't let you in without a round-trip ticket.",he:"יש מדינות שלא יכניסו אותך בלי כרטיס הלוך ושוב.",l:4},
+    {s:"A round-trip ticket buys you a cheaper fare and takes away the freedom to change your mind.",he:"כרטיס הלוך ושוב קונה לך מחיר זול יותר ולוקח ממך את החופש לשנות את דעתך.",l:5}
+  ],
+  "Fare":[
+    {s:"What is the fare?",he:"מה מחיר הנסיעה?",l:1},
+    {s:"The fare is about ten dollars.",he:"מחיר הנסיעה הוא בערך עשרה דולר.",l:2},
+    {s:"You pay the fare when you get on the bus.",he:"משלמים את מחיר הנסיעה כשעולים לאוטובוס.",l:3},
+    {s:"The fare doubles after midnight, which nobody tells you in advance.",he:"מחיר הנסיעה מוכפל אחרי חצות, ואף אחד לא אומר לך את זה מראש.",l:4},
+    {s:"Agreeing on the fare before you get in has saved more travelers money than any app.",he:"לסכם על מחיר הנסיעה לפני שנכנסים חסך לנוסעים יותר כסף מכל אפליקציה.",l:5}
+  ],
+  "Timetable":[
+    {s:"Look at the timetable.",he:"תסתכל בלוח הזמנים.",l:1},
+    {s:"Check the timetable before you leave.",he:"בדוק את לוח הזמנים לפני שאתה יוצא.",l:2},
+    {s:"The timetable changes on weekends.",he:"לוח הזמנים משתנה בסופי שבוע.",l:3},
+    {s:"The timetable at the stop was old, so I checked the app instead.",he:"לוח הזמנים בתחנה היה ישן, אז בדקתי באפליקציה במקום.",l:4},
+    {s:"A timetable tells you what is supposed to happen; the people waiting at the stop tell you what actually happens.",he:"לוח זמנים מספר לך מה אמור לקרות; האנשים שמחכים בתחנה מספרים לך מה באמת קורה.",l:5}
+  ],
+  "Platform":[
+    {s:"Which platform?",he:"איזה רציף?",l:1},
+    {s:"The train leaves from platform four.",he:"הרכבת יוצאת מרציף ארבע.",l:2},
+    {s:"They changed the platform at the last minute.",he:"הם שינו את הרציף ברגע האחרון.",l:3},
+    {s:"We ran to the wrong platform and watched our train leave from the other one.",he:"רצנו לרציף הלא נכון וראינו את הרכבת שלנו יוצאת מהשני.",l:4},
+    {s:"Always look at the platform screen again just before boarding — the number you memorized may no longer be true.",he:"תמיד תסתכל שוב על מסך הרציף ממש לפני העלייה — המספר שזכרת אולי כבר לא נכון.",l:5}
+  ],
+  "Departure point":[
+    {s:"Where is the departure point?",he:"איפה נקודת היציאה?",l:1},
+    {s:"The departure point is in front of the hotel.",he:"נקודת היציאה נמצאת מול המלון.",l:2},
+    {s:"Be at the departure point ten minutes early.",he:"תהיה בנקודת היציאה עשר דקות לפני.",l:3},
+    {s:"They sent us a map with the exact departure point marked on it.",he:"הם שלחו לנו מפה עם נקודת היציאה המדויקת מסומנת עליה.",l:4},
+    {s:"Find the departure point the evening before, so the morning is about waking up and nothing else.",he:"מצא את נקודת היציאה בערב שלפני, כדי שהבוקר יהיה על להתעורר ותו לא.",l:5}
+  ],
+  "Drop-off point":[
+    {s:"This is the drop-off point.",he:"זו נקודת ההורדה.",l:1},
+    {s:"This is the drop-off point for the tour.",he:"זו נקודת ההורדה של הסיור.",l:2},
+    {s:"The drop-off point is two streets from the hotel.",he:"נקודת ההורדה נמצאת שני רחובות מהמלון.",l:3},
+    {s:"The driver used a different drop-off point because the main road was closed.",he:"הנהג השתמש בנקודת הורדה אחרת כי הכביש הראשי היה סגור.",l:4},
+    {s:"Confirm the drop-off point when you book, not when you're already sitting in the car.",he:"ודא את נקודת ההורדה כשאתה מזמין, לא כשאתה כבר יושב ברכב.",l:5}
+  ],
+  "Pick-up point":[
+    {s:"Where is the pick-up point?",he:"איפה נקודת האיסוף?",l:1},
+    {s:"Wait for me at the pick-up point.",he:"תחכה לי בנקודת האיסוף.",l:2},
+    {s:"The pick-up point is on the other side of the terminal.",he:"נקודת האיסוף נמצאת בצד השני של הטרמינל.",l:3},
+    {s:"We waited at the wrong pick-up point for twenty minutes before we realized.",he:"חיכינו בנקודת האיסוף הלא נכונה עשרים דקות לפני שהבנו.",l:4},
+    {s:"At a big airport the pick-up point can be a ten-minute walk from where you land, so leave time for it.",he:"בשדה תעופה גדול נקודת האיסוף יכולה להיות עשר דקות הליכה מהמקום שבו נחתת, אז השאר לזה זמן.",l:5}
+  ],
+  "Transfer":[
+    {s:"I need a transfer.",he:"אני צריך החלפה.",l:1},
+    {s:"You need one transfer to get downtown.",he:"צריך החלפה אחת כדי להגיע למרכז העיר.",l:2},
+    {s:"The transfer is free within ninety minutes.",he:"ההחלפה חינם בתוך תשעים דקות.",l:3},
+    {s:"We chose a route with no transfer because we were carrying heavy bags.",he:"בחרנו מסלול בלי החלפה כי סחבנו תיקים כבדים.",l:4},
+    {s:"One transfer is fine; two transfers with luggage is how a short trip becomes a long one.",he:"החלפה אחת בסדר; שתי החלפות עם מזוודות זה איך שנסיעה קצרה הופכת לארוכה.",l:5}
+  ],
+  "Traffic jam":[
+    {s:"There is a traffic jam.",he:"יש פקק תנועה.",l:1},
+    {s:"We got stuck in a traffic jam.",he:"נתקענו בפקק תנועה.",l:2},
+    {s:"The traffic jam lasted almost an hour.",he:"הפקק נמשך כמעט שעה.",l:3},
+    {s:"We left early to avoid the traffic jam and still arrived late.",he:"יצאנו מוקדם כדי להימנע מהפקק ועדיין הגענו באיחור.",l:4},
+    {s:"A traffic jam is the one delay where everyone around you is having exactly the same bad morning.",he:"פקק תנועה הוא העיכוב היחיד שבו לכל מי שסביבך יש בדיוק אותו בוקר גרוע.",l:5}
+  ],
+  "Pedestrian crossing":[
+    {s:"Use the pedestrian crossing.",he:"תשתמש במעבר החצייה.",l:1},
+    {s:"Use the pedestrian crossing over there.",he:"תשתמש במעבר החצייה שם.",l:2},
+    {s:"Cars must stop at the pedestrian crossing.",he:"מכוניות חייבות לעצור במעבר החצייה.",l:3},
+    {s:"In some countries drivers stop at a pedestrian crossing, and in others they really don't.",he:"בחלק מהמדינות נהגים עוצרים במעבר חצייה, ובאחרות ממש לא.",l:4},
+    {s:"Learning how drivers treat a pedestrian crossing is the fastest way to understand a city's manners.",he:"ללמוד איך נהגים מתייחסים למעבר חצייה היא הדרך המהירה ביותר להבין את הנימוסים של עיר.",l:5}
+  ],
+  "Intersection":[
+    {s:"Stop at the intersection.",he:"תעצור בצומת.",l:1},
+    {s:"Turn right at the next intersection.",he:"פנה ימינה בצומת הבא.",l:2},
+    {s:"The intersection is very busy in the morning.",he:"הצומת עמוס מאוד בבוקר.",l:3},
+    {s:"We agreed to meet at the intersection of the two main streets.",he:"סיכמנו להיפגש בצומת של שני הרחובות הראשיים.",l:4},
+    {s:"An unfamiliar intersection is where most drivers make their one mistake of the day.",he:"צומת לא מוכר הוא המקום שבו רוב הנהגים עושים את הטעות היחידה שלהם ביום.",l:5}
+  ],
+  "Roundabout":[
+    {s:"Go around the roundabout.",he:"סע מסביב לכיכר.",l:1},
+    {s:"Take the second exit at the roundabout.",he:"קח את היציאה השנייה בכיכר.",l:2},
+    {s:"There's a big roundabout before the bridge.",he:"יש כיכר גדולה לפני הגשר.",l:3},
+    {s:"I missed the exit and went around the roundabout twice.",he:"פספסתי את היציאה והסתובבתי בכיכר פעמיים.",l:4},
+    {s:"A roundabout looks confusing until you accept that going around again costs you thirty seconds and nothing else.",he:"כיכר תנועה נראית מבלבלת עד שאתה מקבל שסיבוב נוסף עולה לך שלושים שניות ותו לא.",l:5}
+  ],
+  "Detour":[
+    {s:"There is a detour.",he:"יש דרך חלופית.",l:1},
+    {s:"There's a detour because of construction.",he:"יש דרך חלופית בגלל עבודות.",l:2},
+    {s:"The detour added twenty minutes to the drive.",he:"הדרך החלופית הוסיפה עשרים דקות לנסיעה.",l:3},
+    {s:"The detour took us through a small village we would never have seen otherwise.",he:"הדרך החלופית לקחה אותנו דרך כפר קטן שלעולם לא היינו רואים אחרת.",l:4},
+    {s:"Some of the best parts of a trip are the detours you didn't choose and couldn't avoid.",he:"חלק מהחלקים הטובים ביותר בטיול הם העקיפות שלא בחרת ולא יכולת להימנע מהן.",l:5}
+  ],
+  "Shortcut":[
+    {s:"I know a shortcut.",he:"אני מכיר קיצור דרך.",l:1},
+    {s:"I know a shortcut through the park.",he:"אני מכיר קיצור דרך דרך הפארק.",l:2},
+    {s:"The shortcut saves about ten minutes.",he:"קיצור הדרך חוסך בערך עשר דקות.",l:3},
+    {s:"His shortcut turned out to be longer than the normal road.",he:"קיצור הדרך שלו התברר כארוך יותר מהדרך הרגילה.",l:4},
+    {s:"Every shortcut is a bet that you know the area better than the map does.",he:"כל קיצור דרך הוא הימור שאתה מכיר את האזור טוב יותר מהמפה.",l:5}
+  ],
+  "Walking distance":[
+    {s:"It is walking distance.",he:"זה מרחק הליכה.",l:1},
+    {s:"The beach is within walking distance.",he:"החוף נמצא במרחק הליכה.",l:2},
+    {s:"Everything we needed was within walking distance of the hotel.",he:"כל מה שהיינו צריכים היה במרחק הליכה מהמלון.",l:3},
+    {s:"They said it was walking distance, but they didn't mention it was all uphill.",he:"הם אמרו שזה מרחק הליכה, אבל לא הזכירו שהכל בעלייה.",l:4},
+    {s:"Walking distance means something very different to the person who wrote the listing than to the person carrying the bags.",he:"\"מרחק הליכה\" אומר משהו שונה מאוד למי שכתב את המודעה מאשר למי שסוחב את התיקים.",l:5}
+  ],
+  "Surrounding area":[
+    {s:"We walked in the surrounding area.",he:"הסתובבנו באזור שמסביב.",l:1},
+    {s:"We explored the surrounding area.",he:"סיירנו באזור שמסביב.",l:2},
+    {s:"The surrounding area has a few good restaurants.",he:"באזור שמסביב יש כמה מסעדות טובות.",l:3},
+    {s:"We spent one day in the city and two in the surrounding area.",he:"בילינו יום אחד בעיר ושניים באזור שמסביב.",l:4},
+    {s:"The surrounding area is usually where you find the version of a place that isn't built for visitors.",he:"האזור שמסביב הוא בדרך כלל המקום שבו מוצאים את הגרסה של מקום שלא נבנתה למבקרים.",l:5}
+  ],
+  "Get around":[
+    {s:"It is easy to get around.",he:"קל להתנייד.",l:1},
+    {s:"It's easy to get around by bike.",he:"קל להתנייד באופניים.",l:2},
+    {s:"How do people get around in this city?",he:"איך אנשים מתניידים בעיר הזאת?",l:3},
+    {s:"We learned to get around on the metro after the first day.",he:"למדנו להתנייד ברכבת התחתית אחרי היום הראשון.",l:4},
+    {s:"Once you can get around a city without checking your phone, you've stopped being a tourist there.",he:"ברגע שאתה מסוגל להתנייד בעיר בלי לבדוק בטלפון, הפסקת להיות שם תייר.",l:5}
+  ],
+  "Appetizer":[
+    {s:"I want an appetizer.",he:"אני רוצה מנה ראשונה.",l:1},
+    {s:"The appetizers were amazing.",he:"המנות הראשונות היו מדהימות.",l:2},
+    {s:"Let's share an appetizer before the main course.",he:"בוא נתחלק במנה ראשונה לפני העיקרית.",l:3},
+    {s:"We ordered too many appetizers and barely touched the main course.",he:"הזמנו יותר מדי מנות ראשונות ובקושי נגענו בעיקרית.",l:4},
+    {s:"A good appetizer is meant to make you curious about the meal, not to end it before it starts.",he:"מנה ראשונה טובה אמורה לעורר בך סקרנות לגבי הארוחה, לא לסיים אותה לפני שהתחילה.",l:5}
+  ],
+  "Main course":[
+    {s:"This is the main course.",he:"זו המנה העיקרית.",l:1},
+    {s:"What are you having for the main course?",he:"מה אתה לוקח למנה עיקרית?",l:2},
+    {s:"The main course took a long time to arrive.",he:"המנה העיקרית הגיעה אחרי הרבה זמן.",l:3},
+    {s:"I chose the fish as a main course because everyone recommended it.",he:"בחרתי בדג כמנה עיקרית כי כולם המליצו עליו.",l:4},
+    {s:"The main course is where a kitchen either proves itself or quietly admits it can't.",he:"המנה העיקרית היא המקום שבו מטבח או מוכיח את עצמו או מודה בשקט שהוא לא יכול.",l:5}
+  ],
+  "Side dish":[
+    {s:"I want a side dish.",he:"אני רוצה תוספת.",l:1},
+    {s:"Can I get a side dish of rice?",he:"אפשר לקבל תוספת אורז?",l:2},
+    {s:"The side dish comes with the meal.",he:"התוספת מגיעה עם הארוחה.",l:3},
+    {s:"The side dish was so good that we ordered a second one.",he:"התוספת הייתה כל כך טובה שהזמנו עוד אחת.",l:4},
+    {s:"In a lot of kitchens the side dish is where the real cooking happens, and nobody notices.",he:"בהרבה מטבחים התוספת היא המקום שבו קורה הבישול האמיתי, ואף אחד לא שם לב.",l:5}
+  ],
+  "Beverage":[
+    {s:"I want a cold beverage.",he:"אני רוצה משקה קר.",l:1},
+    {s:"Would you like a beverage with that?",he:"תרצה משקה עם זה?",l:2},
+    {s:"Beverages are not included in the price.",he:"משקאות לא כלולים במחיר.",l:3},
+    {s:"They brought the beverages before we'd even opened the menu.",he:"הם הביאו את המשקאות עוד לפני שפתחנו את התפריט.",l:4},
+    {s:"Beverage is the word restaurants use on a menu; drink is the word people actually use at the table.",he:"\"Beverage\" היא המילה שמסעדות משתמשות בה בתפריט; \"drink\" היא המילה שאנשים באמת אומרים בשולחן.",l:5}
+  ],
+  "Ingredients":[
+    {s:"What are the ingredients?",he:"מה המרכיבים?",l:1},
+    {s:"What are the ingredients in this sauce?",he:"מה המרכיבים ברוטב הזה?",l:2},
+    {s:"She uses only fresh ingredients.",he:"היא משתמשת רק במרכיבים טריים.",l:3},
+    {s:"I always ask about the ingredients because my wife is allergic to nuts.",he:"אני תמיד שואל על המרכיבים כי אשתי אלרגית לאגוזים.",l:4},
+    {s:"The best dishes usually have the fewest ingredients, each one doing exactly one job.",he:"המנות הטובות ביותר בדרך כלל מכילות הכי מעט מרכיבים, כשכל אחד עושה בדיוק תפקיד אחד.",l:5}
+  ],
+  "Seasoning":[
+    {s:"Add more seasoning.",he:"תוסיף עוד תיבול.",l:1},
+    {s:"It needs a little more seasoning.",he:"זה צריך קצת יותר תיבול.",l:2},
+    {s:"The seasoning here is very strong.",he:"התיבול כאן חזק מאוד.",l:3},
+    {s:"The meat was good, but the seasoning was what made it memorable.",he:"הבשר היה טוב, אבל התיבול הוא מה שהפך אותו לבלתי נשכח.",l:4},
+    {s:"Seasoning is the difference between food that fills you and food you remember a year later.",he:"תיבול הוא ההבדל בין אוכל שמשביע אותך לאוכל שאתה זוכר שנה אחר כך.",l:5}
+  ],
+  "Portion":[
+    {s:"The portion is big.",he:"המנה גדולה.",l:1},
+    {s:"The portions here are huge.",he:"המנות כאן ענקיות.",l:2},
+    {s:"We shared one portion between us.",he:"התחלקנו במנה אחת בינינו.",l:3},
+    {s:"The portions were so large that we took half of it home.",he:"המנות היו כל כך גדולות שלקחנו חצי הביתה.",l:4},
+    {s:"Portion size says a lot about a place — generous kitchens are usually confident ones.",he:"גודל המנה מספר הרבה על מקום — מטבחים נדיבים הם בדרך כלל בטוחים בעצמם.",l:5}
+  ],
+  "Specialty":[
+    {s:"What is the specialty?",he:"מה המנה המיוחדת?",l:1},
+    {s:"The fish is the specialty of the house.",he:"הדג הוא המנה המיוחדת של הבית.",l:2},
+    {s:"Every region has its own specialty.",he:"לכל אזור יש את המנה המיוחדת שלו.",l:3},
+    {s:"I always order the specialty, even when I have no idea what it is.",he:"אני תמיד מזמין את המנה המיוחדת, גם כשאין לי מושג מה זה.",l:4},
+    {s:"Ordering the specialty is how you taste the place instead of just eating in it.",he:"להזמין את המנה המיוחדת זה איך שאתה טועם את המקום במקום רק לאכול בו.",l:5}
+  ],
+  "Dietary restrictions":[
+    {s:"I have dietary restrictions.",he:"יש לי מגבלות תזונתיות.",l:1},
+    {s:"Do you have any dietary restrictions?",he:"יש לך מגבלות תזונתיות?",l:2},
+    {s:"Please tell the waiter about your dietary restrictions.",he:"אנא ספר למלצר על המגבלות התזונתיות שלך.",l:3},
+    {s:"I mentioned our dietary restrictions when I booked, and they had already prepared for it.",he:"הזכרתי את המגבלות התזונתיות שלנו כשהזמנתי, והם כבר התכוננו לזה.",l:4},
+    {s:"Mentioning dietary restrictions early is a kindness to the kitchen, not a demand on it.",he:"להזכיר מגבלות תזונתיות מוקדם היא התחשבות במטבח, לא דרישה ממנו.",l:5}
+  ],
+  "Allergic":[
+    {s:"I am allergic.",he:"אני אלרגי.",l:1},
+    {s:"I'm allergic to nuts.",he:"אני אלרגי לאגוזים.",l:2},
+    {s:"She's allergic to dairy, so we chose a different place.",he:"היא אלרגית למוצרי חלב, אז בחרנו מקום אחר.",l:3},
+    {s:"I always say I'm allergic clearly, because being polite about it doesn't help anyone.",he:"אני תמיד אומר שאני אלרגי בבירור, כי להיות מנומס לגבי זה לא עוזר לאף אחד.",l:4},
+    {s:"Saying you're allergic is one of the few times where being direct is far kinder than being subtle.",he:"לומר שאתה אלרגי הוא אחד המקרים הבודדים שבהם להיות ישיר הוא הרבה יותר אדיב מלהיות עדין.",l:5}
+  ],
+  "Dairy-free":[
+    {s:"I need dairy-free food.",he:"אני צריך אוכל ללא חלב.",l:1},
+    {s:"Is there a dairy-free option?",he:"יש אפשרות ללא מוצרי חלב?",l:2},
+    {s:"They made the dish dairy-free for us.",he:"הם הכינו לנו את המנה ללא מוצרי חלב.",l:3},
+    {s:"Finding dairy-free options was much easier than I expected in that city.",he:"למצוא אפשרויות ללא חלב היה הרבה יותר קל ממה שציפיתי בעיר ההיא.",l:4},
+    {s:"Dairy-free used to mean fewer choices, and now it usually just means asking one extra question.",he:"פעם \"ללא חלב\" היה אומר פחות אפשרויות, והיום זה בדרך כלל רק שאלה אחת נוספת.",l:5}
+  ],
+  "Gluten-free":[
+    {s:"I eat gluten-free.",he:"אני אוכל ללא גלוטן.",l:1},
+    {s:"She eats gluten-free.",he:"היא אוכלת ללא גלוטן.",l:2},
+    {s:"They have gluten-free bread here.",he:"יש להם כאן לחם ללא גלוטן.",l:3},
+    {s:"We called ahead to check that they had gluten-free options.",he:"התקשרנו מראש לבדוק שיש להם אפשרויות ללא גלוטן.",l:4},
+    {s:"For some people gluten-free is a preference, and for others it's the difference between a good evening and a terrible night.",he:"עבור חלק מהאנשים \"ללא גלוטן\" היא העדפה, ועבור אחרים זה ההבדל בין ערב טוב ללילה נורא.",l:5}
+  ],
+  "Undercooked":[
+    {s:"The meat is undercooked.",he:"הבשר לא מבושל מספיק.",l:1},
+    {s:"The chicken is a little undercooked.",he:"העוף קצת לא מבושל מספיק.",l:2},
+    {s:"I sent it back because it was undercooked.",he:"החזרתי את זה כי זה לא היה מבושל מספיק.",l:3},
+    {s:"It was slightly undercooked, but the waiter fixed it immediately and apologized.",he:"זה היה קצת לא מבושל, אבל המלצר תיקן את זה מיד והתנצל.",l:4},
+    {s:"Sending back an undercooked dish isn't rude — it's information the kitchen actually wants.",he:"להחזיר מנה שלא מבושלת מספיק זה לא גס רוח — זה מידע שהמטבח באמת רוצה.",l:5}
+  ],
+  "Overcooked":[
+    {s:"It is overcooked.",he:"זה מבושל יותר מדי.",l:1},
+    {s:"The pasta was overcooked.",he:"הפסטה הייתה מבושלת יותר מדי.",l:2},
+    {s:"The steak came overcooked, so I ordered something else.",he:"הסטייק הגיע מבושל יותר מדי, אז הזמנתי משהו אחר.",l:3},
+    {s:"Everything was fine except the vegetables, which were badly overcooked.",he:"הכל היה בסדר חוץ מהירקות, שהיו מבושלים הרבה יותר מדי.",l:4},
+    {s:"An overcooked dish can't be saved, which is why good cooks watch the clock more than the pan.",he:"מנה שבושלה יותר מדי לא ניתנת להצלה, ולכן טבחים טובים מסתכלים על השעון יותר מאשר על המחבת.",l:5}
+  ],
+  "Well-done":[
+    {s:"I want it well-done.",he:"אני רוצה את זה עשוי היטב.",l:1},
+    {s:"I'd like my steak well-done.",he:"אני רוצה את הסטייק שלי עשוי היטב.",l:2},
+    {s:"He always orders his meat well-done.",he:"הוא תמיד מזמין את הבשר שלו עשוי היטב.",l:3},
+    {s:"I asked for well-done and it came out perfectly, which doesn't always happen.",he:"ביקשתי עשוי היטב וזה יצא מושלם, מה שלא תמיד קורה.",l:4},
+    {s:"Ordering a steak well-done will quietly disappoint most chefs, and you should order it that way anyway if that's what you enjoy.",he:"להזמין סטייק עשוי היטב יאכזב בשקט את רוב השפים, וכדאי שתזמין ככה בכל זאת אם זה מה שאתה אוהב.",l:5}
+  ],
+  "Refreshing":[
+    {s:"It is very refreshing.",he:"זה מאוד מרענן.",l:1},
+    {s:"This lemonade is so refreshing.",he:"הלימונדה הזאת כל כך מרעננת.",l:2},
+    {s:"A cold drink is refreshing on a hot day.",he:"משקה קר מרענן ביום חם.",l:3},
+    {s:"After walking all afternoon, that cold drink was the most refreshing thing I'd had all week.",he:"אחרי הליכה של כל אחר הצהריים, המשקה הקר הזה היה הדבר הכי מרענן ששתיתי כל השבוע.",l:4},
+    {s:"Refreshing works for a drink, a swim, or an honest conversation — the word stretches further than people expect.",he:"\"מרענן\" עובד למשקה, לשחייה או לשיחה כנה — המילה נמתחת רחוק יותר ממה שאנשים מצפים.",l:5}
+  ],
+  "Flavorful":[
+    {s:"The food is flavorful.",he:"האוכל עשיר בטעם.",l:1},
+    {s:"The soup was really flavorful.",he:"המרק היה ממש עשיר בטעם.",l:2},
+    {s:"Simple food can still be very flavorful.",he:"אוכל פשוט יכול עדיין להיות מאוד עשיר בטעם.",l:3},
+    {s:"It wasn't spicy at all, just deeply flavorful in a way I couldn't explain.",he:"זה בכלל לא היה חריף, פשוט עשיר בטעם בצורה שלא הצלחתי להסביר.",l:4},
+    {s:"Flavorful is the compliment to give when delicious feels too simple and you want the cook to know you noticed.",he:"\"עשיר בטעם\" היא המחמאה שנותנים כש\"טעים\" מרגיש פשטני מדי ואתה רוצה שהטבח יידע ששמת לב.",l:5}
+  ],
+  "Separate bill":[
+    {s:"We want separate bills.",he:"אנחנו רוצים חשבונות נפרדים.",l:1},
+    {s:"Could we have separate bills, please?",he:"אפשר חשבונות נפרדים, בבקשה?",l:2},
+    {s:"We asked for a separate bill for each couple.",he:"ביקשנו חשבון נפרד לכל זוג.",l:3},
+    {s:"It's easier to ask for a separate bill at the start than to divide it at the end.",he:"יותר קל לבקש חשבון נפרד בהתחלה מאשר לחלק אותו בסוף.",l:4},
+    {s:"Asking for a separate bill at the beginning of the meal saves everyone the awkward mathematics at the end.",he:"לבקש חשבון נפרד בתחילת הארוחה חוסך מכולם את המתמטיקה המביכה בסוף.",l:5}
+  ],
+  "Service charge":[
+    {s:"There is a service charge.",he:"יש דמי שירות.",l:1},
+    {s:"A service charge is already included.",he:"דמי שירות כבר כלולים.",l:2},
+    {s:"The service charge is twelve percent.",he:"דמי השירות הם שנים עשר אחוז.",l:3},
+    {s:"We tipped again without noticing the service charge was already on the bill.",he:"השארנו טיפ שוב בלי לשים לב שדמי השירות כבר היו בחשבון.",l:4},
+    {s:"Always read the bottom of the bill for a service charge before you decide how much to tip.",he:"תמיד קרא את תחתית החשבון ובדוק אם יש דמי שירות לפני שאתה מחליט כמה טיפ להשאיר.",l:5}
+  ],
+  "Price range":[
+    {s:"What is your price range?",he:"מה טווח המחירים שלך?",l:1},
+    {s:"Their price range is quite wide.",he:"טווח המחירים שלהם די רחב.",l:2},
+    {s:"We're looking for something in a lower price range.",he:"אנחנו מחפשים משהו בטווח מחירים נמוך יותר.",l:3},
+    {s:"Once I told her my price range, she showed me exactly three options.",he:"ברגע שאמרתי לה את טווח המחירים שלי, היא הראתה לי בדיוק שלוש אפשרויות.",l:4},
+    {s:"Saying your price range out loud early saves an hour of looking at things you were never going to buy.",he:"לומר את טווח המחירים שלך בקול מוקדם חוסך שעה של הסתכלות על דברים שממילא לא היית קונה.",l:5}
+  ],
+  "Affordable":[
+    {s:"It is affordable.",he:"זה במחיר סביר.",l:1},
+    {s:"This place is actually pretty affordable.",he:"המקום הזה בעצם די זול.",l:2},
+    {s:"We found an affordable hotel near the center.",he:"מצאנו מלון במחיר סביר ליד המרכז.",l:3},
+    {s:"The city is beautiful but not affordable if you're staying more than a few days.",he:"העיר יפה אבל לא זולה אם נשארים יותר מכמה ימים.",l:4},
+    {s:"Affordable is never an absolute number — it only means something relative to what you earn and what you value.",he:"\"במחיר סביר\" אף פעם לא מספר מוחלט — זה אומר משהו רק ביחס למה שאתה מרוויח ולמה שחשוב לך.",l:5}
+  ],
+  "Overpriced":[
+    {s:"It is overpriced.",he:"זה יקר מדי.",l:1},
+    {s:"That restaurant is completely overpriced.",he:"המסעדה הזאת יקרה מדי לגמרי.",l:2},
+    {s:"The coffee near the station is overpriced.",he:"הקפה ליד התחנה יקר מדי.",l:3},
+    {s:"Anything sold right next to a famous landmark is almost always overpriced.",he:"כל דבר שנמכר ממש ליד אתר מפורסם הוא כמעט תמיד יקר מדי.",l:4},
+    {s:"Something overpriced isn't expensive — it's cheap wearing a price tag it didn't earn.",he:"משהו יקר מדי אינו יקר — הוא זול שעונד תווית מחיר שלא הרוויח.",l:5}
+  ],
+  "Discounted":[
+    {s:"It is discounted.",he:"זה בהנחה.",l:1},
+    {s:"These shoes are discounted this week.",he:"הנעליים האלה בהנחה השבוע.",l:2},
+    {s:"Everything in that section is discounted.",he:"הכל במדור ההוא בהנחה.",l:3},
+    {s:"I only bought it because it was discounted, which is rarely a good reason.",he:"קניתי את זה רק כי זה היה בהנחה, וזו לעתים רחוקות סיבה טובה.",l:4},
+    {s:"A discounted price is only a saving if you were already planning to buy the thing.",he:"מחיר מוזל הוא חיסכון רק אם כבר תכננת לקנות את הדבר.",l:5}
+  ],
+  "Exchange rate":[
+    {s:"What is the exchange rate?",he:"מה שער החליפין?",l:1},
+    {s:"What's the exchange rate today?",he:"מה שער החליפין היום?",l:2},
+    {s:"The exchange rate at the airport is always bad.",he:"שער החליפין בשדה התעופה תמיד גרוע.",l:3},
+    {s:"We checked the exchange rate online before changing any money.",he:"בדקנו את שער החליפין באינטרנט לפני שהחלפנו כסף.",l:4},
+    {s:"The exchange rate on the sign and the exchange rate you actually get are two different numbers.",he:"שער החליפין שעל השלט ושער החליפין שאתה באמת מקבל הם שני מספרים שונים.",l:5}
+  ],
+  "Transaction":[
+    {s:"The transaction failed.",he:"העסקה נכשלה.",l:1},
+    {s:"The transaction didn't go through.",he:"העסקה לא עברה.",l:2},
+    {s:"I got a message about the transaction on my phone.",he:"קיבלתי הודעה על העסקה בטלפון.",l:3},
+    {s:"The bank blocked the transaction because it came from another country.",he:"הבנק חסם את העסקה כי היא הגיעה ממדינה אחרת.",l:4},
+    {s:"Tell your bank before you travel, or your first transaction abroad will be your last one that day.",he:"הודע לבנק שלך לפני שאתה נוסע, אחרת העסקה הראשונה שלך בחו\"ל תהיה האחרונה שלך באותו יום.",l:5}
+  ],
+  "Payment method":[
+    {s:"What payment method?",he:"איזה אמצעי תשלום?",l:1},
+    {s:"What payment methods do you accept?",he:"אילו אמצעי תשלום אתם מקבלים?",l:2},
+    {s:"Cash is the only payment method they take.",he:"מזומן הוא אמצעי התשלום היחיד שהם מקבלים.",l:3},
+    {s:"I always carry a second payment method in case the first one fails.",he:"אני תמיד נושא אמצעי תשלום שני למקרה שהראשון ייכשל.",l:4},
+    {s:"Having one payment method abroad is fine right up until the moment it isn't.",he:"אמצעי תשלום אחד בחו\"ל זה בסדר גמור עד לרגע שבו זה לא.",l:5}
+  ],
+  "Contactless payment":[
+    {s:"I use contactless payment.",he:"אני משתמש בתשלום ללא מגע.",l:1},
+    {s:"Do you take contactless payment?",he:"אתם מקבלים תשלום ללא מגע?",l:2},
+    {s:"Contactless payment works on most buses here.",he:"תשלום ללא מגע עובד ברוב האוטובוסים כאן.",l:3},
+    {s:"We paid for everything with contactless payment and never took out cash.",he:"שילמנו על הכל בתשלום ללא מגע ומעולם לא הוצאנו מזומן.",l:4},
+    {s:"Contactless payment is convenient enough that you stop noticing how much you're spending.",he:"תשלום ללא מגע נוח מספיק כדי שתפסיק לשים לב כמה אתה מוציא.",l:5}
+  ],
+  "Installment":[
+    {s:"I pay in installments.",he:"אני משלם בתשלומים.",l:1},
+    {s:"Can I pay in installments?",he:"אפשר לשלם בתשלומים?",l:2},
+    {s:"The first installment is due next month.",he:"התשלום הראשון בחודש הבא.",l:3},
+    {s:"We split it into six installments so it wouldn't hit us all at once.",he:"פיצלנו את זה לשישה תשלומים כדי שזה לא יפגע בנו בבת אחת.",l:4},
+    {s:"Paying in installments makes something feel cheaper without making it cost any less.",he:"תשלום בתשלומים גורם למשהו להרגיש זול יותר בלי שהוא באמת עולה פחות.",l:5}
+  ],
+  "Receipt":[
+    {s:"Can I have a receipt?",he:"אפשר לקבל קבלה?",l:1},
+    {s:"Could I have a receipt, please?",he:"אפשר לקבל קבלה, בבקשה?",l:2},
+    {s:"Keep the receipt in case you want to return it.",he:"שמור את הקבלה למקרה שתרצה להחזיר.",l:3},
+    {s:"I lost the receipt, so they wouldn't let me exchange it.",he:"איבדתי את הקבלה, אז הם לא נתנו לי להחליף.",l:4},
+    {s:"A receipt is worthless every day of the year except the one day you need it.",he:"קבלה חסרת ערך בכל יום בשנה חוץ מהיום האחד שבו אתה צריך אותה.",l:5}
+  ],
+  "Refund":[
+    {s:"I want a refund.",he:"אני רוצה החזר כספי.",l:1},
+    {s:"I'd like a refund for this.",he:"הייתי רוצה החזר כספי על זה.",l:2},
+    {s:"They gave us a full refund without any questions.",he:"הם נתנו לנו החזר מלא בלי שאלות.",l:3},
+    {s:"The refund took two weeks to appear on my card.",he:"ההחזר הופיע בכרטיס שלי אחרי שבועיים.",l:4},
+    {s:"How a company handles a refund tells you more about it than anything on its website.",he:"האופן שבו חברה מטפלת בהחזר כספי מספר עליה יותר מכל דבר באתר שלה.",l:5}
+  ],
+  "Return policy":[
+    {s:"What is the return policy?",he:"מה מדיניות ההחזרה?",l:1},
+    {s:"What's your return policy?",he:"מה מדיניות ההחזרה שלכם?",l:2},
+    {s:"Their return policy is thirty days.",he:"מדיניות ההחזרה שלהם היא שלושים יום.",l:3},
+    {s:"I read the return policy before buying anything expensive online.",he:"אני קורא את מדיניות ההחזרה לפני שאני קונה משהו יקר באינטרנט.",l:4},
+    {s:"A generous return policy is a shop telling you it expects you to be happy with what you bought.",he:"מדיניות החזרה נדיבה היא חנות שאומרת לך שהיא מצפה שתהיה מרוצה ממה שקנית.",l:5}
+  ],
+  "Exchange policy":[
+    {s:"What is the exchange policy?",he:"מה מדיניות ההחלפה?",l:1},
+    {s:"Their exchange policy is thirty days.",he:"מדיניות ההחלפה שלהם היא שלושים יום.",l:2},
+    {s:"The exchange policy does not cover sale items.",he:"מדיניות ההחלפה לא חלה על פריטי מבצע.",l:3},
+    {s:"I asked about the exchange policy because I wasn't sure about the size.",he:"שאלתי על מדיניות ההחלפה כי לא הייתי בטוח לגבי המידה.",l:4},
+    {s:"The exchange policy is the question worth asking before you buy, not after you've worn it once.",he:"מדיניות ההחלפה היא השאלה ששווה לשאול לפני שקונים, לא אחרי שלבשת פעם אחת.",l:5}
+  ],
+  "Out of stock":[
+    {s:"It is out of stock.",he:"זה אזל מהמלאי.",l:1},
+    {s:"Sorry, that size is out of stock.",he:"מצטערים, המידה הזאת אזלה מהמלאי.",l:2},
+    {s:"The item has been out of stock for weeks.",he:"הפריט אזל מהמלאי כבר שבועות.",l:3},
+    {s:"It was out of stock online, but they had one left in the shop.",he:"זה אזל מהמלאי באינטרנט, אבל היה להם אחד בחנות.",l:4},
+    {s:"Out of stock in one branch usually just means someone has to make a phone call to another.",he:"\"אזל מהמלאי\" בסניף אחד בדרך כלל אומר שמישהו צריך להרים טלפון לסניף אחר.",l:5}
+  ],
+  "In stock":[
+    {s:"It is in stock.",he:"זה במלאי.",l:1},
+    {s:"Is the blue one in stock?",he:"הכחול נמצא במלאי?",l:2},
+    {s:"They said it would be in stock next week.",he:"הם אמרו שזה יהיה במלאי בשבוע הבא.",l:3},
+    {s:"I called first to make sure it was in stock before driving across town.",he:"התקשרתי קודם לוודא שזה במלאי לפני שנסעתי לצד השני של העיר.",l:4},
+    {s:"Websites say something is in stock far more confidently than the shelves actually support.",he:"אתרים מצהירים שמשהו נמצא במלאי בהרבה יותר ביטחון ממה שהמדפים באמת מצדיקים.",l:5}
+  ],
+  "Try on":[
+    {s:"Can I try it on?",he:"אפשר למדוד?",l:1},
+    {s:"Can I try these on?",he:"אפשר למדוד את אלה?",l:2},
+    {s:"You can try on three items at a time.",he:"אפשר למדוד שלושה פריטים בבת אחת.",l:3},
+    {s:"I never buy clothes online without being able to try them on first.",he:"אני אף פעם לא קונה בגדים באינטרנט בלי אפשרות למדוד אותם קודם.",l:4},
+    {s:"Two minutes to try something on saves the whole afternoon you'd spend returning it.",he:"שתי דקות של מדידה חוסכות את כל אחר הצהריים שהיית מבזבז בהחזרה.",l:5}
+  ],
+  "Fits properly":[
+    {s:"It fits properly.",he:"זה מתאים במידה.",l:1},
+    {s:"It fits properly now.",he:"עכשיו זה מתאים במידה.",l:2},
+    {s:"The jacket fits properly across the shoulders.",he:"הז'קט מתאים היטב בכתפיים.",l:3},
+    {s:"Nothing fits properly until you check how it feels when you sit down.",he:"שום דבר לא מתאים באמת עד שאתה בודק איך זה מרגיש כשאתה יושב.",l:4},
+    {s:"A cheap shirt that fits properly always looks better than an expensive one that doesn't.",he:"חולצה זולה שמתאימה במידה תמיד נראית טוב יותר מיקרה שלא.",l:5}
+  ],
+  "Damaged":[
+    {s:"It is damaged.",he:"זה פגום.",l:1},
+    {s:"The box arrived damaged.",he:"האריזה הגיעה פגומה.",l:2},
+    {s:"One of the plates was damaged in the post.",he:"אחת הצלחות נפגמה בדואר.",l:3},
+    {s:"I photographed the damaged item before contacting them about it.",he:"צילמתי את הפריט הפגום לפני שפניתי אליהם בנושא.",l:4},
+    {s:"Photograph anything damaged the moment you notice it, because memory is not evidence.",he:"צלם כל דבר פגום ברגע שאתה שם לב אליו, כי זיכרון אינו ראיה.",l:5}
+  ],
+  "Replacement":[
+    {s:"I need a replacement.",he:"אני צריך מוצר חלופי.",l:1},
+    {s:"They sent me a replacement.",he:"הם שלחו לי מוצר חלופי.",l:2},
+    {s:"The replacement arrived two days later.",he:"המוצר החלופי הגיע יומיים אחר כך.",l:3},
+    {s:"They offered a refund or a replacement, and I chose the replacement.",he:"הם הציעו החזר או מוצר חלופי, ובחרתי במוצר החלופי.",l:4},
+    {s:"Asking for a replacement instead of a refund usually gets you a faster answer and a happier shop.",he:"לבקש מוצר חלופי במקום החזר כספי בדרך כלל מביא תשובה מהירה יותר וחנות מרוצה יותר.",l:5}
+  ],
+  "Catch up":[
+    {s:"Let's catch up.",he:"בוא נתעדכן.",l:1},
+    {s:"We should catch up over coffee.",he:"כדאי שנתעדכן על קפה.",l:2},
+    {s:"I haven't seen him in a year, so we have a lot to catch up on.",he:"לא ראיתי אותו שנה, אז יש לנו הרבה על מה להתעדכן.",l:3},
+    {s:"We caught up for two hours and it felt like no time had passed at all.",he:"התעדכנו שעתיים וזה הרגיש כאילו לא עבר זמן בכלל.",l:4},
+    {s:"The friends worth catching up with are the ones where you skip the small talk entirely.",he:"החברים ששווה להתעדכן איתם הם אלה שאיתם מדלגים על שיחות החולין לגמרי.",l:5}
+  ],
+  "Hang out":[
+    {s:"Let's hang out.",he:"בוא נבלה יחד.",l:1},
+    {s:"Let's hang out sometime this week.",he:"בוא נבלה יחד מתישהו השבוע.",l:2},
+    {s:"We hung out at their place all afternoon.",he:"בילינו אצלם כל אחר הצהריים.",l:3},
+    {s:"I like hanging out with her family because nobody makes me feel like a guest.",he:"אני אוהב לבלות עם המשפחה שלה כי אף אחד לא גורם לי להרגיש אורח.",l:4},
+    {s:"Hanging out has no plan and no purpose, which is exactly what makes it worth the time.",he:"לבלות יחד זה בלי תוכנית ובלי מטרה, וזה בדיוק מה שהופך את זה לשווה את הזמן.",l:5}
+  ],
+  "Get along":[
+    {s:"We get along.",he:"אנחנו מסתדרים.",l:1},
+    {s:"I get along really well with her brother.",he:"אני מסתדר ממש טוב עם אחיה.",l:2},
+    {s:"They didn't get along at first.",he:"הם לא הסתדרו בהתחלה.",l:3},
+    {s:"It took a few months, but now I get along with everyone in the family.",he:"זה לקח כמה חודשים, אבל עכשיו אני מסתדר עם כולם במשפחה.",l:4},
+    {s:"Getting along with someone isn't about agreeing with them; it's about not needing to.",he:"להסתדר עם מישהו זה לא להסכים איתו; זה לא להזדקק לזה.",l:5}
+  ],
+  "Figure out":[
+    {s:"I will figure it out.",he:"אני אבין את זה.",l:1},
+    {s:"Don't worry, I'll figure it out.",he:"אל תדאג, אני אסתדר.",l:2},
+    {s:"We figured out the train system after one day.",he:"הבנו את מערכת הרכבות אחרי יום אחד.",l:3},
+    {s:"I couldn't figure out what he meant until someone explained the joke.",he:"לא הצלחתי להבין למה הוא התכוון עד שמישהו הסביר את הבדיחה.",l:4},
+    {s:"Half of learning a language is being comfortable saying you'll figure it out later.",he:"חצי מלימוד שפה הוא להיות בנוח לומר שתבין את זה אחר כך.",l:5}
+  ],
+  "Deal with":[
+    {s:"I will deal with it.",he:"אני אטפל בזה.",l:1},
+    {s:"I have to deal with this today.",he:"אני חייב להתמודד עם זה היום.",l:2},
+    {s:"She dealt with the whole problem in one phone call.",he:"היא טיפלה בכל הבעיה בשיחת טלפון אחת.",l:3},
+    {s:"I'd rather deal with it now than think about it all weekend.",he:"אני מעדיף להתמודד עם זה עכשיו מאשר לחשוב על זה כל סוף השבוע.",l:4},
+    {s:"Dealing with something small today is almost always cheaper than dealing with it large next month.",he:"להתמודד עם משהו קטן היום כמעט תמיד זול יותר מלהתמודד איתו גדול בחודש הבא.",l:5}
+  ],
+  "Keep in touch":[
+    {s:"Keep in touch!",he:"תשמור על קשר!",l:1},
+    {s:"Let's keep in touch.",he:"בוא נשמור על קשר.",l:2},
+    {s:"We kept in touch after they moved away.",he:"שמרנו על קשר אחרי שהם עברו.",l:3},
+    {s:"We promised to keep in touch, and this time we actually did.",he:"הבטחנו לשמור על קשר, והפעם באמת עשינו את זה.",l:4},
+    {s:"Keeping in touch is mostly a series of small messages nobody was obliged to send.",he:"לשמור על קשר זה בעיקר סדרה של הודעות קטנות שאף אחד לא היה חייב לשלוח.",l:5}
+  ],
+  "Look forward to":[
+    {s:"I look forward to it.",he:"אני מצפה לזה.",l:1},
+    {s:"I'm really looking forward to the weekend.",he:"אני ממש מצפה לסוף השבוע.",l:2},
+    {s:"She's looking forward to meeting you.",he:"היא מצפה לפגוש אותך.",l:3},
+    {s:"I look forward to these dinners more than I expected to when we started.",he:"אני מצפה לארוחות האלה יותר משציפיתי כשהתחלנו.",l:4},
+    {s:"Having something to look forward to changes how you experience the ordinary days before it.",he:"כשיש למה לצפות, זה משנה איך אתה חווה את הימים הרגילים שלפני.",l:5}
+  ],
+  "Run into someone":[
+    {s:"I ran into someone I know.",he:"פגשתי מישהו שאני מכיר במקרה.",l:1},
+    {s:"I ran into an old friend downtown.",he:"נתקלתי בחבר ותיק במרכז העיר.",l:2},
+    {s:"We ran into her parents at the supermarket.",he:"נתקלנו בהורים שלה בסופרמרקט.",l:3},
+    {s:"I ran into someone from work and we ended up talking for half an hour.",he:"נתקלתי במישהו מהעבודה ובסוף דיברנו חצי שעה.",l:4},
+    {s:"You always run into someone on the one day you left the house looking like that.",he:"אתה תמיד נתקל במישהו ביום היחיד שיצאת מהבית נראה ככה.",l:5}
+  ],
+  "Show up":[
+    {s:"He did not show up.",he:"הוא לא הגיע.",l:1},
+    {s:"He showed up an hour late.",he:"הוא הגיע באיחור של שעה.",l:2},
+    {s:"Everyone showed up for the dinner.",he:"כולם הגיעו לארוחה.",l:3},
+    {s:"She showed up with dessert even though nobody asked her to.",he:"היא הגיעה עם קינוח למרות שאף אחד לא ביקש ממנה.",l:4},
+    {s:"Showing up, again and again, is most of what people actually mean when they say someone is reliable.",he:"להגיע, שוב ושוב, הוא רוב מה שאנשים באמת מתכוונים כשהם אומרים שמישהו אמין.",l:5}
+  ],
+  "Turn out":[
+    {s:"It turned out well.",he:"זה יצא טוב.",l:1},
+    {s:"It turned out to be a great evening.",he:"התברר שזה היה ערב נהדר.",l:2},
+    {s:"The weather turned out better than we expected.",he:"מזג האוויר התברר טוב יותר משציפינו.",l:3},
+    {s:"I was nervous about the dinner, but it turned out to be the easiest evening of the year.",he:"הייתי לחוץ לגבי הארוחה, אבל התברר שזה היה הערב הכי קל בשנה.",l:4},
+    {s:"Most of the things I worried about turned out to be smaller than the worrying itself.",he:"רוב הדברים שדאגתי לגביהם התבררו כקטנים יותר מהדאגה עצמה.",l:5}
+  ],
+  "Mention":[
+    {s:"She mentioned it.",he:"היא הזכירה את זה.",l:1},
+    {s:"She mentioned you last night.",he:"היא הזכירה אותך אתמול בלילה.",l:2},
+    {s:"He mentioned that he might come later.",he:"הוא הזכיר שאולי יגיע מאוחר יותר.",l:3},
+    {s:"Nobody mentioned that the restaurant was closed on Mondays.",he:"אף אחד לא הזכיר שהמסעדה סגורה בימי שני.",l:4},
+    {s:"The things people casually mention are often the ones they most want you to hear.",he:"הדברים שאנשים מזכירים כבדרך אגב הם לעתים קרובות אלה שהם הכי רוצים שתשמע.",l:5}
+  ],
+  "Assume":[
+    {s:"I assume so.",he:"אני מניח שכן.",l:1},
+    {s:"I assumed you already knew.",he:"הנחתי שאתה כבר יודע.",l:2},
+    {s:"Don't assume they speak Hebrew.",he:"אל תניח שהם מדברים עברית.",l:3},
+    {s:"I assumed the dinner was casual and showed up in a T-shirt.",he:"הנחתי שהארוחה לא רשמית והגעתי בטי-שירט.",l:4},
+    {s:"Almost every misunderstanding in a new family starts with something one person assumed and nobody said.",he:"כמעט כל אי-הבנה במשפחה חדשה מתחילה במשהו שאדם אחד הניח ואף אחד לא אמר.",l:5}
+  ],
+  "Realize":[
+    {s:"I did not realize.",he:"לא הבנתי.",l:1},
+    {s:"I didn't realize it was so late.",he:"לא שמתי לב שכל כך מאוחר.",l:2},
+    {s:"She realized she had left her phone at home.",he:"היא הבינה שהיא השאירה את הטלפון בבית.",l:3},
+    {s:"Halfway through the evening I realized I had stopped translating in my head.",he:"באמצע הערב הבנתי שהפסקתי לתרגם בראש שלי.",l:4},
+    {s:"You rarely realize you've improved while it's happening — only later, looking back at what used to be hard.",he:"אתה לעתים רחוקות מבין שהשתפרת בזמן שזה קורה — רק אחר כך, כשמסתכלים אחורה על מה שהיה קשה.",l:5}
+  ],
+  "Notice":[
+    {s:"Did you notice?",he:"שמת לב?",l:1},
+    {s:"Did you notice the new painting?",he:"שמת לב לתמונה החדשה?",l:2},
+    {s:"I noticed that he seemed tired.",he:"שמתי לב שהוא נראה עייף.",l:3},
+    {s:"Nobody noticed my mistake, or if they did they were kind enough not to say.",he:"אף אחד לא שם לב לטעות שלי, ואם כן הם היו נחמדים מספיק לא לומר.",l:4},
+    {s:"Noticing small things about people is a language of its own, and it works in every country.",he:"לשים לב לדברים קטנים אצל אנשים היא שפה בפני עצמה, והיא עובדת בכל מדינה.",l:5}
+  ],
+  "Prefer":[
+    {s:"I prefer tea.",he:"אני מעדיף תה.",l:1},
+    {s:"I prefer coffee in the morning.",he:"אני מעדיף קפה בבוקר.",l:2},
+    {s:"Would you prefer to sit inside or outside?",he:"אתה מעדיף לשבת בפנים או בחוץ?",l:3},
+    {s:"I prefer smaller dinners where I can actually follow the conversation.",he:"אני מעדיף ארוחות קטנות יותר שבהן אני באמת יכול לעקוב אחרי השיחה.",l:4},
+    {s:"Saying what you prefer is a small act of confidence, and people almost always appreciate the clarity.",he:"לומר מה אתה מעדיף הוא מעשה קטן של ביטחון, ואנשים כמעט תמיד מעריכים את הבהירות.",l:5}
+  ],
+  "Avoid":[
+    {s:"I avoid it.",he:"אני נמנע מזה.",l:1},
+    {s:"I try to avoid the highway at rush hour.",he:"אני משתדל להימנע מהכביש המהיר בשעת עומס.",l:2},
+    {s:"She avoided the subject all evening.",he:"היא נמנעה מהנושא כל הערב.",l:3},
+    {s:"I used to avoid speaking English in groups, and that's exactly what slowed me down.",he:"פעם נמנעתי מלדבר אנגלית בקבוצות, וזה בדיוק מה שעיכב אותי.",l:4},
+    {s:"The conversations you avoid are usually the ones that would have improved your English the fastest.",he:"השיחות שאתה נמנע מהן הן בדרך כלל אלה שהיו משפרות את האנגלית שלך הכי מהר.",l:5}
+  ],
+  "Uncomfortable":[
+    {s:"I am uncomfortable.",he:"לא נוח לי.",l:1},
+    {s:"The chair was really uncomfortable.",he:"הכיסא היה ממש לא נוח.",l:2},
+    {s:"I felt uncomfortable because I didn't understand the joke.",he:"הרגשתי לא בנוח כי לא הבנתי את הבדיחה.",l:3},
+    {s:"The first few dinners were uncomfortable, and then one day they simply weren't.",he:"הארוחות הראשונות היו לא נוחות, ואז יום אחד הן פשוט הפסיקו להיות.",l:4},
+    {s:"Being a little uncomfortable in a second language is not a sign you're failing — it's the sign you're still growing.",he:"להרגיש קצת לא בנוח בשפה שנייה אינו סימן שאתה נכשל — זה הסימן שאתה עדיין מתפתח.",l:5}
+  ],
+  "Relieved":[
+    {s:"I am relieved.",he:"הוקל לי.",l:1},
+    {s:"I'm so relieved it went well.",he:"כל כך הוקל לי שזה הלך טוב.",l:2},
+    {s:"She looked relieved when we finally arrived.",he:"היא נראתה מוקלת כשסוף סוף הגענו.",l:3},
+    {s:"I was relieved that nobody asked me to make a speech.",he:"הוקל לי שאף אחד לא ביקש ממני לשאת נאום.",l:4},
+    {s:"Feeling relieved is quieter than feeling happy, and often runs deeper.",he:"להרגיש הקלה שקט יותר מלהרגיש שמחה, ולעתים קרובות עמוק יותר.",l:5}
+  ],
+  "Frustrated":[
+    {s:"I am frustrated.",he:"אני מתוסכל.",l:1},
+    {s:"I get frustrated when I can't find the right word.",he:"אני מתוסכל כשאני לא מוצא את המילה הנכונה.",l:2},
+    {s:"He was frustrated with the slow internet.",he:"הוא היה מתוסכל מהאינטרנט האיטי.",l:3},
+    {s:"I felt frustrated for a week, and then something suddenly clicked.",he:"הרגשתי מתוסכל שבוע, ואז משהו פתאום התחבר.",l:4},
+    {s:"Feeling frustrated in a language usually means you're right at the edge of what you know, which is where learning happens.",he:"תסכול בשפה בדרך כלל אומר שאתה בדיוק בקצה של מה שאתה יודע, ושם הלמידה קורית.",l:5}
+  ],
+  "Overwhelmed":[
+    {s:"I am overwhelmed.",he:"אני מוצף.",l:1},
+    {s:"I felt overwhelmed on the first day.",he:"הרגשתי מוצף ביום הראשון.",l:2},
+    {s:"She was overwhelmed by how kind everyone was.",he:"היא הייתה מוצפת מכמה שכולם היו נחמדים.",l:3},
+    {s:"Twelve people talking at once left me completely overwhelmed.",he:"שנים עשר אנשים מדברים בבת אחת השאירו אותי מוצף לחלוטין.",l:4},
+    {s:"Feeling overwhelmed in a group conversation is normal, and it fades long before your vocabulary catches up.",he:"להרגיש מוצף בשיחה קבוצתית זה נורמלי, וזה חולף הרבה לפני שאוצר המילים שלך משיג.",l:5}
+  ],
+  "Impressed":[
+    {s:"I am impressed.",he:"אני מתרשם.",l:1},
+    {s:"I'm really impressed with your English!",he:"אני ממש מתרשם מהאנגלית שלך!",l:2},
+    {s:"Her father was impressed that I tried.",he:"אביה התרשם מזה שניסיתי.",l:3},
+    {s:"They seemed genuinely impressed that I'd learned so much in a few months.",he:"הם נראו מתרשמים באמת מזה שלמדתי כל כך הרבה בכמה חודשים.",l:4},
+    {s:"People are impressed far less by perfect grammar than by the willingness to keep talking anyway.",he:"אנשים מתרשמים הרבה פחות מדקדוק מושלם מאשר מהנכונות להמשיך לדבר בכל זאת.",l:5}
+  ],
+  "Curious":[
+    {s:"I am curious.",he:"אני סקרן.",l:1},
+    {s:"I'm curious about American culture.",he:"אני סקרן לגבי התרבות האמריקאית.",l:2},
+    {s:"He was curious about how we met.",he:"הוא היה סקרן איך נפגשנו.",l:3},
+    {s:"I stayed curious instead of embarrassed, and the whole evening got easier.",he:"נשארתי סקרן במקום נבוך, וכל הערב נעשה קל יותר.",l:4},
+    {s:"Staying curious is the one attitude that makes people forgive every mistake you make in their language.",he:"להישאר סקרן היא הגישה היחידה שגורמת לאנשים לסלוח על כל טעות שאתה עושה בשפה שלהם.",l:5}
+  ],
+  "Embarrassed":[
+    {s:"I am embarrassed.",he:"אני נבוך.",l:1},
+    {s:"I was embarrassed when I made a mistake.",he:"הייתי נבוך כשעשיתי טעות.",l:2},
+    {s:"He was embarrassed about forgetting her name.",he:"הוא היה נבוך מכך ששכח את שמה.",l:3},
+    {s:"I was embarrassed for about ten seconds, and then everyone moved on.",he:"הייתי נבוך בערך עשר שניות, ואז כולם המשיכו הלאה.",l:4},
+    {s:"Everyone remembers being embarrassed far longer than anyone else remembers the thing you were embarrassed about.",he:"כל אחד זוכר שהיה נבוך הרבה יותר זמן משכל אחד אחר זוכר את הדבר שבגללו נבוכת.",l:5}
+  ],
+  "Concerned":[
+    {s:"I am concerned.",he:"אני מודאג.",l:1},
+    {s:"I'm a little concerned about the weather.",he:"אני קצת מודאג ממזג האוויר.",l:2},
+    {s:"Her mother was concerned that we were driving at night.",he:"אמה הייתה מודאגת שאנחנו נוסעים בלילה.",l:3},
+    {s:"I was concerned about the language, not about whether they'd like me.",he:"הייתי מודאג לגבי השפה, לא לגבי אם הם יאהבו אותי.",l:4},
+    {s:"Being concerned about someone is a softer thing to say than being worried, and it lands more gently.",he:"לומר שאתה מודאג לגבי מישהו רך יותר מלומר שאתה דואג, וזה נוחת בעדינות רבה יותר.",l:5}
+  ],
+  "Exhausted":[
+    {s:"I am exhausted.",he:"אני מותש.",l:1},
+    {s:"I was exhausted after the flight.",he:"הייתי מותש אחרי הטיסה.",l:2},
+    {s:"We were all exhausted by the end of the week.",he:"כולנו היינו מותשים בסוף השבוע.",l:3},
+    {s:"Speaking a second language all evening left me exhausted in a way I didn't expect.",he:"לדבר בשפה שנייה כל הערב השאיר אותי מותש בצורה שלא ציפיתי לה.",l:4},
+    {s:"Being exhausted after a long conversation in another language is not weakness — it's the cost of real concentration.",he:"להיות מותש אחרי שיחה ארוכה בשפה אחרת אינו חולשה — זה המחיר של ריכוז אמיתי.",l:5}
+  ],
+  "Peaceful":[
+    {s:"It is peaceful here.",he:"שלֵו כאן.",l:1},
+    {s:"It's so peaceful out here.",he:"כל כך שלֵו כאן בחוץ.",l:2},
+    {s:"The village was quiet and peaceful.",he:"הכפר היה שקט ושלֵו.",l:3},
+    {s:"After the noise of the city, that peaceful morning was exactly what we needed.",he:"אחרי הרעש של העיר, הבוקר השלֵו הזה היה בדיוק מה שהיינו צריכים.",l:4},
+    {s:"A peaceful place doesn't have to be silent — it just has to leave your mind alone for a while.",he:"מקום שלֵו לא חייב להיות שקט לגמרי — הוא רק צריך להניח למחשבות שלך לזמן מה.",l:5}
+  ],
+  "Crowded":[
+    {s:"It is crowded.",he:"צפוף.",l:1},
+    {s:"The market was really crowded.",he:"השוק היה ממש צפוף.",l:2},
+    {s:"The train gets crowded in the morning.",he:"הרכבת נעשית צפופה בבוקר.",l:3},
+    {s:"We came back at seven because it's less crowded before the dinner rush.",he:"חזרנו בשבע כי פחות צפוף לפני עומס ארוחת הערב.",l:4},
+    {s:"A crowded restaurant is usually a good sign, right up until you're the one waiting outside it.",he:"מסעדה צפופה היא בדרך כלל סימן טוב, עד לרגע שאתה זה שמחכה בחוץ.",l:5}
+  ],
+  "Lively":[
+    {s:"The place is lively.",he:"המקום תוסס.",l:1},
+    {s:"The neighborhood is lively at night.",he:"השכונה תוססת בלילה.",l:2},
+    {s:"It was a lively dinner with a lot of laughing.",he:"זו הייתה ארוחה תוססת עם הרבה צחוק.",l:3},
+    {s:"Her family dinners are lively in a way mine never were.",he:"ארוחות הערב של המשפחה שלה תוססות בצורה שלי מעולם לא הייתה.",l:4},
+    {s:"A lively table is harder to follow in a second language, and far more worth the effort.",he:"שולחן תוסס קשה יותר לעקוב אחריו בשפה שנייה, ושווה הרבה יותר את המאמץ.",l:5}
+  ],
+  "Remote":[
+    {s:"It is a remote place.",he:"זה מקום מרוחק.",l:1},
+    {s:"They live in a remote village.",he:"הם גרים בכפר מרוחק.",l:2},
+    {s:"The hotel was in a remote part of the island.",he:"המלון היה בחלק מרוחק של האי.",l:3},
+    {s:"We stayed somewhere remote and didn't see another tourist for three days.",he:"התארחנו במקום מרוחק ולא ראינו תייר אחר שלושה ימים.",l:4},
+    {s:"Remote sounds romantic until the nearest shop is forty minutes away and you forgot the coffee.",he:"\"מרוחק\" נשמע רומנטי עד שהחנות הקרובה במרחק ארבעים דקות ושכחת את הקפה.",l:5}
+  ],
+  "Breathtaking":[
+    {s:"It is breathtaking.",he:"זה עוצר נשימה.",l:1},
+    {s:"The view from the hotel was breathtaking.",he:"הנוף מהמלון היה עוצר נשימה.",l:2},
+    {s:"We stopped the car because the scenery was breathtaking.",he:"עצרנו את הרכב כי הנוף היה עוצר נשימה.",l:3},
+    {s:"The photos were nice, but standing there was genuinely breathtaking.",he:"התמונות היו יפות, אבל לעמוד שם היה באמת עוצר נשימה.",l:4},
+    {s:"Breathtaking is a word worth saving, because using it for everything leaves you nothing to say for the real thing.",he:"\"עוצר נשימה\" היא מילה ששווה לשמור, כי שימוש בה לכל דבר לא משאיר לך מה לומר על הדבר האמיתי.",l:5}
+  ],
+  "Unusual":[
+    {s:"That is unusual.",he:"זה לא רגיל.",l:1},
+    {s:"That's an unusual name.",he:"זה שם לא רגיל.",l:2},
+    {s:"It's unusual for him to be late.",he:"זה לא רגיל שהוא מאחר.",l:3},
+    {s:"The food had an unusual flavor that I couldn't quite place.",he:"לאוכל היה טעם לא רגיל שלא הצלחתי לזהות.",l:4},
+    {s:"Calling something unusual is a polite way to say you found it strange and you're still deciding.",he:"לקרוא למשהו \"לא רגיל\" היא דרך מנומסת לומר שמצאת את זה מוזר ואתה עדיין מתלבט.",l:5}
+  ],
+  "Reasonable":[
+    {s:"The price is reasonable.",he:"המחיר סביר.",l:1},
+    {s:"The price seems reasonable.",he:"המחיר נראה סביר.",l:2},
+    {s:"That's a reasonable thing to ask.",he:"זו בקשה הגיונית.",l:3},
+    {s:"He was reasonable about it, even though he had every right not to be.",he:"הוא היה הגיוני לגבי זה, למרות שהייתה לו כל זכות לא להיות.",l:4},
+    {s:"Reasonable covers both a fair price and a fair person, and English lets you mean either without explaining.",he:"\"Reasonable\" מכסה גם מחיר הוגן וגם אדם הוגן, ואנגלית מאפשרת לך להתכוון לכל אחד מהם בלי להסביר.",l:5}
+  ],
+  "Unexpected":[
+    {s:"It was unexpected.",he:"זה היה בלתי צפוי.",l:1},
+    {s:"It was a completely unexpected surprise.",he:"זו הייתה הפתעה בלתי צפויה לחלוטין.",l:2},
+    {s:"We got an unexpected invitation for Sunday.",he:"קיבלנו הזמנה בלתי צפויה ליום ראשון.",l:3},
+    {s:"The unexpected part wasn't the gift, it was that they remembered at all.",he:"החלק הבלתי צפוי לא היה המתנה, אלא שהם בכלל זכרו.",l:4},
+    {s:"The unexpected moments are the ones you'll actually remember from a trip, and you can't plan a single one of them.",he:"הרגעים הבלתי צפויים הם אלה שבאמת תזכור מטיול, ואי אפשר לתכנן אף אחד מהם.",l:5}
+  ],
+  "Disappointing":[
+    {s:"It was disappointing.",he:"זה היה מאכזב.",l:1},
+    {s:"The movie was a bit disappointing.",he:"הסרט היה קצת מאכזב.",l:2},
+    {s:"The weather was disappointing all week.",he:"מזג האוויר היה מאכזב כל השבוע.",l:3},
+    {s:"The famous restaurant was disappointing, and the small one next door was excellent.",he:"המסעדה המפורסמת הייתה מאכזבת, והקטנה לידה הייתה מצוינת.",l:4},
+    {s:"Something disappointing usually just means the expectation was built by someone who wasn't there.",he:"משהו מאכזב בדרך כלל אומר שהציפייה נבנתה על ידי מישהו שלא היה שם.",l:5}
+  ],
+  "Appliance":[
+    {s:"It is a kitchen appliance.",he:"זה מכשיר מטבח.",l:1},
+    {s:"We need to buy a new appliance for the kitchen.",he:"אנחנו צריכים לקנות מכשיר חדש למטבח.",l:2},
+    {s:"Every appliance in the house is old but still works.",he:"כל מכשיר בבית ישן אבל עדיין עובד.",l:3},
+    {s:"We replaced one appliance a year instead of everything at once.",he:"החלפנו מכשיר אחד בשנה במקום הכל בבת אחת.",l:4},
+    {s:"A good appliance is one you stop thinking about entirely after the first week.",he:"מכשיר טוב הוא כזה שאתה מפסיק לחשוב עליו לגמרי אחרי השבוע הראשון.",l:5}
+  ],
+  "Dishwasher":[
+    {s:"Open the dishwasher.",he:"תפתח את המדיח.",l:1},
+    {s:"Can you load the dishwasher?",he:"אתה יכול להכניס למדיח?",l:2},
+    {s:"The dishwasher takes about two hours.",he:"המדיח לוקח בערך שעתיים.",l:3},
+    {s:"We run the dishwasher at night because the electricity is cheaper.",he:"אנחנו מפעילים את המדיח בלילה כי החשמל זול יותר.",l:4},
+    {s:"Every household eventually develops one strong opinion about the correct way to load a dishwasher.",he:"בכל בית בסופו של דבר מתפתחת דעה נחרצת אחת על הדרך הנכונה לסדר את המדיח.",l:5}
+  ],
+  "Dryer":[
+    {s:"Use the dryer.",he:"תשתמש במייבש.",l:1},
+    {s:"Put the towels in the dryer.",he:"תכניס את המגבות למייבש.",l:2},
+    {s:"The dryer takes about forty minutes.",he:"המייבש לוקח בערך ארבעים דקות.",l:3},
+    {s:"We don't use the dryer in summer because things dry outside in an hour.",he:"אנחנו לא משתמשים במייבש בקיץ כי דברים מתייבשים בחוץ בשעה.",l:4},
+    {s:"A dryer saves time and slowly destroys your clothes, which is a trade most people accept without thinking.",he:"מייבש חוסך זמן והורס לאט את הבגדים שלך, וזו עסקה שרוב האנשים מקבלים בלי לחשוב.",l:5}
+  ],
+  "Vacuum cleaner":[
+    {s:"Where is the vacuum cleaner?",he:"איפה שואב האבק?",l:1},
+    {s:"Where do you keep the vacuum cleaner?",he:"איפה אתם שומרים את שואב האבק?",l:2},
+    {s:"The vacuum cleaner is broken again.",he:"שואב האבק שוב מקולקל.",l:3},
+    {s:"I run the vacuum cleaner every Friday before people come over.",he:"אני מפעיל את שואב האבק כל יום שישי לפני שאנשים מגיעים.",l:4},
+    {s:"A vacuum cleaner is the one appliance where paying double genuinely buys you something twice as good.",he:"שואב אבק הוא המכשיר היחיד שבו תשלום כפול באמת קונה לך משהו טוב פי שניים.",l:5}
+  ],
+  "Microwave":[
+    {s:"Use the microwave.",he:"תשתמש במיקרוגל.",l:1},
+    {s:"Just heat it up in the microwave.",he:"פשוט תחמם את זה במיקרוגל.",l:2},
+    {s:"Don't put metal in the microwave.",he:"אל תשים מתכת במיקרוגל.",l:3},
+    {s:"I microwaved the leftovers and they were better than the first night.",he:"חיממתי את השאריות במיקרוגל והן היו טובות יותר מהערב הראשון.",l:4},
+    {s:"The microwave is the appliance everyone claims not to rely on and everyone uses every single day.",he:"המיקרוגל הוא המכשיר שכולם טוענים שהם לא נשענים עליו וכולם משתמשים בו כל יום.",l:5}
+  ],
+  "Toaster":[
+    {s:"Where is the toaster?",he:"איפה המצנם?",l:1},
+    {s:"The toaster is next to the kettle.",he:"המצנם ליד הקומקום.",l:2},
+    {s:"The toaster burns everything on the highest setting.",he:"המצנם שורף הכל בהגדרה הגבוהה ביותר.",l:3},
+    {s:"We've had the same toaster for eight years and it still works perfectly.",he:"יש לנו את אותו מצנם כבר שמונה שנים והוא עדיין עובד מצוין.",l:4},
+    {s:"A toaster does one thing, does it in two minutes, and outlives almost everything else in the kitchen.",he:"מצנם עושה דבר אחד, עושה אותו בשתי דקות, ומאריך ימים כמעט מכל דבר אחר במטבח.",l:5}
+  ],
+  "Electric kettle":[
+    {s:"Turn on the electric kettle.",he:"תדליק את הקומקום החשמלי.",l:1},
+    {s:"I'll put the electric kettle on.",he:"אני אדליק את הקומקום החשמלי.",l:2},
+    {s:"The electric kettle boils in under two minutes.",he:"הקומקום החשמלי רותח בפחות משתי דקות.",l:3},
+    {s:"The first thing I look for in a hotel room is an electric kettle.",he:"הדבר הראשון שאני מחפש בחדר במלון הוא קומקום חשמלי.",l:4},
+    {s:"An electric kettle is one of those small things that quietly decides whether a place feels like home.",he:"קומקום חשמלי הוא אחד מאותם דברים קטנים שמחליטים בשקט אם מקום מרגיש כמו בית.",l:5}
+  ],
+  "Blender":[
+    {s:"I have a blender.",he:"יש לי בלנדר.",l:1},
+    {s:"I make smoothies in the blender every morning.",he:"אני מכין שייקים בבלנדר כל בוקר.",l:2},
+    {s:"The blender is too loud for the morning.",he:"הבלנדר רועש מדי לשעות הבוקר.",l:3},
+    {s:"We use the blender for soup far more often than for drinks.",he:"אנחנו משתמשים בבלנדר למרק הרבה יותר מאשר למשקאות.",l:4},
+    {s:"A blender is bought with great enthusiasm and used with steadily declining frequency.",he:"בלנדר נקנה בהתלהבות גדולה ומשמש בתדירות שהולכת ופוחתת.",l:5}
+  ],
+  "Food processor":[
+    {s:"Use the food processor.",he:"תשתמש במעבד המזון.",l:1},
+    {s:"Use the food processor for the salad.",he:"תשתמש במעבד המזון בשביל הסלט.",l:2},
+    {s:"The food processor saves a lot of time.",he:"מעבד המזון חוסך הרבה זמן.",l:3},
+    {s:"She chopped everything for twelve people with the food processor in five minutes.",he:"היא קצצה הכל לשנים עשר אנשים עם מעבד המזון בחמש דקות.",l:4},
+    {s:"A food processor pays for itself the first time you cook for more than six people.",he:"מעבד מזון מחזיר את ההשקעה בפעם הראשונה שאתה מבשל ליותר משישה אנשים.",l:5}
+  ],
+  "Coffee maker":[
+    {s:"Turn on the coffee maker.",he:"תדליק את מכונת הקפה.",l:1},
+    {s:"The coffee maker is already on.",he:"מכונת הקפה כבר דולקת.",l:2},
+    {s:"The coffee maker needs cleaning once a month.",he:"מכונת הקפה צריכה ניקוי פעם בחודש.",l:3},
+    {s:"I set the coffee maker the night before so it's ready when I wake up.",he:"אני מכוון את מכונת הקפה בערב שלפני כדי שתהיה מוכנה כשאני קם.",l:4},
+    {s:"The sound of a coffee maker starting is, for a lot of people, the actual beginning of the day.",he:"הקול של מכונת קפה שמתחילה לעבוד הוא, עבור הרבה אנשים, ההתחלה האמיתית של היום.",l:5}
+  ],
+  "Iron":[
+    {s:"I need an iron.",he:"אני צריך מגהץ.",l:1},
+    {s:"Do you have an iron I could borrow?",he:"יש לך מגהץ שאוכל לשאול?",l:2},
+    {s:"The iron is in the cupboard on the left.",he:"המגהץ בארון משמאל.",l:3},
+    {s:"I used the hotel iron on my shirt ten minutes before the dinner.",he:"השתמשתי במגהץ של המלון על החולצה שלי עשר דקות לפני הארוחה.",l:4},
+    {s:"An iron turns a shirt you slept on into a shirt you can wear to meet someone's parents.",he:"מגהץ הופך חולצה שישנת עליה לחולצה שאפשר ללבוש כדי לפגוש את ההורים של מישהו.",l:5}
+  ],
+  "Ironing board":[
+    {s:"Where is the ironing board?",he:"איפה קרש הגיהוץ?",l:1},
+    {s:"The ironing board is in the closet.",he:"קרש הגיהוץ בארון.",l:2},
+    {s:"Open the ironing board next to the window.",he:"תפתח את קרש הגיהוץ ליד החלון.",l:3},
+    {s:"The hotel had an ironing board in every room, which I didn't expect.",he:"במלון היה קרש גיהוץ בכל חדר, מה שלא ציפיתי לו.",l:4},
+    {s:"An ironing board takes up more space than it deserves and is impossible to do without.",he:"קרש גיהוץ תופס יותר מקום ממה שמגיע לו ובלתי אפשרי להסתדר בלעדיו.",l:5}
+  ],
+  "Hair dryer":[
+    {s:"I need a hair dryer.",he:"אני צריך מייבש שיער.",l:1},
+    {s:"Is there a hair dryer in the room?",he:"יש מייבש שיער בחדר?",l:2},
+    {s:"The hair dryer is under the sink.",he:"מייבש השיער מתחת לכיור.",l:3},
+    {s:"She always packs her own hair dryer because hotel ones are too weak.",he:"היא תמיד אורזת מייבש שיער משלה כי אלה של המלונות חלשים מדי.",l:4},
+    {s:"A hair dryer is also the fastest way to dry a shirt you washed in the sink the night before.",he:"מייבש שיער הוא גם הדרך המהירה ביותר לייבש חולצה שכיבסת בכיור בערב שלפני.",l:5}
+  ],
+  "Extension cord":[
+    {s:"I need an extension cord.",he:"אני צריך כבל מאריך.",l:1},
+    {s:"We need an extension cord for the lamp.",he:"אנחנו צריכים כבל מאריך למנורה.",l:2},
+    {s:"The extension cord doesn't reach the corner.",he:"הכבל המאריך לא מגיע לפינה.",l:3},
+    {s:"I always travel with a short extension cord so one socket becomes three.",he:"אני תמיד נוסע עם כבל מאריך קצר כדי ששקע אחד יהפוך לשלושה.",l:4},
+    {s:"An extension cord solves the one problem every hotel room has: exactly one socket, in exactly the wrong place.",he:"כבל מאריך פותר את הבעיה האחת שיש בכל חדר מלון: שקע אחד בדיוק, במקום הלא נכון בדיוק.",l:5}
+  ],
+  "Power outlet":[
+    {s:"Where is the power outlet?",he:"איפה השקע?",l:1},
+    {s:"Where's the nearest power outlet?",he:"איפה השקע הקרוב ביותר?",l:2},
+    {s:"The power outlet is behind the bed.",he:"השקע נמצא מאחורי המיטה.",l:3},
+    {s:"The power outlets are a different shape here, so I needed an adapter.",he:"השקעים כאן בצורה אחרת, אז הייתי צריך מתאם.",l:4},
+    {s:"Checking what shape the power outlets are is the least exciting and most useful thing you can do before a trip.",he:"לבדוק באיזו צורה השקעים היא הפעולה הכי פחות מרגשת והכי שימושית שאפשר לעשות לפני נסיעה.",l:5}
+  ],
+  "Light switch":[
+    {s:"Where is the light switch?",he:"איפה מתג האור?",l:1},
+    {s:"The light switch is behind the door.",he:"מתג האור מאחורי הדלת.",l:2},
+    {s:"I couldn't find the light switch in the dark.",he:"לא מצאתי את מתג האור בחושך.",l:3},
+    {s:"Every house has one light switch that nobody knows what it controls.",he:"בכל בית יש מתג אור אחד שאף אחד לא יודע מה הוא מפעיל.",l:4},
+    {s:"You know you've settled into a place when you find the light switch without looking for it.",he:"אתה יודע שהתרגלת למקום כשאתה מוצא את מתג האור בלי לחפש אותו.",l:5}
+  ],
+  "Remote control":[
+    {s:"Where is the remote control?",he:"איפה השלט?",l:1},
+    {s:"Have you seen the remote control?",he:"ראית את השלט?",l:2},
+    {s:"The remote control needs new batteries.",he:"השלט צריך סוללות חדשות.",l:3},
+    {s:"We spent ten minutes looking for the remote control and it was under the cushion.",he:"בילינו עשר דקות בחיפוש אחר השלט והוא היה מתחת לכרית.",l:4},
+    {s:"The remote control is the only object in a home that is simultaneously always needed and never where it should be.",he:"השלט הוא החפץ היחיד בבית שגם תמיד נחוץ וגם אף פעם לא במקום שהוא אמור להיות בו.",l:5}
+  ],
+  "Air purifier":[
+    {s:"We have an air purifier.",he:"יש לנו מטהר אוויר.",l:1},
+    {s:"We bought an air purifier for the bedroom.",he:"קנינו מטהר אוויר לחדר השינה.",l:2},
+    {s:"The air purifier runs quietly all night.",he:"מטהר האוויר פועל בשקט כל הלילה.",l:3},
+    {s:"The air purifier helped much more with her allergies than we expected.",he:"מטהר האוויר עזר לאלרגיות שלה הרבה יותר משציפינו.",l:4},
+    {s:"An air purifier is one of those purchases you can't measure and wouldn't give up.",he:"מטהר אוויר הוא אחת מאותן רכישות שאי אפשר למדוד ולא היית מוותר עליהן.",l:5}
+  ],
+  "Water heater":[
+    {s:"Turn on the water heater.",he:"תדליק את הדוד.",l:1},
+    {s:"The water heater takes about twenty minutes.",he:"הדוד לוקח בערך עשרים דקות.",l:2},
+    {s:"The water heater broke in the middle of winter.",he:"הדוד התקלקל באמצע החורף.",l:3},
+    {s:"We turn the water heater on before dinner so there's hot water by nine.",he:"אנחנו מדליקים את הדוד לפני ארוחת הערב כדי שיהיו מים חמים עד תשע.",l:4},
+    {s:"Nobody thinks about the water heater until the exact morning it stops working.",he:"אף אחד לא חושב על הדוד עד לבוקר המדויק שבו הוא מפסיק לעבוד.",l:5}
+  ],
+  "Cutting board":[
+    {s:"Where is the cutting board?",he:"איפה קרש החיתוך?",l:1},
+    {s:"Can you pass me the cutting board?",he:"אתה יכול להעביר לי את קרש החיתוך?",l:2},
+    {s:"Use a separate cutting board for meat.",he:"תשתמש בקרש חיתוך נפרד לבשר.",l:3},
+    {s:"We keep one cutting board for vegetables and another for everything else.",he:"אנחנו שומרים קרש חיתוך אחד לירקות ואחד לכל השאר.",l:4},
+    {s:"A heavy wooden cutting board makes cooking feel serious in a way a plastic one never does.",he:"קרש חיתוך כבד מעץ גורם לבישול להרגיש רציני בצורה שקרש פלסטיק לעולם לא.",l:5}
+  ],
+  "Frying pan":[
+    {s:"Get the frying pan.",he:"תביא את המחבת.",l:1},
+    {s:"Heat the frying pan first.",he:"תחמם קודם את המחבת.",l:2},
+    {s:"The frying pan is still hot, be careful.",he:"המחבת עדיין חמה, תיזהר.",l:3},
+    {s:"I use the same frying pan for almost everything I cook.",he:"אני משתמש באותה מחבת כמעט לכל מה שאני מבשל.",l:4},
+    {s:"One good frying pan will outcook five cheap ones, and it usually outlives them by a decade.",he:"מחבת טובה אחת תבשל טוב יותר מחמש זולות, והיא בדרך כלל שורדת אותן בעשור.",l:5}
+  ],
+  "Saucepan":[
+    {s:"Use a small saucepan.",he:"תשתמש בסיר קטן.",l:1},
+    {s:"Boil the rice in a small saucepan.",he:"תבשל את האורז בסיר קטן.",l:2},
+    {s:"The saucepan is in the bottom cupboard.",he:"הסיר בארון התחתון.",l:3},
+    {s:"I heated the soup in a saucepan instead of the microwave.",he:"חיממתי את המרק בסיר במקום במיקרוגל.",l:4},
+    {s:"A saucepan with a heavy base burns far less, which matters more than any brand name on it.",he:"סיר עם תחתית כבדה שורף הרבה פחות, וזה חשוב יותר מכל שם מותג שעליו.",l:5}
+  ],
+  "Lid":[
+    {s:"Where is the lid?",he:"איפה המכסה?",l:1},
+    {s:"Put the lid on so it cooks faster.",he:"תשים את המכסה כדי שיתבשל מהר יותר.",l:2},
+    {s:"The lid doesn't fit this pot.",he:"המכסה לא מתאים לסיר הזה.",l:3},
+    {s:"Leave the lid slightly open so it doesn't boil over.",he:"תשאיר את המכסה קצת פתוח כדי שלא יגלוש.",l:4},
+    {s:"Every kitchen has more lids than pots, and nobody has ever explained how that happens.",he:"בכל מטבח יש יותר מכסים מסירים, ואף אחד מעולם לא הסביר איך זה קורה.",l:5}
+  ],
+  "Spatula":[
+    {s:"Give me the spatula.",he:"תן לי את המרית.",l:1},
+    {s:"Use the spatula to flip it.",he:"תשתמש במרית כדי להפוך את זה.",l:2},
+    {s:"The spatula is in the drawer by the stove.",he:"המרית במגירה ליד הכיריים.",l:3},
+    {s:"Use a soft spatula so you don't scratch the pan.",he:"תשתמש במרית רכה כדי לא לשרוט את המחבת.",l:4},
+    {s:"A spatula is the one tool where the cheap version is genuinely as good as the expensive one.",he:"מרית היא הכלי היחיד שבו הגרסה הזולה באמת טובה כמו היקרה.",l:5}
+  ],
+  "Whisk":[
+    {s:"Use a whisk.",he:"תשתמש במטרפה.",l:1},
+    {s:"Beat the eggs with a whisk.",he:"תטרוף את הביצים עם מטרפה.",l:2},
+    {s:"The whisk is hanging next to the spoons.",he:"המטרפה תלויה ליד הכפות.",l:3},
+    {s:"A whisk gets the lumps out much better than a fork ever will.",he:"מטרפה מוציאה את הגושים הרבה יותר טוב ממזלג.",l:4},
+    {s:"A whisk does in thirty seconds what a fork does in three minutes, badly.",he:"מטרפה עושה בשלושים שניות מה שמזלג עושה בשלוש דקות, ובצורה גרועה.",l:5}
+  ],
+  "Bottle opener":[
+    {s:"I need a bottle opener.",he:"אני צריך פותחן.",l:1},
+    {s:"Do you have a bottle opener?",he:"יש לך פותחן בקבוקים?",l:2},
+    {s:"The bottle opener is in the top drawer.",he:"הפותחן במגירה העליונה.",l:3},
+    {s:"We couldn't find a bottle opener, so someone used a spoon.",he:"לא מצאנו פותחן, אז מישהו השתמש בכפית.",l:4},
+    {s:"A bottle opener is never where you left it, and always in the last drawer you check.",he:"פותחן אף פעם לא נמצא איפה שהשארת אותו, ותמיד במגירה האחרונה שאתה בודק.",l:5}
+  ],
+  "Storage container":[
+    {s:"I need a storage container.",he:"אני צריך קופסת אחסון.",l:1},
+    {s:"Put the leftovers in a storage container.",he:"תשים את השאריות בקופסת אחסון.",l:2},
+    {s:"The storage containers are under the counter.",he:"קופסאות האחסון מתחת לשיש.",l:3},
+    {s:"She sent us home with three storage containers full of food.",he:"היא שלחה אותנו הביתה עם שלוש קופסאות אחסון מלאות באוכל.",l:4},
+    {s:"Being sent home with a storage container full of food is how some families say they love you.",he:"לשלוח אותך הביתה עם קופסת אחסון מלאה באוכל היא הדרך של חלק מהמשפחות לומר שהן אוהבות אותך.",l:5}
+  ],
+  "Laundry basket":[
+    {s:"The laundry basket is full.",he:"סל הכביסה מלא.",l:1},
+    {s:"The laundry basket is full again.",he:"סל הכביסה שוב מלא.",l:2},
+    {s:"Put your clothes in the laundry basket.",he:"תשים את הבגדים שלך בסל הכביסה.",l:3},
+    {s:"We keep one laundry basket for whites and one for everything else.",he:"אנחנו מחזיקים סל כביסה אחד ללבנים ואחד לכל השאר.",l:4},
+    {s:"A laundry basket is either empty for one hour a week or overflowing for the other hundred and sixty-seven.",he:"סל כביסה הוא או ריק שעה אחת בשבוע או עולה על גדותיו במאה שישים ושבע הנותרות.",l:5}
+  ],
+  "Clothes hanger":[
+    {s:"I need a clothes hanger.",he:"אני צריך קולב.",l:1},
+    {s:"Could I have a few more clothes hangers?",he:"אפשר לקבל עוד כמה קולבים?",l:2},
+    {s:"There are only three clothes hangers in the closet.",he:"יש רק שלושה קולבים בארון.",l:3},
+    {s:"Hang the shirt on a clothes hanger straight away and you won't need to iron it.",he:"תלה את החולצה על קולב מיד ולא תצטרך לגהץ אותה.",l:4},
+    {s:"Hotels never give you enough clothes hangers, and nobody has ever complained about it out loud.",he:"מלונות אף פעם לא נותנים מספיק קולבים, ואף אחד מעולם לא התלונן על זה בקול.",l:5}
+  ],
+  "Bedsheet":[
+    {s:"Change the bedsheet.",he:"תחליף את הסדין.",l:1},
+    {s:"I changed the bedsheets this morning.",he:"החלפתי את הסדינים הבוקר.",l:2},
+    {s:"The bedsheets are clean and smell great.",he:"הסדינים נקיים ומריחים נהדר.",l:3},
+    {s:"We change the bedsheets every Friday, which somehow makes the whole weekend better.",he:"אנחנו מחליפים סדינים כל יום שישי, וזה איכשהו משפר את כל סוף השבוע.",l:4},
+    {s:"Clean bedsheets are the cheapest luxury there is, and the one people underestimate most.",he:"סדינים נקיים הם המותרות הזולות ביותר שיש, ואלה שאנשים הכי מזלזלים בהן.",l:5}
+  ],
+  "Pillowcase":[
+    {s:"Change the pillowcase.",he:"תחליף את הציפית.",l:1},
+    {s:"The pillowcases are in the drawer.",he:"הציפיות במגירה.",l:2},
+    {s:"This pillowcase doesn't match the sheets.",he:"הציפית הזאת לא תואמת לסדינים.",l:3},
+    {s:"I brought my own pillowcase because I sleep better on my own one.",he:"הבאתי ציפית משלי כי אני ישן טוב יותר על שלי.",l:4},
+    {s:"A pillowcase is the single item of bedding your face actually touches all night, which is worth remembering.",he:"ציפית היא פריט המצעים היחיד שהפנים שלך באמת נוגעות בו כל הלילה, וכדאי לזכור את זה.",l:5}
+  ],
+  "Duvet cover":[
+    {s:"We need a duvet cover.",he:"אנחנו צריכים ציפה לשמיכה.",l:1},
+    {s:"We need a new duvet cover.",he:"אנחנו צריכים ציפה חדשה לשמיכה.",l:2},
+    {s:"The duvet cover is too small for this blanket.",he:"הציפה קטנה מדי לשמיכה הזאת.",l:3},
+    {s:"Putting on a duvet cover alone is harder than it has any right to be.",he:"לשים ציפה לשמיכה לבד קשה יותר ממה שסביר שיהיה.",l:4},
+    {s:"Changing a duvet cover is the one household task that has defeated otherwise capable adults for generations.",he:"להחליף ציפה לשמיכה היא משימת הבית האחת שהביסה מבוגרים מוכשרים לחלוטין במשך דורות.",l:5}
+  ],
+  "Cleaning supplies":[
+    {s:"Where are the cleaning supplies?",he:"איפה חומרי הניקוי?",l:1},
+    {s:"The cleaning supplies are under the sink.",he:"חומרי הניקוי מתחת לכיור.",l:2},
+    {s:"We ran out of cleaning supplies this week.",he:"נגמרו לנו חומרי הניקוי השבוע.",l:3},
+    {s:"I keep all the cleaning supplies in one box so I don't search for them.",he:"אני שומר את כל חומרי הניקוי בקופסה אחת כדי לא לחפש אותם.",l:4},
+    {s:"Most homes own eleven cleaning supplies and genuinely use three of them.",he:"רוב הבתים מחזיקים אחד עשר חומרי ניקוי ובאמת משתמשים בשלושה מהם.",l:5}
+  ],
+  "Detergent":[
+    {s:"We need detergent.",he:"אנחנו צריכים אבקת כביסה.",l:1},
+    {s:"We're out of detergent.",he:"נגמרה לנו אבקת הכביסה.",l:2},
+    {s:"Don't use too much detergent in the machine.",he:"אל תשים יותר מדי אבקת כביסה במכונה.",l:3},
+    {s:"We switched to a detergent without perfume because of her skin.",he:"עברנו לאבקת כביסה בלי בושם בגלל העור שלה.",l:4},
+    {s:"Using more detergent than the instructions say makes clothes dirtier, not cleaner, which surprises almost everyone.",he:"שימוש ביותר אבקת כביסה ממה שכתוב בהוראות עושה את הבגדים מלוכלכים יותר, לא נקיים יותר, וזה מפתיע כמעט את כולם.",l:5}
+  ],
+  "Fabric softener":[
+    {s:"Add fabric softener.",he:"תוסיף מרכך כביסה.",l:1},
+    {s:"Don't forget the fabric softener.",he:"אל תשכח את מרכך הכביסה.",l:2},
+    {s:"The fabric softener goes in the middle compartment.",he:"מרכך הכביסה נכנס לתא האמצעי.",l:3},
+    {s:"We stopped using fabric softener on towels because it makes them less absorbent.",he:"הפסקנו להשתמש במרכך כביסה על מגבות כי זה הופך אותן לפחות סופגות.",l:4},
+    {s:"Fabric softener is the reason someone else's towels always smell better than your own.",he:"מרכך כביסה הוא הסיבה שהמגבות של מישהו אחר תמיד מריחות טוב יותר משלך.",l:5}
+  ],
+  "Dustpan":[
+    {s:"Bring the dustpan.",he:"תביא את היעה.",l:1},
+    {s:"Grab the dustpan and brush.",he:"תיקח את היעה והמברשת.",l:2},
+    {s:"The dustpan is behind the door.",he:"היעה מאחורי הדלת.",l:3},
+    {s:"I swept everything into the dustpan and it took two minutes.",he:"טאטאתי הכל ליעה וזה לקח שתי דקות.",l:4},
+    {s:"There is always one line of dust the dustpan refuses to pick up, no matter how many times you try.",he:"תמיד יש קו אחד של אבק שהיעה מסרבת לאסוף, לא משנה כמה פעמים תנסה.",l:5}
+  ],
+  "Mop":[
+    {s:"Where is the mop?",he:"איפה המגב?",l:1},
+    {s:"I'll mop the kitchen floor.",he:"אני אשטוף את רצפת המטבח.",l:2},
+    {s:"The mop is drying outside.",he:"המגב מתייבש בחוץ.",l:3},
+    {s:"I mopped the whole apartment before her parents arrived.",he:"שטפתי את כל הדירה לפני שההורים שלה הגיעו.",l:4},
+    {s:"A floor you mopped yourself looks cleaner than the same floor cleaned by someone else.",he:"רצפה ששטפת בעצמך נראית נקייה יותר מאותה רצפה שמישהו אחר ניקה.",l:5}
+  ],
+  "Toolbox":[
+    {s:"Where is the toolbox?",he:"איפה ארגז הכלים?",l:1},
+    {s:"The screwdriver is in the toolbox.",he:"המברג בארגז הכלים.",l:2},
+    {s:"The toolbox is in the storage room.",he:"ארגז הכלים בחדר האחסון.",l:3},
+    {s:"Her father brought his own toolbox and fixed the door in ten minutes.",he:"אביה הביא ארגז כלים משלו ותיקן את הדלת בעשר דקות.",l:4},
+    {s:"A small toolbox and the willingness to try will solve most of what goes wrong in a home.",he:"ארגז כלים קטן והנכונות לנסות יפתרו את רוב מה שמשתבש בבית.",l:5}
+  ],
+  "Screwdriver":[
+    {s:"I need a screwdriver.",he:"אני צריך מברג.",l:1},
+    {s:"Do you have a small screwdriver?",he:"יש לך מברג קטן?",l:2},
+    {s:"The screwdriver is too big for this screw.",he:"המברג גדול מדי לבורג הזה.",l:3},
+    {s:"I fixed the shelf with a screwdriver and a lot of patience.",he:"תיקנתי את המדף עם מברג והרבה סבלנות.",l:4},
+    {s:"Owning exactly one screwdriver guarantees that every screw in your home will be the other kind.",he:"להחזיק מברג אחד בדיוק מבטיח שכל בורג בבית שלך יהיה מהסוג השני.",l:5}
+  ],
+  "Instructor":[
+    {s:"He is my instructor.",he:"הוא המדריך שלי.",l:1},
+    {s:"Our instructor explained it twice.",he:"המדריך שלנו הסביר את זה פעמיים.",l:2},
+    {s:"The driving instructor was very patient with me.",he:"מורה הנהיגה היה מאוד סבלני איתי.",l:3},
+    {s:"A good instructor makes you feel capable before you actually are.",he:"מדריך טוב גורם לך להרגיש מסוגל עוד לפני שאתה באמת כזה.",l:4},
+    {s:"The difference between a teacher and an instructor is mostly the setting, not the skill.",he:"ההבדל בין מורה למדריך הוא בעיקר ההקשר, לא המיומנות.",l:5}
+  ],
+  "Blends":[
+    {s:"It blends fast.",he:"זה מתערבב מהר.",l:1},
+    {s:"This machine blends fruit in seconds.",he:"המכונה הזאת טוחנת פירות בשניות.",l:2},
+    {s:"She blends the soup until it's completely smooth.",he:"היא טוחנת את המרק עד שהוא חלק לגמרי.",l:3},
+    {s:"He blends into any group within about five minutes.",he:"הוא משתלב בכל קבוצה תוך חמש דקות בערך.",l:4},
+    {s:"The word blends works for food and for people, and the second meaning is the more useful one.",he:"המילה blends עובדת גם על אוכל וגם על אנשים, והמשמעות השנייה היא השימושית יותר.",l:5}
+  ],
+  "Dishes":[
+    {s:"Wash the dishes.",he:"תשטוף את הכלים.",l:1},
+    {s:"I'll wash the dishes tonight.",he:"אני אשטוף את הכלים הערב.",l:2},
+    {s:"They served four different dishes at dinner.",he:"הם הגישו ארבע מנות שונות בארוחת הערב.",l:3},
+    {s:"I always offer to do the dishes when I'm a guest.",he:"אני תמיד מציע לשטוף כלים כשאני אורח.",l:4},
+    {s:"Dishes means both the plates you wash and the food you serve, and only the sentence tells you which.",he:"Dishes אומר גם את הצלחות שאתה שוטף וגם את האוכל שאתה מגיש, ורק המשפט מגלה לך במה מדובר.",l:5}
+  ],
+  "Infomercial":[
+    {s:"It is an infomercial.",he:"זו פרסומת מידע.",l:1},
+    {s:"There was an infomercial on TV at two in the morning.",he:"הייתה פרסומת מידע בטלוויזיה בשתיים בלילה.",l:2},
+    {s:"The infomercial was thirty minutes long.",he:"פרסומת המידע נמשכה שלושים דקות.",l:3},
+    {s:"I watched half an infomercial before I realized it was selling something.",he:"צפיתי בחצי פרסומת מידע לפני שהבנתי שהיא מוכרת משהו.",l:4},
+    {s:"An infomercial pretends to inform you and is designed entirely to sell you something.",he:"פרסומת מידע מעמידה פנים שהיא מיידעת אותך, ובנויה כולה כדי למכור לך משהו.",l:5}
+  ],
+  "Development":[
+    {s:"It is a good development.",he:"זו התפתחות טובה.",l:1},
+    {s:"There's been a lot of development here.",he:"הייתה כאן הרבה התפתחות.",l:2},
+    {s:"The development of the project took two years.",he:"פיתוח הפרויקט לקח שנתיים.",l:3},
+    {s:"I've seen real development in my English since the spring.",he:"ראיתי התפתחות אמיתית באנגלית שלי מאז האביב.",l:4},
+    {s:"Development is the polite English word for progress that is still too slow to celebrate.",he:"Development היא המילה המנומסת באנגלית להתקדמות שעדיין איטית מכדי לחגוג אותה.",l:5}
+  ],
+  "Movement":[
+    {s:"I saw a movement.",he:"ראיתי תנועה.",l:1},
+    {s:"I saw a small movement in the corner.",he:"ראיתי תנועה קטנה בפינה.",l:2},
+    {s:"There was a lot of movement at the entrance.",he:"הייתה הרבה תנועה בכניסה.",l:3},
+    {s:"One small movement of his hand told me the whole story.",he:"תנועה קטנה אחת של היד שלו סיפרה לי את כל הסיפור.",l:4},
+    {s:"Movement can mean a gesture, a crowd, or a cause, and English lets all three share one word.",he:"Movement יכול להיות מחווה, קהל או מאבק, ואנגלית מאפשרת לשלושתם לחלוק מילה אחת.",l:5}
+  ],
+  "Management":[
+    {s:"I work in management.",he:"אני עובד בניהול.",l:1},
+    {s:"The management made a new decision.",he:"ההנהלה קיבלה החלטה חדשה.",l:2},
+    {s:"Good time management changes everything.",he:"ניהול זמן טוב משנה הכל.",l:3},
+    {s:"The problem wasn't the team, it was the management above them.",he:"הבעיה לא הייתה הצוות, אלא ההנהלה מעליו.",l:4},
+    {s:"Management is a job about people far more than it is a job about plans.",he:"ניהול הוא תפקיד שעוסק באנשים הרבה יותר מאשר בתוכניות.",l:5}
+  ],
+  "Escalate":[
+    {s:"Do not escalate it.",he:"אל תסלים את זה.",l:1},
+    {s:"Let's not escalate this.",he:"בוא לא נסלים את זה.",l:2},
+    {s:"A small argument can escalate very quickly.",he:"ויכוח קטן יכול להסלים מהר מאוד.",l:3},
+    {s:"I decided to apologize rather than let it escalate any further.",he:"החלטתי להתנצל במקום לתת לזה להסלים עוד.",l:4},
+    {s:"Almost nothing needs to escalate; it just needs one person willing to speak more quietly.",he:"כמעט שום דבר לא צריך להסלים; הוא רק צריך אדם אחד שמוכן לדבר בשקט יותר.",l:5}
+  ],
+  "Escalator":[
+    {s:"Take the escalator.",he:"קח את המדרגות הנעות.",l:1},
+    {s:"Take the escalator to the second floor.",he:"קח את המדרגות הנעות לקומה השנייה.",l:2},
+    {s:"The escalator is broken, so we used the stairs.",he:"המדרגות הנעות מקולקלות, אז השתמשנו במדרגות.",l:3},
+    {s:"Stand on the right side of the escalator so people can pass on the left.",he:"עמוד בצד ימין של המדרגות הנעות כדי שאנשים יוכלו לעבור משמאל.",l:4},
+    {s:"Standing on the correct side of an escalator is one of those unwritten rules every city enforces silently.",he:"לעמוד בצד הנכון של מדרגות נעות הוא אחד מאותם כללים לא כתובים שכל עיר אוכפת בשקט.",l:5}
+  ],
+  "Escalation":[
+    {s:"There was an escalation.",he:"הייתה הסלמה.",l:1},
+    {s:"We want to avoid any escalation.",he:"אנחנו רוצים להימנע מכל הסלמה.",l:2},
+    {s:"The escalation started over something very small.",he:"ההסלמה התחילה ממשהו מאוד קטן.",l:3},
+    {s:"Nobody planned the escalation; it just happened one sentence at a time.",he:"אף אחד לא תכנן את ההסלמה; היא פשוט קרתה משפט אחר משפט.",l:4},
+    {s:"Every escalation looks avoidable afterwards and looks necessary while it's happening.",he:"כל הסלמה נראית ניתנת למניעה בדיעבד, ונראית הכרחית בזמן שהיא קורית.",l:5}
+  ],
+  "De-escalation":[
+    {s:"We need de-escalation.",he:"אנחנו צריכים הרגעה.",l:1},
+    {s:"De-escalation is always the better option.",he:"הרגעת המצב היא תמיד האפשרות הטובה יותר.",l:2},
+    {s:"He is very good at de-escalation.",he:"הוא מאוד טוב בהרגעת מצבים.",l:3},
+    {s:"A quiet voice and one honest question is most of what de-escalation actually is.",he:"קול שקט ושאלה כנה אחת הם רוב מה שהרגעת מצב באמת מורכבת ממנו.",l:4},
+    {s:"De-escalation is a skill nobody praises you for, because when it works nothing visible happens.",he:"הרגעת מצב היא מיומנות שאף אחד לא משבח אותך עליה, כי כשהיא עובדת שום דבר גלוי לא קורה.",l:5}
+  ],
+  "Appoint":[
+    {s:"They will appoint him.",he:"הם ימנו אותו.",l:1},
+    {s:"They will appoint a new manager.",he:"הם ימנו מנהל חדש.",l:2},
+    {s:"The company appointed her as head of the team.",he:"החברה מינתה אותה לראש הצוות.",l:3},
+    {s:"They appointed someone from outside instead of promoting from within.",he:"הם מינו מישהו מבחוץ במקום לקדם מבפנים.",l:4},
+    {s:"To appoint someone is to hand them authority; whether they earn it is a separate question.",he:"למנות מישהו זה למסור לו סמכות; אם הוא יזכה בה זו שאלה נפרדת.",l:5}
+  ],
+  "Disappoint":[
+    {s:"I do not want to disappoint you.",he:"אני לא רוצה לאכזב אותך.",l:1},
+    {s:"I don't want to disappoint them.",he:"אני לא רוצה לאכזב אותם.",l:2},
+    {s:"He was afraid he would disappoint his parents.",he:"הוא פחד שיאכזב את ההורים שלו.",l:3},
+    {s:"I said no, even though I knew it would disappoint her.",he:"אמרתי לא, למרות שידעתי שזה יאכזב אותה.",l:4},
+    {s:"Trying never to disappoint anyone is the fastest way to disappoint yourself.",he:"לנסות אף פעם לא לאכזב אף אחד היא הדרך המהירה ביותר לאכזב את עצמך.",l:5}
+  ],
+  "Disappointment":[
+    {s:"It was a disappointment.",he:"זו הייתה אכזבה.",l:1},
+    {s:"It was a big disappointment.",he:"זו הייתה אכזבה גדולה.",l:2},
+    {s:"You could hear the disappointment in her voice.",he:"אפשר היה לשמוע את האכזבה בקול שלה.",l:3},
+    {s:"The disappointment passed much faster than I expected it to.",he:"האכזבה חלפה הרבה יותר מהר משציפיתי.",l:4},
+    {s:"Disappointment usually says more about the size of the expectation than about what actually happened.",he:"אכזבה בדרך כלל מספרת יותר על גודל הציפייה מאשר על מה שבאמת קרה.",l:5}
+  ],
+  "Margin":[
+    {s:"It was a small margin.",he:"זה היה פער קטן.",l:1},
+    {s:"We won by a small margin.",he:"ניצחנו בפער קטן.",l:2},
+    {s:"Write your notes in the margin of the page.",he:"תכתוב את ההערות שלך בשוליים של הדף.",l:3},
+    {s:"Their profit margin is thinner than most people assume.",he:"שולי הרווח שלהם דקים יותר ממה שרוב האנשים מניחים.",l:4},
+    {s:"Leaving yourself a margin of time is the cheapest way to stop rushing through your own life.",he:"להשאיר לעצמך מרווח זמן היא הדרך הזולה ביותר להפסיק לרוץ דרך החיים של עצמך.",l:5}
+  ],
+  "Initially":[
+    {s:"Initially it was hard.",he:"בהתחלה זה היה קשה.",l:1},
+    {s:"Initially I was nervous, but it was fine.",he:"בהתחלה הייתי לחוץ, אבל זה היה בסדר.",l:2},
+    {s:"Initially we planned to stay only two days.",he:"בתחילה תכננו להישאר רק יומיים.",l:3},
+    {s:"Initially I understood almost nothing at their dinners, and now I follow most of it.",he:"בהתחלה כמעט לא הבנתי כלום בארוחות שלהם, ועכשיו אני עוקב אחרי רובן.",l:4},
+    {s:"Initially is the word you use when you want to admit you were wrong without saying so directly.",he:"Initially היא המילה שמשתמשים בה כשרוצים להודות שטעית בלי לומר את זה ישירות.",l:5}
+  ],
+  "Ultimately":[
+    {s:"Ultimately it was fine.",he:"בסופו של דבר זה היה בסדר.",l:1},
+    {s:"Ultimately, it was the right decision.",he:"בסופו של דבר, זו הייתה ההחלטה הנכונה.",l:2},
+    {s:"Ultimately we decided to stay one more night.",he:"בסופו של דבר החלטנו להישאר עוד לילה.",l:3},
+    {s:"It was uncomfortable at first, but ultimately it brought us closer.",he:"זה היה לא נוח בהתחלה, אבל בסופו של דבר זה קירב בינינו.",l:4},
+    {s:"Ultimately signals that everything before it was detail and what comes next is the actual point.",he:"Ultimately מסמן שכל מה שקדם לו היה פרטים ושמה שבא אחריו הוא העיקר.",l:5}
+  ],
 };
 
 // ── APP STATE ──
@@ -4922,7 +6589,7 @@ let wlCat='all', wlStatus='all', wlFiltersBuilt=false;
 // ── STORAGE ──
 const DATA_KEY='englishAppData';
 function loadData(){
-  const DEF={version:2,progress:{},settings:{direction:'en-he',dailyGoal:20,autoSpeak:false,speakAfterFlip:false,showExamples:true,showPhonetic:true},history:{},userAddedWords:[],longestStreak:0};
+  const DEF={version:2,progress:{},settings:{direction:'en-he',dailyGoal:20,autoSpeak:false,speakAfterFlip:false,showExamples:true,showPhonetic:true,geminiKey:''},history:{},userAddedWords:[],longestStreak:0,talkMistakes:[],talkSessions:[],talkLevel:null,talkLevelHistory:[]};
   try{
     const raw=localStorage.getItem(DATA_KEY);
     if(raw){
@@ -4969,6 +6636,14 @@ function calcScore(w){
   if(p.status==='mastered')s-=30;
   s-=(p.streak||0)*10;
   s+=Math.random()*4;
+  // ── סדר הלמידה שביקשת (2026-08-03) — "עיגול" ──
+  // 1. מילים מהרשימה החדשה עולות ראשונות
+  // 2. סימנת "יודע" (mastered) → צונחות לסוף הרשימה
+  // 3. הגיע מועד החזרה → חוזרות לראש התור. העיגול נסגר.
+  if(w.prio){
+    const due=p.nextReviewAt&&p.nextReviewAt<=now;
+    if(p.status!=='mastered'||due)s+=400;
+  }
   return s;
 }
 
@@ -5066,9 +6741,9 @@ function renderCard(){
   document.getElementById('cSpeakBtn').style.display=isEN?'flex':'none';
   const phBtn=document.getElementById('cPhBtn');
   phBtn.style.display=(s.showPhonetic!==false&&isEN)?'inline-flex':'none';
-  const exEl=document.getElementById('cEx');
-  if(s.showExamples!==false&&w.ex){exEl.textContent=w.ex;exEl.style.display='block';}
-  else{exEl.style.display='none';}
+  // המתג "Show examples" שולט עכשיו על פאנל המשפטים בצד
+  const exPanel=document.getElementById('exPanel');
+  if(exPanel)exPanel.style.display=(s.showExamples!==false)?'':'none';
   document.getElementById('cardScene').classList.remove('flipped');
   document.getElementById('cPhonetic').classList.remove('vis');
   phBtn.classList.remove('on');phBtn.textContent='🔤 Phonetic';
