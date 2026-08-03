@@ -6809,9 +6809,10 @@ function renderExPanel(w){
   listEl.innerHTML=items.map(item=>{
     const safe=item.s.replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const lv=item.l||3;
-    const escaped=item.s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    // בורח גם מהמחרוזת של JavaScript וגם ממאפיין ה-HTML, אחרת גרש או מרכאה שוברים החוצה
+    const escaped=esc(item.s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"));
     const heBtn=item.he?'<button class="exp-he-btn" onclick="toggleExpHe(this)" title="תרגום עברי">🇮🇱</button>':'';
-    const heTxt=item.he?'<div class="exp-he">'+item.he+'</div>':'';
+    const heTxt=item.he?'<div class="exp-he">'+esc(item.he)+'</div>':'';
     return '<div class="exp-item">'
       +'<div class="exp-item-top">'
       +'<span class="exp-lvl lvl-'+lv+'">'+lvlLabel[lv]+'</span>'
@@ -6932,8 +6933,9 @@ function switchAddTab(t){
 function isDup(en){return allWords().some(w=>w.en.toLowerCase()===en.trim().toLowerCase());}
 
 function makeUserWord(en,he,cat,emoji,ph,ex,type){
-  return{id:'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),source:'user',
-    en:en.trim(),he:he.trim(),cat:cat||'basics',emoji:emoji||'📝',ph:ph||'',ex:ex||'',type:type||'word',addedAt:Date.now()};
+  // עובר דרך sanitizeWord כדי שתגיות HTML לא ייכנסו לנתונים
+  return sanitizeWord({id:'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),source:'user',
+    en:en,he:he,cat:cat||'basics',emoji:emoji||'📝',ph:ph||'',ex:ex||'',type:type||'word',addedAt:Date.now()});
 }
 
 function addSingle(studyNow){
@@ -6944,6 +6946,7 @@ function addSingle(studyNow){
   const w=makeUserWord(en,he,document.getElementById('aCat').value,
     document.getElementById('aEmoji').value,document.getElementById('aPh').value.trim(),
     document.getElementById('aEx').value.trim(),document.getElementById('aType').value);
+  if(!w){toast('Those characters are not allowed','err');return;}
   appData.userAddedWords.push(w);saveData();
   ['aEn','aHe','aEmoji','aPh','aEx'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   toast('✅ "'+en+'" added!');renderRecent();updateHeaderCount();
@@ -6972,7 +6975,9 @@ function addBulk(){
   lines.forEach(line=>{
     const r=parseBulkLine(line);if(!r)return;
     if(isDup(r.en)){skipped++;return;}
-    appData.userAddedWords.push(makeUserWord(r.en,r.he,cat,'📝','',r.ex,type));
+    const bw=makeUserWord(r.en,r.he,cat,'📝','',r.ex,type);
+    if(!bw){skipped++;return;}
+    appData.userAddedWords.push(bw);
     added++;
   });
   saveData();
@@ -6985,7 +6990,7 @@ function renderRecent(){
   const el=document.getElementById('recentlyAdded');if(!el)return;
   const items=[...appData.userAddedWords].reverse().slice(0,10);
   if(!items.length){el.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:8px 0;">No words added yet.</div>';return;}
-  el.innerHTML=items.map(w=>'<div class="recent-item"><span class="ri-en">'+(w.emoji||'📝')+' '+w.en+'</span><span class="ri-he">'+w.he+'</span><span class="ri-date">'+new Date(w.addedAt).toLocaleDateString('en',{month:'short',day:'numeric'})+'</span><button onclick="studyOne(\''+w.id+'\')" class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:.7rem;">▶</button></div>').join('');
+  el.innerHTML=items.map(w=>'<div class="recent-item"><span class="ri-en">'+esc(w.emoji||'📝')+' '+esc(w.en)+'</span><span class="ri-he">'+esc(w.he)+'</span><span class="ri-date">'+new Date(w.addedAt).toLocaleDateString('en',{month:'short',day:'numeric'})+'</span><button onclick="studyOne(\''+esc(String(w.id)).replace(/\x27/g,'')+'\')" class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:.7rem;">▶</button></div>').join('');
 }
 
 function studyOne(id){
@@ -7039,8 +7044,8 @@ function renderWL(){
   words.forEach(w=>{
     const p=getProgress(w.id);
     const card=document.createElement('div');card.className='word-card';
-    const formsHtml=w.forms?'<div class="wc-forms">'+w.forms+'</div>':'';
-    card.innerHTML='<div class="wc-top"><div class="wc-en">'+(w.emoji||'📝')+' '+w.en+'</div><div class="wc-status-dot" style="background:'+(statusColors[p.status||'new'])+'"></div></div><div class="wc-he">'+w.he+'</div>'+formsHtml+'<div class="wc-meta"><span>'+w.cat+(w.type!=='word'?' · '+w.type:'')+'</span><span>'+(p.streak?'🔥'+p.streak:'')+'</span></div>'+(w.source==='user'?'<button class="wc-del" onclick="deleteWord(\''+w.id+'\',event)">🗑</button>':'');
+    const formsHtml=w.forms?'<div class="wc-forms">'+esc(w.forms)+'</div>':'';
+    card.innerHTML='<div class="wc-top"><div class="wc-en">'+esc(w.emoji||'📝')+' '+esc(w.en)+'</div><div class="wc-status-dot" style="background:'+(statusColors[p.status||'new'])+'"></div></div><div class="wc-he">'+esc(w.he)+'</div>'+formsHtml+'<div class="wc-meta"><span>'+esc(w.cat)+(w.type!=='word'?' · '+esc(w.type):'')+'</span><span>'+(p.streak?'🔥'+p.streak:'')+'</span></div>'+(w.source==='user'?'<button class="wc-del" onclick="deleteWord(\''+esc(String(w.id)).replace(/\x27/g,'')+'\',event)">🗑</button>':'');
     card.onclick=()=>studyOne(w.id);
     grid.appendChild(card);
   });
@@ -7154,18 +7159,56 @@ function importHandler(e){
       if(merge){
         if(d.progress)Object.assign(appData.progress,d.progress);
         if(d.history)Object.assign(appData.history,d.history);
-        if(d.userAddedWords)d.userAddedWords.forEach(w=>{if(!isDup(w.en))appData.userAddedWords.push({...w,source:'user'});});
-        if(d.longestStreak>appData.longestStreak)appData.longestStreak=d.longestStreak;
+        // כל מילה שמגיעה מקובץ חיצוני עוברת ניקוי לפני שהיא נשמרת
+        if(Array.isArray(d.userAddedWords))d.userAddedWords.forEach(raw=>{
+          const w=sanitizeWord(raw);
+          if(w&&!isDup(w.en))appData.userAddedWords.push(w);
+        });
+        if(d.longestStreak>appData.longestStreak)appData.longestStreak=+d.longestStreak||0;
         toast('✅ Data merged successfully!');
       }else{
         if(!confirm('⚠️ Replace ALL your progress and settings? This cannot be undone.'))return;
-        appData=Object.assign(loadData(),d);
+        const clean=loadData();
+        if(d.progress&&typeof d.progress==='object')clean.progress=d.progress;
+        if(d.history&&typeof d.history==='object')clean.history=d.history;
+        if(d.settings&&typeof d.settings==='object')Object.assign(clean.settings,d.settings);
+        clean.longestStreak=+d.longestStreak||0;
+        clean.userAddedWords=Array.isArray(d.userAddedWords)?d.userAddedWords.map(sanitizeWord).filter(Boolean):[];
+        appData=clean;
         toast('✅ Data replaced.');
       }
       saveData();updateStreak();updateHeaderCount();
     }catch(err){toast('Import failed: invalid file format','err');}
   };
   reader.readAsText(file);e.target.value='';
+}
+
+// ── אבטחה: בריחת תווים לפני הכנסה ל-HTML ──
+// בלי זה, מילה שמכילה תגית HTML הייתה מורצת כקוד בדף.
+function esc(v){
+  return String(v==null?'':v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// מנקה מילה שהגיעה מבחוץ (קובץ גיבוי / הוספה ידנית) לפני שהיא נשמרת
+function sanitizeWord(w){
+  if(!w||typeof w!=='object')return null;
+  const str=(v,max)=>typeof v==='string'?v.replace(/[<>]/g,'').trim().slice(0,max):'';
+  const en=str(w.en,80), he=str(w.he,120);
+  if(!en||!he)return null;
+  return {
+    id:   /^[\w.-]{1,40}$/.test(String(w.id||'')) ? String(w.id) : 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    en, he,
+    emoji: str(w.emoji,8)||'📝',
+    cat:   CATS.some(c=>c.id===w.cat) ? w.cat : 'basics',
+    type:  ['word','phrase','pattern'].includes(w.type) ? w.type : 'word',
+    ph:    str(w.ph,120),
+    ex:    str(w.ex,300),
+    forms: str(w.forms,200),
+    addedAt: Number(w.addedAt)||Date.now(),
+    source:'user'
+  };
 }
 
 // ── TOAST ──
