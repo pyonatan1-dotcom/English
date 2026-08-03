@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>English Flashcards — Yonatan</title>
+<!-- ═══ אפליקציה (PWA) — התקנה במסך הבית + עבודה בלי אינטרנט ═══ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D0D0D">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="English">
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -18,7 +26,7 @@
   --nav:60px;--hdr:56px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;min-height:100vh;padding-bottom:var(--nav);}
+body{background:var(--bg);color:var(--text);font-family:'Heebo',sans-serif;min-height:100vh;padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom));}
 a{color:inherit;text-decoration:none;}
 button{cursor:pointer;font-family:'Heebo',sans-serif;}
 input,select,textarea{font-family:'Heebo',sans-serif;color:var(--text);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;width:100%;font-size:.88rem;outline:none;transition:border .2s;}
@@ -34,7 +42,7 @@ label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-w
 .hdr-streak{font-size:.82rem;color:var(--orange-l);white-space:nowrap;background:rgba(255,111,0,.1);border:1px solid rgba(255,111,0,.2);border-radius:20px;padding:4px 10px;}
 
 /* BOTTOM NAV */
-.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-size:.63rem;font-weight:500;transition:color .2s;padding:0;}
 .nav-btn.active{color:var(--gold);}
 .nav-btn svg{flex-shrink:0;}
@@ -61,7 +69,7 @@ label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-w
 .btn-icon{width:32px;height:32px;padding:0;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold-d);display:inline-flex;align-items:center;justify-content:center;}
 
 /* TOAST */
-.toast{position:fixed;bottom:calc(var(--nav) + 12px);left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:.85rem;z-index:200;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
+.toast{position:fixed;bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 12px);left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:.85rem;z-index:200;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{border-color:var(--red);color:var(--red-l);}
 
@@ -7227,6 +7235,28 @@ function init(){
 }
 try{init();}catch(err){
   document.body.insertAdjacentHTML('afterbegin','<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#c00;color:#fff;padding:12px;font-size:13px;word-break:break-all;">JS ERROR: '+err.message+' — '+err.stack+'</div>');
+}
+
+// ── אפליקציה (PWA): רישום ה-Service Worker ──
+// עובד רק דרך https (האתר החי). בפתיחת הקובץ מקומית זה פשוט מדולג.
+if('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      // אם יש גרסה חדשה — מרעננים פעם אחת כדי שהאפליקציה תמיד תהיה עדכנית
+      reg.addEventListener('updatefound', function(){
+        const nw = reg.installing;
+        if(!nw) return;
+        nw.addEventListener('statechange', function(){
+          if(nw.state === 'installed' && navigator.serviceWorker.controller){
+            if(!sessionStorage.getItem('sw_reloaded')){
+              sessionStorage.setItem('sw_reloaded','1');
+              location.reload();
+            }
+          }
+        });
+      });
+    }).catch(function(){ /* בלי SW האתר עדיין עובד רגיל */ });
+  });
 }
 </script>
 </body>
