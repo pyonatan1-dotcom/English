@@ -343,6 +343,8 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
   <div class="s-picker" id="sPicker">
     <div class="picker-title">Today's Practice</div>
     <div class="picker-sub" id="pickerSub">Loading…</div>
+    <!-- בורר נושא — קובע ממה הסשן הבא ילמד -->
+    <div class="wl-filters" id="topicRow" style="justify-content:center;margin:12px 0 2px;"></div>
     <div class="quick-btns">
       <button class="btn btn-gold" onclick="startSession('smart',10)">▶ Quick Study</button>
       <button class="btn btn-orange" onclick="startSession('weak',20)">⚡ Weak Words</button>
@@ -647,7 +649,7 @@ const WORDS = [
   {en:"Recommend",he:"ממליץ",emoji:"👍",cat:"verbs",type:"word",ph:"רֶק-וֹ-מֶנְד",ex:"Can you recommend a good book?"},
   {en:"Spend",he:"להוציא / לבלות",emoji:"💳",cat:"verbs",type:"word",ph:"סְפֶּנְד",ex:"I spend too much money.",forms:"spent / spending / spends"},
   {en:"Complain",he:"להתלונן",emoji:"😤",cat:"verbs",type:"word",ph:"קוֹם-פְּלֵיין",ex:"Please don't complain all the time."},
-  {en:"Fund",he:"לממן",emoji:"💵",cat:"verbs",type:"word",ph:"פַּאנְד",ex:"Who will fund this project?"},
+  {en:"Fund",he:"לממן",emoji:"💵",cat:"investing",type:"word",ph:"פַּאנְד",ex:"Who will fund this project?"},
   {en:"Melts",he:"נמס",emoji:"🧊",cat:"verbs",type:"word",ph:"מֶלְטְס",ex:"The ice melts in summer."},
   {en:"Raised",he:"הרים / העלה",emoji:"⬆️",cat:"verbs",type:"word",ph:"רֵיְזְד",ex:"She raised her hand."},
   {en:"Suggested",he:"הציע",emoji:"💭",cat:"verbs",type:"word",ph:"סַג-גֶ'סְ-טֶד",ex:"He suggested a great idea."},
@@ -794,7 +796,7 @@ const WORDS = [
   {en:"Saturday",he:"שבת",emoji:"✡️",cat:"days",type:"word",ph:"סַט-ֶר-דֵיי",ex:""},
   // people
   {en:"Entrepreneur",he:"יזם",emoji:"💡",cat:"people",type:"word",ph:"אַנ-טְרֶ-פְּרֶ-נֶר",ex:"He's a successful entrepreneur."},
-  {en:"Investor",he:"משקיע",emoji:"💹",cat:"people",type:"word",ph:"אִין-וֶוס-טֶר",ex:"We need an investor."},
+  {en:"Investor",he:"משקיע",emoji:"💹",cat:"investing",type:"word",ph:"אִין-וֶוס-טֶר",ex:"We need an investor."},
   {en:"Friend",he:"חבר",emoji:"👫",cat:"people",type:"word",ph:"פְּרֶנְד",ex:"She's my best friend."},
   {en:"Nurse",he:"אחות / אח בבית חולים",emoji:"👩‍⚕️",cat:"people",type:"word",ph:"נֶרְס",ex:"The nurse is very kind."},
   {en:"People",he:"אנשים",emoji:"👥",cat:"people",type:"word",ph:"פִּי-פֶּל",ex:"People are interesting."},
@@ -946,7 +948,7 @@ const WORDS = [
   {en:"Schedule",he:"לוח זמנים",emoji:"📅",cat:"work",type:"word",ph:"שְׁקֶד'-יוּל",ex:"Check the schedule."},
   {en:"Presentation",he:"מצגת",emoji:"📺",cat:"work",type:"word",ph:"פְּרֶז-ֶן-טֵיי-שֶׁן",ex:"I gave a presentation today."},
   {en:"Feedback",he:"משוב",emoji:"💬",cat:"work",type:"word",ph:"פִּיד-בַּק",ex:"Give me your feedback."},
-  {en:"Budget",he:"תקציב",emoji:"💰",cat:"work",type:"word",ph:"בַּד'-ֶט",ex:"We are over budget."},
+  {en:"Budget",he:"תקציב",emoji:"💰",cat:"finance",type:"word",ph:"בַּד'-ֶט",ex:"We are over budget."},
   {en:"Contract",he:"חוזה",emoji:"📜",cat:"work",type:"word",ph:"קוֹן-טְרַקְט",ex:"Sign the contract."},
   {en:"Resume",he:"קורות חיים",emoji:"📄",cat:"work",type:"word",ph:"רֶז-ֶ-מֵי",ex:"Send me your resume."},
   {en:"Meeting room",he:"חדר ישיבות",emoji:"🚪",cat:"work",type:"phrase",ph:"מִי-טִינְג רוּם",ex:"Book the meeting room."},
@@ -998,11 +1000,11 @@ const WORDS = [
   {en:"Matches",he:"גפרורים / תואם",emoji:"🔥",cat:"things",type:"word",ph:"מַאצ'-אִיז",ex:"Do you have any matches?"},
   // concepts - business
   {en:"Strategy",he:"אסטרטגיה",emoji:"♟️",cat:"concepts",type:"word",ph:"סְטְרַא-טֶ-ג'ִי",ex:"We need a clear strategy."},
-  {en:"Revenue",he:"הכנסות",emoji:"💰",cat:"work",type:"word",ph:"רֶב-יוּ",ex:"Our revenue grew this quarter."},
-  {en:"Profit",he:"רווח",emoji:"📈",cat:"work",type:"word",ph:"פְּרוֹ-פִיט",ex:"The company made a big profit."},
-  {en:"Loss",he:"הפסד",emoji:"📉",cat:"work",type:"word",ph:"לוֹס",ex:"They reported a loss this year."},
-  {en:"Investment",he:"השקעה",emoji:"💹",cat:"work",type:"word",ph:"אִין-וֶסְט-מֶנְט",ex:"This is a smart investment."},
-  {en:"Growth",he:"צמיחה",emoji:"📈",cat:"work",type:"word",ph:"גְרוֹת'",ex:"The company showed strong growth."},
+  {en:"Revenue",he:"הכנסות",emoji:"💰",cat:"finance",type:"word",ph:"רֶב-יוּ",ex:"Our revenue grew this quarter."},
+  {en:"Profit",he:"רווח",emoji:"📈",cat:"finance",type:"word",ph:"פְּרוֹ-פִיט",ex:"The company made a big profit."},
+  {en:"Loss",he:"הפסד",emoji:"📉",cat:"finance",type:"word",ph:"לוֹס",ex:"They reported a loss this year."},
+  {en:"Investment",he:"השקעה",emoji:"💹",cat:"investing",type:"word",ph:"אִין-וֶסְט-מֶנְט",ex:"This is a smart investment."},
+  {en:"Growth",he:"צמיחה",emoji:"📈",cat:"investing",type:"word",ph:"גְרוֹת'",ex:"The company showed strong growth."},
     {en:"Target",he:"יעד / מטרה",emoji:"🎯",cat:"work",type:"word",ph:"טַאר-גֶט",ex:"We hit our sales target."},
   {en:"Launch",he:"השקה / להשיק",emoji:"🚀",cat:"work",type:"word",ph:"לוֹנְץ'",ex:"We're launching the product next week."},
   {en:"Campaign",he:"קמפיין",emoji:"📣",cat:"work",type:"word",ph:"קַאם-פֵּיין",ex:"The marketing campaign was successful."},
@@ -1085,7 +1087,7 @@ const WORDS = [
   {en:"Progress",he:"התקדמות",emoji:"📈",cat:"concepts",type:"word",ph:"פְּרוֹ-גְּרֶס",ex:"I'm making great progress."},
   {en:"Challenge",he:"אתגר",emoji:"⛰️",cat:"concepts",type:"word",ph:"צ'ַ-לֶנְדְ'",ex:"Every challenge is an opportunity."},
     {en:"Impact",he:"השפעה / השפעה",emoji:"💥",cat:"concepts",type:"word",ph:"אִים-פַּקְט",ex:"What's the impact of this decision?"},
-  {en:"Trend",he:"מגמה",emoji:"📈",cat:"concepts",type:"word",ph:"טְרֶנְד",ex:"This is a growing trend."},
+  {en:"Trend",he:"מגמה",emoji:"📈",cat:"investing",type:"word",ph:"טְרֶנְד",ex:"This is a growing trend."},
   {en:"Innovation",he:"חדשנות",emoji:"💡",cat:"concepts",type:"word",ph:"אִי-נוֹ-וֵי-שֶׁן",ex:"Innovation drives growth."},
   {en:"Leadership",he:"מנהיגות",emoji:"👑",cat:"concepts",type:"word",ph:"לִי-דֶר-שִׁיפּ",ex:"Good leadership is essential."},
   {en:"Teamwork",he:"עבודת צוות",emoji:"🤝",cat:"concepts",type:"word",ph:"טִים-וֶרְק",ex:"Teamwork makes the dream work."},
@@ -1095,7 +1097,7 @@ const WORDS = [
   {en:"Reputation",he:"מוניטין",emoji:"⭐",cat:"concepts",type:"word",ph:"רֶ-פְּיוּ-טֵי-שֶׁן",ex:"Protect your reputation."},
   {en:"Network",he:"רשת קשרים",emoji:"🌐",cat:"concepts",type:"word",ph:"נֶט-וֶרְק",ex:"Build your professional network."},
     {en:"Efficiency",he:"יעילות",emoji:"⚡",cat:"concepts",type:"word",ph:"אִי-פִי-שֶׁן-סִי",ex:"Efficiency saves time and money."},
-  {en:"Risk",he:"סיכון",emoji:"⚠️",cat:"concepts",type:"word",ph:"רִיסְק",ex:"What's the risk of this decision?"},
+  {en:"Risk",he:"סיכון",emoji:"⚠️",cat:"investing",type:"word",ph:"רִיסְק",ex:"What's the risk of this decision?"},
   {en:"Benefit",he:"יתרון / הטבה",emoji:"✅",cat:"concepts",type:"word",ph:"בֶ-נֶ-פִיט",ex:"What are the benefits?"},
   {en:"Cost",he:"עלות / מחיר",emoji:"💵",cat:"concepts",type:"word",ph:"קוֹסְט",ex:"What's the total cost?"},
   {en:"Value",he:"ערך",emoji:"💎",cat:"concepts",type:"word",ph:"וַל-יוּ",ex:"We create real value."},
@@ -1251,7 +1253,7 @@ const WORDS = [
   {prio:1,en:"Overpriced",he:"יקר מדי ביחס לערך",emoji:"💸",cat:"concepts",type:"word",ph:"אוֹ-וֶר-פְּרַייסְט",ex:"That restaurant is completely overpriced."},
   {prio:1,en:"Discounted",he:"בהנחה",emoji:"🏷️",cat:"concepts",type:"word",ph:"דִיס-קַאונ-טֶד",ex:"These shoes are discounted this week."},
   {prio:1,en:"Exchange rate",he:"שער חליפין",emoji:"💱",cat:"concepts",type:"phrase",ph:"אֶקְס-צֵ'יינְג' רֵייט",ex:"What's the exchange rate today?"},
-  {prio:1,en:"Transaction",he:"עסקה כספית",emoji:"💳",cat:"concepts",type:"word",ph:"טְרַאנ-זַאק-שֶׁן",ex:"The transaction didn't go through."},
+  {prio:1,en:"Transaction",he:"עסקה כספית",emoji:"💳",cat:"finance",type:"word",ph:"טְרַאנ-זַאק-שֶׁן",ex:"The transaction didn't go through."},
   {prio:1,en:"Payment method",he:"אמצעי תשלום",emoji:"💰",cat:"concepts",type:"phrase",ph:"פֵּיי-מֶנְט מֶ-ת'ֶד",ex:"What payment methods do you accept?"},
   {prio:1,en:"Contactless payment",he:"תשלום ללא מגע",emoji:"📲",cat:"concepts",type:"phrase",ph:"קוֹן-טַאקְט-לֶס פֵּיי-מֶנְט",ex:"Do you take contactless payment?"},
   {prio:1,en:"Installment",he:"תשלום בתשלומים",emoji:"📆",cat:"concepts",type:"word",ph:"אִינ-סְטוֹל-מֶנְט",ex:"Can I pay in installments?"},
@@ -1358,9 +1360,108 @@ const WORDS = [
   {prio:1,en:"Appoint",he:"למנות לתפקיד",emoji:"📋",cat:"verbs",type:"word",ph:"אַ-פּוֹיְנְט",ex:"They will appoint a new manager."},
   {prio:1,en:"Disappoint",he:"לאכזב",emoji:"😞",cat:"verbs",type:"word",ph:"דִי-סֶ-פּוֹיְנְט",ex:"I don't want to disappoint them."},
   {prio:1,en:"Disappointment",he:"אכזבה",emoji:"💔",cat:"concepts",type:"word",ph:"דִי-סֶ-פּוֹיְנְט-מֶנְט",ex:"It was a big disappointment."},
-  {prio:1,en:"Margin",he:"מרווח / שוליים / פער רווח",emoji:"📊",cat:"concepts",type:"word",ph:"מַאר-גִ'ין",ex:"We won by a small margin."},
+  {prio:1,en:"Margin",he:"מרווח / שוליים / פער רווח",emoji:"📊",cat:"finance",type:"word",ph:"מַאר-גִ'ין",ex:"We won by a small margin."},
   {prio:1,en:"Initially",he:"בהתחלה / בתחילה",emoji:"1️⃣",cat:"time",type:"word",ph:"אִי-נִי-שֶׁ-לִי",ex:"Initially I was nervous, but it was fine."},
   {prio:1,en:"Ultimately",he:"בסופו של דבר",emoji:"🏁",cat:"time",type:"word",ph:"אַל-טִי-מֶט-לִי",ex:"Ultimately, it was the right decision."},
+  // ═══ השקעות — 📈 מניות, שוק ההון וניתוח ═══
+  {inv:1,en:"Return",he:"תשואה",emoji:"📈",cat:"investing",type:"word",ph:"רִי-טֶרְן",ex:"The return on this investment was 8%."},
+  {inv:1,en:"Yield",he:"תשואה שוטפת",emoji:"🌾",cat:"investing",type:"word",ph:"יִילְד",ex:"This bond has a 4% yield."},
+  {inv:1,en:"Portfolio",he:"תיק השקעות",emoji:"💼",cat:"investing",type:"word",ph:"פּוֹרְט-פוֹ-לִיוֹ",ex:"My portfolio is mostly stocks."},
+  {inv:1,en:"Asset",he:"נכס",emoji:"🏛️",cat:"investing",type:"word",ph:"אַ-סֶט",ex:"A house is a valuable asset."},
+  {inv:1,en:"Capital",he:"הון",emoji:"💵",cat:"investing",type:"word",ph:"קַא-פִּי-טֶל",ex:"We need more capital to start."},
+  {inv:1,en:"Reward",he:"תגמול",emoji:"🏆",cat:"investing",type:"word",ph:"רִי-וֹורְד",ex:"Higher risk usually means higher reward."},
+  {inv:1,en:"Diversification",he:"פיזור השקעות",emoji:"🧩",cat:"investing",type:"word",ph:"דַיי-וֶר-סִי-פִי-קֵיי-שֶׁן",ex:"Diversification lowers your risk."},
+  {inv:1,en:"Compound interest",he:"ריבית דריבית",emoji:"🔁",cat:"investing",type:"phrase",ph:"קוֹם-פַּאונְד אִינ-טְרֶסְט",ex:"Compound interest grows your money over time."},
+  {inv:1,en:"Principal",he:"קרן ההשקעה",emoji:"💎",cat:"investing",type:"word",ph:"פְּרִינ-סִי-פֶּל",ex:"You get your principal back at the end."},
+  {inv:1,en:"Stock",he:"מניה",emoji:"📊",cat:"investing",type:"word",ph:"סְטוֹק",ex:"I bought stock in that company."},
+  {inv:1,en:"Share",he:"מניה בודדת",emoji:"🧾",cat:"investing",type:"word",ph:"שֵׁר",ex:"I own 100 shares."},
+  {inv:1,en:"Shareholder",he:"בעל מניות",emoji:"👤",cat:"investing",type:"word",ph:"שֵׁר-הוֹל-דֶר",ex:"Every shareholder can vote."},
+  {inv:1,en:"Equity",he:"הון עצמי",emoji:"🏦",cat:"investing",type:"word",ph:"אֶ-קְוִוי-טִי",ex:"We have 40% equity in the house."},
+  {inv:1,en:"Dividend",he:"דיבידנד",emoji:"💸",cat:"investing",type:"word",ph:"דִי-וִי-דֶנְד",ex:"The company pays a dividend every quarter."},
+  {inv:1,en:"Broker",he:"ברוקר / מתווך",emoji:"🤝",cat:"investing",type:"word",ph:"בְּרוֹו-קֶר",ex:"My broker handles the trades."},
+  {inv:1,en:"Stock exchange",he:"בורסה",emoji:"🏛️",cat:"investing",type:"phrase",ph:"סְטוֹק אֶקְס-צֵ'יינְג'",ex:"The stock exchange opens at nine."},
+  {inv:1,en:"Index",he:"מדד",emoji:"📉",cat:"investing",type:"word",ph:"אִינ-דֶקְס",ex:"The index went up 2% today."},
+  {inv:1,en:"Index fund",he:"קרן מחקה מדד",emoji:"🗂️",cat:"investing",type:"phrase",ph:"אִינ-דֶקְס פַאנְד",ex:"An index fund is a simple way to invest."},
+  {inv:1,en:"Bull market",he:"שוק עולה",emoji:"🐂",cat:"investing",type:"phrase",ph:"בּוּל מַאר-קֶט",ex:"We've been in a bull market for two years."},
+  {inv:1,en:"Bear market",he:"שוק יורד",emoji:"🐻",cat:"investing",type:"phrase",ph:"בֵּר מַאר-קֶט",ex:"Prices fall in a bear market."},
+  {inv:1,en:"Volatility",he:"תנודתיות",emoji:"🎢",cat:"investing",type:"word",ph:"ווֹ-לֶ-טִי-לִי-טִי",ex:"There's a lot of volatility this month."},
+  {inv:1,en:"Valuation",he:"הערכת שווי",emoji:"⚖️",cat:"investing",type:"word",ph:"וֶל-יוּ-אֵיי-שֶׁן",ex:"The valuation seems too high."},
+  {inv:1,en:"Market cap",he:"שווי שוק",emoji:"🏔️",cat:"investing",type:"phrase",ph:"מַאר-קֶט קַאפּ",ex:"Its market cap is over a billion."},
+  {inv:1,en:"Earnings",he:"רווחי החברה",emoji:"📑",cat:"investing",type:"word",ph:"אֶר-נִינְגְז",ex:"Earnings come out next week."},
+  {inv:1,en:"IPO",he:"הנפקה ראשונה לציבור",emoji:"🚀",cat:"investing",type:"word",ph:"אַיי-פִּי-אוֹו",ex:"The company is planning an IPO."},
+  {inv:1,en:"Blue chip",he:"מניה יציבה ומובילה",emoji:"🔵",cat:"investing",type:"phrase",ph:"בְּלוּ צִ'יפּ",ex:"Blue chip stocks are usually safer."},
+  {inv:1,en:"Bond",he:"אגרת חוב",emoji:"📜",cat:"investing",type:"word",ph:"בּוֹנְד",ex:"Bonds are less risky than stocks."},
+  {inv:1,en:"Holding",he:"החזקה בתיק",emoji:"🗃️",cat:"investing",type:"word",ph:"הוֹל-דִינְג",ex:"That's my largest holding."},
+  {inv:1,en:"Stake",he:"נתח בעלות",emoji:"🥧",cat:"investing",type:"word",ph:"סְטֵייק",ex:"He owns a 10% stake in the company."},
+  {inv:1,en:"Due diligence",he:"בדיקת נאותות",emoji:"🔍",cat:"investing",type:"phrase",ph:"דוּ דִי-לִי-גֶ'נְס",ex:"Do your due diligence before you buy."},
+  {inv:1,en:"Fundamentals",he:"נתוני יסוד של חברה",emoji:"🧱",cat:"investing",type:"word",ph:"פַאנ-דֶ-מֶנ-טֶלְז",ex:"The fundamentals look strong."},
+  {inv:1,en:"Benchmark",he:"מדד ייחוס",emoji:"🎯",cat:"investing",type:"word",ph:"בֶּנְץ'-מַארְק",ex:"We beat the benchmark this year."},
+  {inv:1,en:"Allocation",he:"הקצאת נכסים",emoji:"🥧",cat:"investing",type:"word",ph:"אַ-לוֹ-קֵיי-שֶׁן",ex:"My allocation is 70% stocks."},
+  {inv:1,en:"Rebalance",he:"איזון מחדש של התיק",emoji:"⚖️",cat:"investing",type:"word",ph:"רִי-בַּא-לֶנְס",ex:"I rebalance my portfolio once a year."},
+  {inv:1,en:"Liquidity",he:"נזילות",emoji:"💧",cat:"investing",type:"word",ph:"לִי-קְוִוי-דִי-טִי",ex:"Cash has the highest liquidity."},
+  {inv:1,en:"Leverage",he:"מינוף",emoji:"🏋️",cat:"investing",type:"word",ph:"לֶ-וֶ-רִיג'",ex:"Using leverage increases both gain and risk."},
+  {inv:1,en:"Hedge",he:"גידור סיכון",emoji:"🛡️",cat:"investing",type:"word",ph:"הֶג'",ex:"Gold can hedge against inflation."},
+  {inv:1,en:"Exposure",he:"חשיפה לשוק",emoji:"🌡️",cat:"investing",type:"word",ph:"אֶקְס-פּוֹו-ז'ֶר",ex:"I want less exposure to tech."},
+  {inv:1,en:"Speculation",he:"ספקולציה",emoji:"🎲",cat:"investing",type:"word",ph:"סְפֶּ-קְיוּ-לֵיי-שֶׁן",ex:"That's speculation, not investing."},
+  {inv:1,en:"Long-term",he:"לטווח ארוך",emoji:"🕰️",cat:"investing",type:"word",ph:"לוֹנְג-טֶרְם",ex:"I'm a long-term investor."},
+  {inv:1,en:"Short-term",he:"לטווח קצר",emoji:"⏱️",cat:"investing",type:"word",ph:"שׁוֹרְט-טֶרְם",ex:"Short-term prices are unpredictable."},
+  {inv:1,en:"Bubble",he:"בועה",emoji:"🫧",cat:"investing",type:"word",ph:"בַּא-בֶּל",ex:"Some people think it's a bubble."},
+  {inv:1,en:"Crash",he:"קריסת שוק",emoji:"💥",cat:"investing",type:"word",ph:"קְרַאשׁ",ex:"The market crash wiped out billions."},
+  {inv:1,en:"Recession",he:"מיתון",emoji:"📉",cat:"investing",type:"word",ph:"רִי-סֶ-שֶׁן",ex:"We may be heading into a recession."},
+  {inv:1,en:"Trade",he:"עסקת קנייה או מכירה",emoji:"🔄",cat:"investing",type:"word",ph:"טְרֵייד",ex:"I made three trades today."},
+
+  // ═══ נדל"ן — 🏘️ ═══
+  {inv:1,en:"Real estate",he:"נדל\"ן",emoji:"🏘️",cat:"realestate",type:"phrase",ph:"רִי-אֶל אֶס-טֵייט",ex:"He invests in real estate."},
+  {inv:1,en:"Property",he:"נכס",emoji:"🏠",cat:"realestate",type:"word",ph:"פְּרוֹ-פֶּר-טִי",ex:"They own three properties."},
+  {inv:1,en:"Landlord",he:"בעל הדירה",emoji:"🔑",cat:"realestate",type:"word",ph:"לַאנְד-לוֹרְד",ex:"The landlord raised the rent."},
+  {inv:1,en:"Tenant",he:"שוכר",emoji:"👥",cat:"realestate",type:"word",ph:"טֶ-נֶנְט",ex:"The tenant pays on the first."},
+  {inv:1,en:"Lease",he:"חוזה שכירות",emoji:"📝",cat:"realestate",type:"word",ph:"לִיס",ex:"We signed a two-year lease."},
+  {inv:1,en:"Rent",he:"שכר דירה",emoji:"💵",cat:"realestate",type:"word",ph:"רֶנְט",ex:"The rent is due tomorrow."},
+  {inv:1,en:"Rental income",he:"הכנסה משכירות",emoji:"📥",cat:"realestate",type:"phrase",ph:"רֶנ-טֶל אִינ-קַאם",ex:"The rental income covers the mortgage."},
+  {inv:1,en:"Mortgage",he:"משכנתא",emoji:"🏦",cat:"realestate",type:"word",ph:"מוֹר-גִיג'",ex:"We're still paying the mortgage."},
+  {inv:1,en:"Down payment",he:"מקדמה / הון עצמי לרכישה",emoji:"💰",cat:"realestate",type:"phrase",ph:"דַאון פֵּיי-מֶנְט",ex:"We saved for the down payment."},
+  {inv:1,en:"Loan",he:"הלוואה",emoji:"🏧",cat:"realestate",type:"word",ph:"לוֹון",ex:"The bank approved the loan."},
+  {inv:1,en:"Refinance",he:"מיחזור הלוואה",emoji:"♻️",cat:"realestate",type:"word",ph:"רִי-פַיי-נַאנְס",ex:"We refinanced at a lower rate."},
+  {inv:1,en:"Appraisal",he:"שמאות / הערכת שווי נכס",emoji:"📋",cat:"realestate",type:"word",ph:"אַ-פְּרֵיי-זֶל",ex:"The appraisal came in low."},
+  {inv:1,en:"Closing costs",he:"עלויות סגירת עסקה",emoji:"🧾",cat:"realestate",type:"phrase",ph:"קְלוֹו-זִינְג קוֹסְטְס",ex:"Don't forget the closing costs."},
+  {inv:1,en:"Escrow",he:"נאמנות כספית",emoji:"🔒",cat:"realestate",type:"word",ph:"אֶס-קְרוֹו",ex:"The money is held in escrow."},
+  {inv:1,en:"Deed",he:"שטר בעלות",emoji:"📜",cat:"realestate",type:"word",ph:"דִיד",ex:"The deed is in her name."},
+  {inv:1,en:"Title",he:"זכות בעלות רשומה",emoji:"🗝️",cat:"realestate",type:"word",ph:"טַיי-טֶל",ex:"Make sure the title is clean."},
+  {inv:1,en:"Zoning",he:"ייעוד קרקע",emoji:"🗺️",cat:"realestate",type:"word",ph:"זוֹו-נִינְג",ex:"The zoning doesn't allow a shop here."},
+  {inv:1,en:"Vacancy rate",he:"שיעור דירות ריקות",emoji:"🚪",cat:"realestate",type:"phrase",ph:"וֵיי-קֶן-סִי רֵייט",ex:"The vacancy rate is very low."},
+  {inv:1,en:"Cap rate",he:"שיעור תשואה על נכס",emoji:"📐",cat:"realestate",type:"phrase",ph:"קַאפּ רֵייט",ex:"The cap rate on that building is 6%."},
+  {inv:1,en:"Appreciation",he:"עליית ערך",emoji:"⬆️",cat:"realestate",type:"word",ph:"אַ-פְּרִי-שִׁי-אֵיי-שֶׁן",ex:"The house saw strong appreciation."},
+  {inv:1,en:"Depreciation",he:"ירידת ערך / פחת",emoji:"⬇️",cat:"realestate",type:"word",ph:"דִי-פְּרִי-שִׁי-אֵיי-שֶׁן",ex:"Depreciation lowers your taxable income."},
+  {inv:1,en:"Renovation",he:"שיפוץ",emoji:"🔨",cat:"realestate",type:"word",ph:"רֶ-נוֹ-וֵיי-שֶׁן",ex:"The renovation took four months."},
+  {inv:1,en:"Property tax",he:"ארנונה / מס רכוש",emoji:"🏛️",cat:"realestate",type:"phrase",ph:"פְּרוֹ-פֶּר-טִי טַאקְס",ex:"Property tax went up again."},
+  {inv:1,en:"Square footage",he:"שטח במטרים",emoji:"📏",cat:"realestate",type:"phrase",ph:"סְקְוֶור פוּ-טִיג'",ex:"What's the square footage?"},
+  {inv:1,en:"Homeowner",he:"בעל בית",emoji:"🏡",cat:"realestate",type:"word",ph:"הוֹום-אוֹו-נֶר",ex:"He became a homeowner last year."},
+  {inv:1,en:"Sublet",he:"שכירות משנה",emoji:"🔁",cat:"realestate",type:"word",ph:"סַאב-לֶט",ex:"We sublet the apartment for the summer."},
+  {inv:1,en:"Security deposit",he:"פיקדון ביטחון",emoji:"🛡️",cat:"realestate",type:"phrase",ph:"סִי-קְיוּ-רִי-טִי דִי-פּוֹ-זִיט",ex:"They returned the security deposit."},
+
+  // ═══ כסף ופיננסים — 💰 ═══
+  {inv:1,en:"Income",he:"הכנסה",emoji:"📥",cat:"finance",type:"word",ph:"אִינ-קַאם",ex:"Our income went up this year."},
+  {inv:1,en:"Passive income",he:"הכנסה פסיבית",emoji:"🛋️",cat:"finance",type:"phrase",ph:"פַּא-סִיב אִינ-קַאם",ex:"Rent is a form of passive income."},
+  {inv:1,en:"Expense",he:"הוצאה",emoji:"📤",cat:"finance",type:"word",ph:"אֶקְס-פֶּנְס",ex:"That's a monthly expense."},
+  {inv:1,en:"Overhead",he:"הוצאות תפעול קבועות",emoji:"🏢",cat:"finance",type:"word",ph:"אוֹו-וֶר-הֶד",ex:"We cut our overhead by half."},
+  {inv:1,en:"Debt",he:"חוב",emoji:"⛓️",cat:"finance",type:"word",ph:"דֶט",ex:"We paid off all our debt."},
+  {inv:1,en:"Credit",he:"אשראי",emoji:"💳",cat:"finance",type:"word",ph:"קְרֶ-דִיט",ex:"His credit is excellent."},
+  {inv:1,en:"Interest",he:"ריבית",emoji:"➕",cat:"finance",type:"word",ph:"אִינ-טְרֶסְט",ex:"The loan has 5% interest."},
+  {inv:1,en:"Interest rate",he:"שיעור ריבית",emoji:"📊",cat:"finance",type:"phrase",ph:"אִינ-טְרֶסְט רֵייט",ex:"Interest rates went up again."},
+  {inv:1,en:"Inflation",he:"אינפלציה",emoji:"🎈",cat:"finance",type:"word",ph:"אִינ-פְלֵיי-שֶׁן",ex:"Inflation makes everything cost more."},
+  {inv:1,en:"Tax",he:"מס",emoji:"🧾",cat:"finance",type:"word",ph:"טַאקְס",ex:"How much tax do you pay?"},
+  {inv:1,en:"Capital gains",he:"רווחי הון",emoji:"💹",cat:"finance",type:"phrase",ph:"קַא-פִּי-טֶל גֵיינְז",ex:"You pay tax on capital gains."},
+  {inv:1,en:"Deduction",he:"ניכוי מס",emoji:"✂️",cat:"finance",type:"word",ph:"דִי-דַאק-שֶׁן",ex:"That's a legal deduction."},
+  {inv:1,en:"Balance sheet",he:"מאזן",emoji:"📋",cat:"finance",type:"phrase",ph:"בַּא-לֶנְס שִׁיט",ex:"Their balance sheet looks healthy."},
+  {inv:1,en:"Cash flow",he:"תזרים מזומנים",emoji:"🌊",cat:"finance",type:"phrase",ph:"קַאשׁ פְלוֹו",ex:"Cash flow matters more than profit."},
+  {inv:1,en:"Net worth",he:"שווי נקי",emoji:"🧮",cat:"finance",type:"phrase",ph:"נֶט וֶרְת'",ex:"His net worth doubled in five years."},
+  {inv:1,en:"Break even",he:"נקודת איזון",emoji:"⚖️",cat:"finance",type:"phrase",ph:"בְּרֵייק אִי-וֶן",ex:"We break even after two years."},
+  {inv:1,en:"Fee",he:"עמלה / דמי טיפול",emoji:"🏷️",cat:"finance",type:"word",ph:"פִי",ex:"The fund charges a small fee."},
+  {inv:1,en:"Commission",he:"עמלת תיווך",emoji:"🤝",cat:"finance",type:"word",ph:"קֶ-מִי-שֶׁן",ex:"The agent takes a 2% commission."},
+  {inv:1,en:"Liability",he:"התחייבות",emoji:"⚠️",cat:"finance",type:"word",ph:"לַיי-אַ-בִּי-לִי-טִי",ex:"A loan is a liability, not an asset."},
+  {inv:1,en:"Wealth",he:"עושר",emoji:"👑",cat:"finance",type:"word",ph:"וֶולְת'",ex:"Wealth is built slowly."},
+  {inv:1,en:"Savings",he:"חסכונות",emoji:"🐷",cat:"finance",type:"word",ph:"סֵיי-וִינְגְז",ex:"We keep our savings in the bank."},
+  {inv:1,en:"Statement",he:"דוח חשבון",emoji:"📄",cat:"finance",type:"word",ph:"סְטֵייט-מֶנְט",ex:"Check your bank statement."},
 ];
 
 // ── CATEGORIES ──
@@ -1382,6 +1483,10 @@ const CATS = [
   {id:'work',label:'Work',emoji:'💼'},
   {id:'home',label:'Home',emoji:'🏠'},
   {id:'patterns',label:'Patterns',emoji:'💬'},
+  // ── נושאי השקעות (נוסף 2026-08-05) ──
+  {id:'investing',label:'Investing',emoji:'📈'},
+  {id:'realestate',label:'Real Estate',emoji:'🏘️'},
+  {id:'finance',label:'Money',emoji:'💰'},
 ];
 
 // Assign IDs + source to built-in words
@@ -6656,8 +6761,54 @@ function calcScore(w){
 }
 
 // ── STUDY QUEUE ──
+// ── בורר הנושא ללימוד ──
+// 'all' = מכל אוצר המילים. אחרת — רק מהקטגוריה שנבחרה.
+// הבחירה נשמרת, כך שהיא נשארת בין סשנים ובין מכשירים.
+const TOPIC_GROUPS=[
+  {id:'all',label:'🎴 Everything'},
+  {id:'investing',label:'📈 Investing'},
+  {id:'realestate',label:'🏘️ Real Estate'},
+  {id:'finance',label:'💰 Money'},
+  {id:'travel',label:'✈️ Travel'},
+  {id:'home',label:'🏠 Home'},
+  {id:'work',label:'💼 Work'},
+  {id:'food',label:'🍽️ Food'},
+  {id:'verbs',label:'⚡ Verbs'},
+  {id:'phrases',label:'🗣️ Phrases'},
+];
+function getStudyCat(){
+  const c=appData&&appData.settings&&appData.settings.studyCat;
+  return (c&&(c==='all'||CATS.some(x=>x.id===c)))?c:'all';
+}
+function setStudyCat(id){
+  appData.settings.studyCat=id;saveData();
+  renderTopicChips();updatePickerSub();
+  const t=TOPIC_GROUPS.find(x=>x.id===id);
+  toast('Studying: '+(t?t.label:id));
+}
+function renderTopicChips(){
+  const row=document.getElementById('topicRow');if(!row)return;
+  const cur=getStudyCat(), all=allWords();
+  row.innerHTML='';
+  TOPIC_GROUPS.forEach(t=>{
+    const n=t.id==='all'?all.length:all.filter(w=>w.cat===t.id).length;
+    if(!n)return;                                   // לא מציג נושא ריק
+    const b=document.createElement('button');
+    b.className='filter-btn'+(t.id===cur?' active':'');
+    b.textContent=t.label+' '+n;
+    b.onclick=()=>setStudyCat(t.id);
+    row.appendChild(b);
+  });
+}
+
 function buildQueue(mode,size){
   let words=allWords();
+  const cat=getStudyCat();
+  if(cat!=='all'){
+    const inTopic=words.filter(w=>w.cat===cat);
+    if(!inTopic.length){toast('No words in this topic yet','err');return null;}
+    words=inTopic;
+  }
   if(mode==='weak'){
     words=words.filter(w=>{const p=getProgress(w.id);return(p.timesLearning||0)>0&&((p.easeScore||2.5)<2.0||(p.timesLearning||0)>(p.timesKnown||0));});
     if(!words.length){toast('No weak words yet — keep studying! 💪');return null;}
@@ -6704,10 +6855,17 @@ function showTab(t){
 
 // ── STUDY ──
 function updatePickerSub(){
-  const all=allWords(),now=Date.now();
-  const due=all.filter(w=>{const p=getProgress(w.id);return!p.lastReviewedAt||p.status==='new'||p.status==='learning'||(p.nextReviewAt&&p.nextReviewAt<=now);}).length;
+  const now=Date.now(), cat=getStudyCat();
+  const all=allWords();
+  const scope=cat==='all'?all:all.filter(w=>w.cat===cat);
+  const due=scope.filter(w=>{const p=getProgress(w.id);return!p.lastReviewedAt||p.status==='new'||p.status==='learning'||(p.nextReviewAt&&p.nextReviewAt<=now);}).length;
+  const known=scope.filter(w=>getProgress(w.id).status==='mastered').length;
   const el=document.getElementById('pickerSub');
-  if(el)el.textContent=due+' words due · '+all.length+' total in library';
+  if(!el)return;
+  const t=TOPIC_GROUPS.find(x=>x.id===cat);
+  el.textContent = cat==='all'
+    ? due+' words due · '+all.length+' total in library'
+    : due+' due · '+known+' known · '+scope.length+' in '+(t?t.label.replace(/^\S+\s/,''):cat);
 }
 
 function startSession(mode,size){
@@ -7274,6 +7432,7 @@ function init(){
   updateDirBtns();
   updateHeaderCount();
   updateStreak();
+  renderTopicChips();
   updatePickerSub();
 }
 try{init();}catch(err){
