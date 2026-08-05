@@ -314,6 +314,27 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
   .comp-stats{gap:7px;}
   .stats-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}
 }
+
+/* ── READ — קטעי קריאה ── */
+.read-wrap{max-width:720px;margin:0 auto;padding:18px 16px;}
+.art-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+.art-card:hover{border-color:var(--gold-d);}
+.art-emoji{font-size:1.5rem;margin-bottom:6px;}
+.art-title{font-family:'Frank Ruhl Libre',serif;font-size:1.02rem;color:var(--gold-l);line-height:1.35;}
+.art-sub{font-size:.78rem;color:var(--muted);margin-top:3px;}
+.art-meta{font-size:.7rem;color:var(--muted);margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;}
+.art-body{font-size:1.02rem;line-height:2;color:var(--text);white-space:pre-wrap;margin:14px 0;}
+.rw{color:var(--gold-l);border-bottom:1px dashed var(--gold-d);cursor:pointer;padding:0 1px;}
+.rw.known{color:var(--muted);border-bottom-color:transparent;}
+.rw:active{background:rgba(201,168,76,.18);}
+.read-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+.read-he{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;font-size:.92rem;line-height:1.85;color:var(--muted);white-space:pre-wrap;margin-top:12px;display:none;}
+.read-he.on{display:block;}
+.rw-word{font-family:'Frank Ruhl Libre',serif;font-size:1.6rem;color:var(--gold-l);}
+.rw-ph{font-size:.9rem;color:var(--muted);margin-top:4px;}
+.rw-he{font-size:1.15rem;margin:10px 0;}
+.rw-ex{background:var(--bg3);border-radius:9px;padding:10px 12px;font-size:.86rem;color:var(--muted);line-height:1.6;}
+.paste-box{width:100%;min-height:110px;font-family:'Heebo',sans-serif;font-size:.88rem;line-height:1.6;}
 </style>
 <script>window.onerror=function(msg,src,line,col,err){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#900;color:#fff;padding:14px;font-size:13px;word-break:break-all;white-space:pre-wrap';d.textContent='ERROR at line '+line+':\n'+msg;document.body?document.body.prepend(d):document.addEventListener("DOMContentLoaded",function(){document.body.prepend(d);});return false;};</script>
 </head>
@@ -566,6 +587,54 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
   </div>
 </div>
 
+
+<!-- ═══ TAB: READ ═══ -->
+<div id="tab-read" class="tab">
+  <div class="read-wrap">
+
+    <div id="readList">
+      <div class="tab-h2">📖 Read</div>
+      <div style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:16px;">
+        Tap any highlighted word to see what it means and hear it.
+        Words you tap can be added straight to your study list.
+      </div>
+      <div id="artList"></div>
+
+      <div class="sg" style="margin-top:22px;">
+        <div class="sg-title">📋 Paste your own text</div>
+        <div style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:10px;">
+          Reading something at work? Paste the English here and it becomes a lesson.
+          The Hebrew is optional — paste it too and you will be able to compare.
+        </div>
+        <textarea id="pasteEn" class="paste-box" placeholder="Paste the English text here…"></textarea>
+        <textarea id="pasteHe" class="paste-box" style="margin-top:8px;min-height:70px;" placeholder="(אופציונלי) הדבק כאן את התרגום לעברית…"></textarea>
+        <button class="btn btn-gold" style="width:100%;margin-top:10px;" onclick="readPasted()">📖 Read it</button>
+      </div>
+    </div>
+
+    <div id="readView" style="display:none;">
+      <div class="read-top">
+        <button class="btn btn-outline btn-sm" onclick="closeArticle()">← Back</button>
+        <button class="btn btn-outline btn-sm" id="readHeBtn" onclick="toggleReadHe()">🇮🇱 Translation</button>
+      </div>
+      <div class="art-title" id="readTitle"></div>
+      <div class="art-sub" id="readSub"></div>
+      <div class="art-body" id="readBody"></div>
+      <div class="read-he" id="readHe"></div>
+      <div style="font-size:.75rem;color:var(--muted);text-align:center;margin:16px 0 4px;" id="readTapped"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- READING WORD POPUP -->
+<div class="modal" id="rwModal" onclick="if(event.target===this)closeRW()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeRW()">✕</button>
+    <div id="rwBody"></div>
+  </div>
+</div>
+
 <!-- SHORTCUTS MODAL -->
 <div class="modal" id="shortcutsModal" onclick="this.classList.remove('active')">
   <div class="modal-box" onclick="event.stopPropagation()">
@@ -594,6 +663,9 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 <nav class="bnav">
   <button class="nav-btn active" id="nav-study" onclick="showTab('study')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="21" height="21"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Study
+  </button>
+  <button class="nav-btn" id="nav-read" onclick="showTab('read')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="21" height="21"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg>Read
   </button>
   <button class="nav-btn" id="nav-add" onclick="showTab('add')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="21" height="21"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>Add
@@ -6693,6 +6765,664 @@ const EXTRA_EXAMPLES = {
     {s:"It was uncomfortable at first, but ultimately it brought us closer.",he:"זה היה לא נוח בהתחלה, אבל בסופו של דבר זה קירב בינינו.",l:4},
     {s:"Ultimately signals that everything before it was detail and what comes next is the actual point.",he:"Ultimately מסמן שכל מה שקדם לו היה פרטים ושמה שבא אחריו הוא העיקר.",l:5}
   ],
+  "Income":[
+    {s:"I have a good income.",he:"יש לי הכנסה טובה.",l:1},
+    {s:"My income comes from two jobs.",he:"ההכנסה שלי מגיעה משתי עבודות.",l:2},
+    {s:"The building gives us a steady income every month from rent.",he:"הבניין נותן לנו הכנסה קבועה כל חודש משכר דירה.",l:3},
+    {s:"After the tenant left, our income dropped almost forty percent, so we cut everything we could.",he:"אחרי שהדייר עזב, ההכנסה שלנו ירדה בכמעט ארבעים אחוז, אז קיצצנו בכל מה שיכולנו.",l:4},
+    {s:"Most family offices care less about a big exit and more about building income they can count on through any market.",he:"רוב משרדי המשפחה פחות מתעניינים באקזיט גדול ויותר בבניית הכנסה שאפשר לסמוך עליה בכל שוק.",l:5}
+  ],
+  "Passive income":[
+    {s:"I want passive income.",he:"אני רוצה הכנסה פסיבית.",l:1},
+    {s:"The apartment gives me passive income.",he:"הדירה נותנת לי הכנסה פסיבית.",l:2},
+    {s:"He lives mostly on passive income from dividends and two rental units.",he:"הוא חי בעיקר מהכנסה פסיבית מדיבידנדים ומשתי דירות להשכרה.",l:3},
+    {s:"People call rentals passive income, but between repairs and late tenants it takes real work every month.",he:"אנשים קוראים להשכרה הכנסה פסיבית, אבל בין תיקונים לדיירים שמאחרים בתשלום זו עבודה אמיתית כל חודש.",l:4},
+    {s:"The dream of passive income sells well, though in practice you are simply getting paid for capital and risk you took on years earlier.",he:"החלום של הכנסה פסיבית נמכר טוב, אבל בפועל אתה פשוט מקבל תשלום על ההון והסיכון שנטלת על עצמך שנים קודם לכן.",l:5}
+  ],
+  "Expense":[
+    {s:"That is a big expense.",he:"זו הוצאה גדולה.",l:1},
+    {s:"The new roof was an expense we planned.",he:"הגג החדש היה הוצאה שתכננו.",l:2},
+    {s:"Every expense goes in the spreadsheet, even the small ones like cleaning.",he:"כל הוצאה נכנסת לגיליון, אפילו הקטנות כמו ניקיון.",l:3},
+    {s:"Legal fees turned into our biggest expense last quarter, and nobody had budgeted a single dollar for them.",he:"שכר טרחת עורכי הדין הפך להוצאה הגדולה ביותר שלנו ברבעון האחרון, ואף אחד לא תקצב עבורו דולר אחד.",l:4},
+    {s:"Deals rarely die from one huge expense; they bleed out from a dozen small ones nobody bothered to underwrite.",he:"עסקאות כמעט אף פעם לא מתות מהוצאה ענקית אחת; הן מדממות למוות מתריסר הוצאות קטנות שאף אחד לא טרח לקחת בחשבון.",l:5}
+  ],
+  "Overhead":[
+    {s:"Our overhead is low.",he:"הוצאות התפעול שלנו נמוכות.",l:1},
+    {s:"Rent and salaries are our main overhead.",he:"שכר דירה ומשכורות הם הוצאות התפעול העיקריות שלנו.",l:2},
+    {s:"We moved to a smaller office to cut our monthly overhead.",he:"עברנו למשרד קטן יותר כדי לצמצם את הוצאות התפעול החודשיות שלנו.",l:3},
+    {s:"The fund looks profitable on paper, but once you add overhead like staff and software, the margin nearly disappears.",he:"הקרן נראית רווחית על הנייר, אבל ברגע שמוסיפים הוצאות תפעול כמו כוח אדם ותוכנה, המרווח כמעט נעלם.",l:4},
+    {s:"The smartest operators I know keep overhead brutally lean, because fixed costs are what force you to sell good assets at bad times.",he:"המפעילים הכי חכמים שאני מכיר שומרים על הוצאות תפעול רזות בצורה אכזרית, כי עלויות קבועות הן מה שמכריח אותך למכור נכסים טובים בזמנים גרועים.",l:5}
+  ],
+  "Debt":[
+    {s:"He has no debt.",he:"אין לו חוב.",l:1},
+    {s:"We paid off the debt last year.",he:"פרענו את החוב בשנה שעברה.",l:2},
+    {s:"The company took on debt to buy the warehouse next door.",he:"החברה לקחה חוב כדי לקנות את המחסן ליד.",l:3},
+    {s:"Their debt was fine at three percent, but refinancing at seven wiped out the entire cash flow.",he:"החוב שלהם היה בסדר גמור בשלושה אחוזים, אבל מיחזור בשבעה אחוזים מחק את כל תזרים המזומנים.",l:4},
+    {s:"Debt is not the enemy; the enemy is debt that comes due at the exact moment nobody wants to lend you anything.",he:"החוב אינו האויב; האויב הוא חוב שמגיע לפירעון בדיוק ברגע שבו אף אחד לא רוצה להלוות לך שום דבר.",l:5}
+  ],
+  "Credit":[
+    {s:"My credit is good.",he:"דירוג האשראי שלי טוב.",l:1},
+    {s:"The bank gave us more credit this year.",he:"הבנק נתן לנו יותר אשראי השנה.",l:2},
+    {s:"We opened a line of credit so we can move fast on deals.",he:"פתחנו מסגרת אשראי כדי שנוכל לפעול מהר בעסקאות.",l:3},
+    {s:"Her credit was strong enough that the lender approved the loan in four days without extra guarantees.",he:"דירוג האשראי שלה היה חזק מספיק כדי שהמלווה יאשר את ההלוואה תוך ארבעה ימים בלי ערבויות נוספות.",l:4},
+    {s:"Lenders offer you all the credit in the world when you do not need it, and none of it the week you actually do.",he:"מלווים מציעים לך את כל האשראי שבעולם כשאתה לא צריך אותו, ואפס אשראי בדיוק בשבוע שבו אתה באמת צריך.",l:5}
+  ],
+  "Interest":[
+    {s:"The loan has high interest.",he:"להלוואה יש ריבית גבוהה.",l:1},
+    {s:"We pay interest to the bank every month.",he:"אנחנו משלמים ריבית לבנק כל חודש.",l:2},
+    {s:"Most of the early payments go to interest, not to the loan itself.",he:"רוב התשלומים הראשונים הולכים לריבית, לא להלוואה עצמה.",l:3},
+    {s:"He was shocked to learn he had paid more in interest over ten years than the house originally cost.",he:"הוא היה בהלם לגלות שהוא שילם יותר בריבית לאורך עשר שנים ממה שהבית עלה במקור.",l:4},
+    {s:"Compound interest is the only employee that works nights and weekends without complaining, which is why time beats timing every single decade.",he:"ריבית דריבית היא העובדת היחידה שעובדת בלילות ובסופי שבוע בלי להתלונן, ולכן זמן מנצח תזמון בכל עשור.",l:5}
+  ],
+  "Interest rate":[
+    {s:"The interest rate is low.",he:"שיעור הריבית נמוך.",l:1},
+    {s:"The bank raised the interest rate again.",he:"הבנק העלה שוב את שיעור הריבית.",l:2},
+    {s:"We locked in a fixed interest rate before the market moved.",he:"קיבענו שיעור ריבית קבוע לפני שהשוק זז.",l:3},
+    {s:"A one point jump in the interest rate added nine hundred dollars to their monthly mortgage payment.",he:"קפיצה של אחוז אחד בשיעור הריבית הוסיפה תשע מאות דולר לתשלום המשכנתא החודשי שלהם.",l:4},
+    {s:"Every asset on earth is priced off the interest rate, so when rates move, everything you own quietly gets repriced overnight.",he:"כל נכס בעולם מתומחר על בסיס שיעור הריבית, ולכן כשהריבית זזה, כל מה שיש לך מתומחר מחדש בשקט בן לילה.",l:5}
+  ],
+  "Inflation":[
+    {s:"Inflation is very high.",he:"האינפלציה מאוד גבוהה.",l:1},
+    {s:"Inflation makes food more expensive every year.",he:"האינפלציה מייקרת את המזון בכל שנה.",l:2},
+    {s:"The rents we charge went up because inflation pushed all the costs higher.",he:"שכר הדירה שאנחנו גובים עלה כי האינפלציה דחפה את כל העלויות למעלה.",l:3},
+    {s:"The portfolio returned six percent, but with inflation near five, we barely made anything in real terms.",he:"התיק החזיר שישה אחוזים, אבל עם אינפלציה של כמעט חמישה, כמעט לא הרווחנו כלום במונחים ריאליים.",l:4},
+    {s:"Inflation is the quietest tax there is; nobody votes for it, nobody bills you, and it still takes a cut of everything you saved.",he:"האינפלציה היא המס השקט ביותר שקיים; אף אחד לא מצביע בעדו, אף אחד לא שולח לך חשבון, והוא עדיין לוקח נתח מכל מה שחסכת.",l:5}
+  ],
+  "Tax":[
+    {s:"I paid the tax today.",he:"שילמתי את המס היום.",l:1},
+    {s:"We pay tax on the rental income.",he:"אנחנו משלמים מס על ההכנסה מהשכרה.",l:2},
+    {s:"If we sell now, the tax on the gain will be huge.",he:"אם נמכור עכשיו, המס על הרווח יהיה עצום.",l:3},
+    {s:"Their accountant restructured the deal so the family paid tax in one country instead of three.",he:"רואה החשבון שלהם בנה מחדש את העסקה כך שהמשפחה שילמה מס במדינה אחת במקום בשלוש.",l:4},
+    {s:"Never let the tax tail wag the investment dog; a bad asset held for tax reasons is still a bad asset.",he:"לעולם אל תיתן לשיקולי המס להכתיב את ההשקעה; נכס גרוע שמוחזק מסיבות מס הוא עדיין נכס גרוע.",l:5}
+  ],
+  "Savings":[
+    {s:"I have some savings.",he:"יש לי קצת חסכונות.",l:1},
+    {s:"We keep our savings in a separate account.",he:"אנחנו שומרים את החסכונות שלנו בחשבון נפרד.",l:2},
+    {s:"He used his savings to buy his first apartment.",he:"הוא השתמש בחסכונות שלו כדי לקנות את הדירה הראשונה שלו.",l:3},
+    {s:"After the market dropped, she moved half her savings into bonds to sleep better at night.",he:"אחרי שהשוק ירד, היא העבירה חצי מהחסכונות שלה לאגרות חוב כדי לישון טוב יותר בלילה.",l:4},
+    {s:"Keeping all your savings in cash feels safe, but inflation quietly eats a few percent of it every single year.",he:"להחזיק את כל החסכונות שלך במזומן מרגיש בטוח, אבל האינפלציה אוכלת מהם בשקט כמה אחוזים בכל שנה ושנה.",l:5}
+  ],
+  "Statement":[
+    {s:"I read my bank statement.",he:"אני קורא את דף החשבון שלי.",l:1},
+    {s:"My monthly statement came in the mail today.",he:"דף החשבון החודשי שלי הגיע היום בדואר.",l:2},
+    {s:"Check your statement to see how much interest you earned.",he:"תבדוק את דף החשבון שלך כדי לראות כמה ריבית הרווחת.",l:3},
+    {s:"The statement showed a fee I never agreed to, so I called the bank the next morning.",he:"בדף החשבון הופיעה עמלה שמעולם לא הסכמתי לה, אז התקשרתי לבנק למחרת בבוקר.",l:4},
+    {s:"I go through every statement line by line, because that is usually where the fees nobody told you about show up.",he:"אני עובר על כל דף חשבון שורה אחרי שורה, כי שם בדרך כלל צצות העמלות שאף אחד לא סיפר לך עליהן.",l:5}
+  ],
+  "Real estate":[
+    {s:"I like real estate.",he:"אני אוהב נדל״ן.",l:1},
+    {s:"My family invests in real estate downtown.",he:"המשפחה שלי משקיעה בנדל״ן במרכז העיר.",l:2},
+    {s:"Real estate moves slower than stocks, but it feels safer.",he:"נדל״ן זז לאט יותר ממניות, אבל זה מרגיש בטוח יותר.",l:3},
+    {s:"He left his tech job to work in real estate, and now he manages twelve buildings.",he:"הוא עזב את העבודה שלו בהייטק כדי לעבוד בנדל״ן, והיום הוא מנהל שנים עשר בניינים.",l:4},
+    {s:"Real estate rewards patience more than brilliance, and the people who win are usually the ones who were never forced to sell.",he:"נדל״ן מתגמל סבלנות יותר מגאונות, ומי שמנצחים הם בדרך כלל אלה שמעולם לא נאלצו למכור.",l:5}
+  ],
+  "Property":[
+    {s:"This property is big.",he:"הנכס הזה גדול.",l:1},
+    {s:"They bought a property near the beach.",he:"הם קנו נכס ליד הים.",l:2},
+    {s:"The property has been on the market for six months.",he:"הנכס נמצא בשוק כבר שישה חודשים.",l:3},
+    {s:"We looked at a property in Jaffa, but once we added up the renovation costs, the numbers stopped working.",he:"בדקנו נכס ביפו, אבל ברגע שסיכמנו את עלויות השיפוץ, המספרים הפסיקו להסתדר.",l:4},
+    {s:"A property is worth exactly what someone is willing to pay for it today, not whatever number the appraisal puts on paper.",he:"נכס שווה בדיוק את מה שמישהו מוכן לשלם עליו היום, ולא את המספר שהשמאות רושמת על הנייר.",l:5}
+  ],
+  "Landlord":[
+    {s:"My landlord is nice.",he:"בעל הדירה שלי נחמד.",l:1},
+    {s:"The landlord fixed the broken heater yesterday.",he:"בעל הדירה תיקן אתמול את התנור המקולקל.",l:2},
+    {s:"Our landlord wants to raise the rent next year.",he:"בעל הדירה שלנו רוצה להעלות את שכר הדירה בשנה הבאה.",l:3},
+    {s:"A good landlord picks up the phone at eleven at night when a pipe bursts.",he:"בעל דירה טוב עונה לטלפון באחת עשרה בלילה כשצינור מתפוצץ.",l:4},
+    {s:"Being a landlord sounds passive until the water heater dies on a Friday and you realize nobody else is going to pay for it.",he:"להיות בעל דירה נשמע פסיבי עד שהדוד מתקלקל ביום שישי ואתה מבין שאין אף אחד אחר שישלם על זה.",l:5}
+  ],
+  "Tenant":[
+    {s:"The tenant paid today.",he:"השוכר שילם היום.",l:1},
+    {s:"We have a quiet tenant on the second floor.",he:"יש לנו שוכר שקט בקומה השנייה.",l:2},
+    {s:"The tenant has lived in the apartment for three years.",he:"השוכר גר בדירה כבר שלוש שנים.",l:3},
+    {s:"We picked a tenant with a stable job over one who offered us a higher rent.",he:"בחרנו בשוכר עם עבודה יציבה על פני אחד שהציע לנו שכר דירה גבוה יותר.",l:4},
+    {s:"One good long-term tenant is worth more than two extra months of rent from someone you will end up chasing every month.",he:"שוכר טוב אחד לטווח ארוך שווה יותר משני חודשי שכירות נוספים ממישהו שבסוף תרדוף אחריו כל חודש.",l:5}
+  ],
+  "Lease":[
+    {s:"I signed a lease.",he:"חתמתי על חוזה שכירות.",l:1},
+    {s:"Our lease ends at the end of June.",he:"חוזה השכירות שלנו נגמר בסוף יוני.",l:2},
+    {s:"Read the lease carefully before you sign anything.",he:"תקרא את חוזה השכירות בעיון לפני שאתה חותם על משהו.",l:3},
+    {s:"The lease says we cannot keep a dog, so we asked the owner to make an exception for us.",he:"בחוזה השכירות כתוב שאסור לנו להחזיק כלב, אז ביקשנו מהבעלים לעשות לנו חריגה.",l:4},
+    {s:"A ten-year lease with a solid corporate tenant is basically a bond with a roof on it, and that is what the buyer is really paying for.",he:"חוזה שכירות לעשר שנים עם שוכר תאגידי איתן הוא בעצם אגרת חוב עם גג, וזה מה שהקונה באמת משלם עליו.",l:5}
+  ],
+  "Rent":[
+    {s:"The rent is high.",he:"שכר הדירה גבוה.",l:1},
+    {s:"We pay rent on the first of the month.",he:"אנחנו משלמים שכר דירה באחד לחודש.",l:2},
+    {s:"Our rent went up two hundred dollars this year.",he:"שכר הדירה שלנו עלה השנה במאתיים דולר.",l:3},
+    {s:"If the rent covers the mortgage and the taxes, the apartment basically pays for itself over time.",he:"אם שכר הדירה מכסה את המשכנתא ואת המסים, הדירה בעצם מחזירה את עצמה עם הזמן.",l:4},
+    {s:"Rent in that neighborhood has doubled in five years, which tells you a lot more about how little they build than about demand.",he:"שכר הדירה בשכונה הזאת הוכפל בחמש שנים, וזה מלמד הרבה יותר על כמה מעט בונים שם מאשר על הביקוש.",l:5}
+  ],
+  "Rental income":[
+    {s:"We have rental income.",he:"יש לנו הכנסה משכירות.",l:1},
+    {s:"His rental income covers most of his bills.",he:"ההכנסה שלו משכירות מכסה את רוב ההוצאות שלו.",l:2},
+    {s:"She lives mostly on rental income from two small apartments.",he:"היא חיה בעיקר מהכנסה משכירות של שתי דירות קטנות.",l:3},
+    {s:"After the mortgage and the property tax, the rental income leaves us about nine hundred dollars a month.",he:"אחרי המשכנתא והארנונה, ההכנסה משכירות משאירה לנו בערך תשע מאות דולר בחודש.",l:4},
+    {s:"Everyone loves rental income until they count the months the place sat empty, the repairs nobody planned for, and the hours on the phone.",he:"כולם אוהבים הכנסה משכירות עד שהם סופרים את החודשים שהדירה עמדה ריקה, את התיקונים שאף אחד לא תכנן, ואת השעות בטלפון.",l:5}
+  ],
+  "Mortgage":[
+    {s:"We have a mortgage.",he:"יש לנו משכנתא.",l:1},
+    {s:"Our mortgage payment is due next week.",he:"התשלום של המשכנתא שלנו חל בשבוע הבא.",l:2},
+    {s:"We paid off the mortgage ten years early.",he:"סיימנו לשלם את המשכנתא עשר שנים לפני הזמן.",l:3},
+    {s:"The bank approved the mortgage, but only after we put twenty-five percent down in cash.",he:"הבנק אישר את המשכנתא, אבל רק אחרי שהבאנו עשרים וחמישה אחוז הון עצמי במזומן.",l:4},
+    {s:"A cheap fixed-rate mortgage is one of the few loans where inflation is quietly working for you instead of against you.",he:"משכנתא זולה בריבית קבועה היא אחת ההלוואות הבודדות שבהן האינפלציה עובדת בשקט לטובתך במקום נגדך.",l:5}
+  ],
+  "Down payment":[
+    {s:"I need a down payment.",he:"אני צריך מקדמה.",l:1},
+    {s:"We saved money for the down payment.",he:"חסכנו כסף בשביל המקדמה.",l:2},
+    {s:"The bank wants a twenty percent down payment on the apartment.",he:"הבנק רוצה מקדמה של עשרים אחוז על הדירה.",l:3},
+    {s:"Her parents covered half the down payment, so the monthly mortgage stayed under three thousand dollars.",he:"ההורים שלה כיסו חצי מהמקדמה, ולכן המשכנתא החודשית נשארה מתחת לשלושת אלפים דולר.",l:4},
+    {s:"A bigger down payment lowers your rate and kills the mortgage insurance, but it also locks up cash you might need elsewhere.",he:"מקדמה גדולה יותר מורידה לך את הריבית ומבטלת את ביטוח המשכנתא, אבל היא גם מקפיאה מזומן שאולי תצטרך במקום אחר.",l:5}
+  ],
+  "Loan":[
+    {s:"I got a loan.",he:"קיבלתי הלוואה.",l:1},
+    {s:"We paid off the loan last year.",he:"סילקנו את ההלוואה בשנה שעברה.",l:2},
+    {s:"The bank approved our loan for the second property.",he:"הבנק אישר לנו את ההלוואה לנכס השני.",l:3},
+    {s:"They took a short term loan to close fast, then replaced it with a regular mortgage.",he:"הם לקחו הלוואה לטווח קצר כדי לסגור מהר, ואז החליפו אותה במשכנתא רגילה.",l:4},
+    {s:"Cheap debt feels free until rates move, and then every floating rate loan on the books starts eating your returns.",he:"חוב זול מרגיש כאילו הוא בחינם עד שהריביות זזות, ואז כל הלוואה בריבית משתנה שרשומה בספרים מתחילה לאכול לך את התשואה.",l:5}
+  ],
+  "Refinance":[
+    {s:"We want to refinance.",he:"אנחנו רוצים למחזר את ההלוואה.",l:1},
+    {s:"They refinanced the house last month.",he:"הם מיחזרו את המשכנתא על הבית בחודש שעבר.",l:2},
+    {s:"If rates drop again, we should refinance the mortgage.",he:"אם הריביות ירדו שוב, כדאי לנו למחזר את המשכנתא.",l:3},
+    {s:"He refinanced at a lower rate and pulled out cash to buy a small rental unit.",he:"הוא מיחזר את ההלוואה בריבית נמוכה יותר ומשך מזומן כדי לקנות דירה קטנה להשכרה.",l:4},
+    {s:"Everyone rushes to refinance the moment rates dip, but the fees can eat the savings if you sell within three years.",he:"כולם ממהרים למחזר את ההלוואה ברגע שהריבית יורדת, אבל העמלות יכולות לבלוע את החיסכון אם תמכור בתוך שלוש שנים.",l:5}
+  ],
+  "Appraisal":[
+    {s:"The appraisal was low.",he:"השמאות יצאה נמוכה.",l:1},
+    {s:"We are waiting for the appraisal report.",he:"אנחנו מחכים לדוח השמאות.",l:2},
+    {s:"The bank ordered an appraisal before approving the mortgage.",he:"הבנק הזמין שמאות לפני שאישר את המשכנתא.",l:3},
+    {s:"The appraisal came in fifty thousand below the price, so the buyer asked us to drop it.",he:"השמאות יצאה חמישים אלף מתחת למחיר, אז הקונה ביקש שנוריד אותו.",l:4},
+    {s:"In a hot market the appraisal is the only thing standing between an excited buyer and a very expensive mistake.",he:"בשוק לוהט השמאות היא הדבר היחיד שעומד בין קונה נלהב לבין טעות מאוד יקרה.",l:5}
+  ],
+  "Closing costs":[
+    {s:"Closing costs are high.",he:"עלויות סגירת העסקה גבוהות.",l:1},
+    {s:"We did not expect such high closing costs.",he:"לא ציפינו לעלויות סגירת עסקה כל כך גבוהות.",l:2},
+    {s:"The closing costs added about four percent to the total price.",he:"עלויות סגירת העסקה הוסיפו בערך ארבעה אחוזים למחיר הכולל.",l:3},
+    {s:"The seller agreed to cover the closing costs, which saved us almost twelve thousand dollars at signing.",he:"המוכר הסכים לכסות את עלויות סגירת העסקה, וזה חסך לנו כמעט שנים עשר אלף דולר בחתימה.",l:4},
+    {s:"People budget carefully for the down payment and then get blindsided by closing costs that show up two days before signing.",he:"אנשים מתכננים בקפידה את המקדמה ואז מופתעים לרעה מעלויות סגירת העסקה שצצות יומיים לפני החתימה.",l:5}
+  ],
+  "Escrow":[
+    {s:"The money is in escrow.",he:"הכסף נמצא בנאמנות.",l:1},
+    {s:"We put the deposit in escrow today.",he:"הפקדנו היום את הפיקדון בנאמנות.",l:2},
+    {s:"The deposit from the buyer sits in escrow until the deal closes.",he:"הפיקדון של הקונה יושב בנאמנות עד לסגירת העסקה.",l:3},
+    {s:"We kept two hundred thousand in escrow until the seller finished the repairs he promised.",he:"השארנו מאתיים אלף בנאמנות עד שהמוכר סיים את התיקונים שהבטיח.",l:4},
+    {s:"Escrow exists because nobody wants to hand over money and just hope; a neutral third party holds it until both sides actually deliver.",he:"נאמנות כספית קיימת כי אף אחד לא רוצה להעביר כסף ורק לקוות; צד שלישי ניטרלי מחזיק את הכסף עד ששני הצדדים באמת מבצעים את חלקם.",l:5}
+  ],
+  "Deed":[
+    {s:"I signed the deed.",he:"חתמתי על שטר הבעלות.",l:1},
+    {s:"The deed is in her name.",he:"שטר הבעלות רשום על שמה.",l:2},
+    {s:"They handed us the deed right after the closing.",he:"הם מסרו לנו את שטר הבעלות מיד אחרי סגירת העסקה.",l:3},
+    {s:"The deed still lists his late father as the owner, so we cannot sell until it is fixed.",he:"בשטר הבעלות עדיין רשום אביו המנוח כבעלים, ולכן אי אפשר למכור עד שזה יתוקן.",l:4},
+    {s:"A deed transfers ownership, but it tells you nothing about who else has a claim on the property, and that is where deals die.",he:"שטר בעלות מעביר את הבעלות, אבל הוא לא מספר לך כלום על מי עוד יש תביעה על הנכס, ובדיוק שם עסקאות מתות.",l:5}
+  ],
+  "Title":[
+    {s:"The title is clean.",he:"זכות הבעלות נקייה.",l:1},
+    {s:"The lawyer checked the title yesterday.",he:"עורך הדין בדק אתמול את הבעלות הרשומה.",l:2},
+    {s:"We cannot close until the title comes back clear.",he:"אי אפשר לסגור עד שהבעלות הרשומה תחזור נקייה.",l:3},
+    {s:"A title search found an old lien from a contractor, and that delayed the whole closing by three weeks.",he:"בדיקת הבעלות הרשומה חשפה שעבוד ישן של קבלן, וזה עיכב את כל סגירת העסקה בשלושה שבועות.",l:4},
+    {s:"Buying a property without title insurance is like buying a company without ever checking who really owns the shares.",he:"לקנות נכס בלי ביטוח זכות בעלות זה כמו לקנות חברה בלי לבדוק בכלל למי באמת שייכות המניות.",l:5}
+  ],
+  "Zoning":[
+    {s:"The zoning is residential.",he:"ייעוד הקרקע הוא למגורים.",l:1},
+    {s:"We checked the zoning before buying the lot.",he:"בדקנו את ייעוד הקרקע לפני שקנינו את המגרש.",l:2},
+    {s:"The zoning does not allow a fourth floor on that building.",he:"ייעוד הקרקע לא מאפשר קומה רביעית בבניין הזה.",l:3},
+    {s:"They bought the old warehouse cheap and waited for the city to change the zoning to residential.",he:"הם קנו את המחסן הישן בזול וחיכו שהעירייה תשנה את ייעוד הקרקע למגורים.",l:4},
+    {s:"Most of the money in development is made the day the zoning changes, not the day the concrete gets poured.",he:"רוב הכסף בייזום נעשה ביום שבו ייעוד הקרקע משתנה, ולא ביום שבו יוצקים את הבטון.",l:5}
+  ],
+  "Vacancy rate":[
+    {s:"The vacancy rate is low.",he:"שיעור הדירות הריקות נמוך.",l:1},
+    {s:"Our building has a high vacancy rate.",he:"לבניין שלנו יש שיעור גבוה של דירות ריקות.",l:2},
+    {s:"The vacancy rate downtown rose to nine percent this year.",he:"שיעור הדירות הריקות במרכז העיר עלה לתשעה אחוזים השנה.",l:3},
+    {s:"We dropped the rent a little because the vacancy rate in that neighborhood keeps climbing every quarter.",he:"הורדנו קצת את שכר הדירה כי שיעור הדירות הריקות בשכונה הזאת ממשיך לטפס כל רבעון.",l:4},
+    {s:"A five percent vacancy rate sounds harmless until you realize it is one empty unit in twenty paying nothing while the mortgage keeps running.",he:"שיעור דירות ריקות של חמישה אחוזים נשמע לא מזיק עד שאתה מבין שזו דירה ריקה אחת מתוך עשרים שלא מכניסה כלום בזמן שהמשכנתא ממשיכה לרוץ.",l:5}
+  ],
+  "Cap rate":[
+    {s:"The cap rate is low.",he:"שיעור התשואה על הנכס נמוך.",l:1},
+    {s:"We check the cap rate before buying.",he:"אנחנו בודקים את שיעור התשואה לפני שקונים.",l:2},
+    {s:"A five percent cap rate is normal for this neighborhood.",he:"שיעור תשואה של חמישה אחוזים הוא נורמלי בשכונה הזאת.",l:3},
+    {s:"The seller is asking way too much, so the cap rate drops to under four percent.",he:"המוכר מבקש הרבה יותר מדי, ולכן שיעור התשואה יורד מתחת לארבעה אחוזים.",l:4},
+    {s:"Cap rate is really just the market pricing risk, so when everyone feels safe, cap rates compress and you end up paying for optimism.",he:"שיעור התשואה הוא בעצם האופן שבו השוק מתמחר סיכון, ולכן כשכולם מרגישים בטוחים שיעורי התשואה מתכווצים ואתה משלם על אופטימיות.",l:5}
+  ],
+  "Appreciation":[
+    {s:"We hope for appreciation.",he:"אנחנו מקווים לעליית ערך.",l:1},
+    {s:"The apartment saw strong appreciation last year.",he:"הדירה רשמה עליית ערך חזקה בשנה שעברה.",l:2},
+    {s:"Most of our profit came from appreciation, not from the rent.",he:"רוב הרווח שלנו הגיע מעליית ערך, לא משכר הדירה.",l:3},
+    {s:"Prices in Tel Aviv rose so fast that appreciation alone covered our entire down payment.",he:"המחירים בתל אביב עלו כל כך מהר שעליית הערך לבדה כיסתה את כל ההון העצמי שלנו.",l:4},
+    {s:"Betting on appreciation works until the market stalls; cash flow pays the bills every month, but appreciation only pays you the day you sell.",he:"להמר על עליית ערך עובד עד שהשוק נתקע; תזרים המזומנים משלם את החשבונות כל חודש, אבל עליית ערך משלמת לך רק ביום שאתה מוכר.",l:5}
+  ],
+  "Depreciation":[
+    {s:"Depreciation lowers the value.",he:"ירידת ערך מפחיתה את השווי.",l:1},
+    {s:"Old buildings lose value to depreciation every year.",he:"בניינים ישנים מאבדים ערך בגלל ירידת ערך בכל שנה.",l:2},
+    {s:"The kitchen is falling apart, so we expect real depreciation here.",he:"המטבח מתפרק, ולכן אנחנו מצפים כאן לירידת ערך אמיתית.",l:3},
+    {s:"Nobody talks about depreciation while prices are rising, but a tired building quietly loses value every year.",he:"אף אחד לא מדבר על ירידת ערך כשהמחירים עולים, אבל בניין עייף מאבד משוויו בשקט בכל שנה.",l:4},
+    {s:"The land holds its value while the structure sitting on it slowly loses value to depreciation, which is exactly why location beats construction.",he:"הקרקע שומרת על ערכה בזמן שהמבנה שעליה מאבד ערך לאט בגלל ירידת ערך, וזו בדיוק הסיבה שמיקום מנצח בנייה.",l:5}
+  ],
+  "Renovation":[
+    {s:"The renovation starts today.",he:"השיפוץ מתחיל היום.",l:1},
+    {s:"The renovation cost more than we planned.",he:"השיפוץ עלה יותר ממה שתכננו.",l:2},
+    {s:"After the renovation we raised the rent by twenty percent.",he:"אחרי השיפוץ העלינו את שכר הדירה בעשרים אחוז.",l:3},
+    {s:"A cheap renovation looks fine in photos, but buyers notice the shortcuts the second they walk in.",he:"שיפוץ זול נראה בסדר גמור בתמונות, אבל הקונים מזהים את קיצורי הדרך ברגע שהם נכנסים.",l:4},
+    {s:"The best renovation is the boring one, kitchen and bathrooms and floors, because anything more personal than that rarely comes back in the sale price.",he:"השיפוץ הכי טוב הוא המשעמם, מטבח וחדרי רחצה ורצפות, כי כל דבר אישי יותר מזה כמעט אף פעם לא חוזר במחיר המכירה.",l:5}
+  ],
+  "Property tax":[
+    {s:"Property tax is expensive here.",he:"הארנונה יקרה כאן.",l:1},
+    {s:"We pay property tax every two months.",he:"אנחנו משלמים ארנונה כל חודשיים.",l:2},
+    {s:"The property tax on that apartment is higher than I expected.",he:"הארנונה על הדירה הזאת גבוהה ממה שציפיתי.",l:3},
+    {s:"People forget property tax when they calculate their returns, and then wonder where the monthly profit went.",he:"אנשים שוכחים את הארנונה כשהם מחשבים את התשואה, ואז תוהים לאן נעלם הרווח החודשי.",l:4},
+    {s:"In some American towns the property tax bill runs so high that it quietly turns a decent rental into a break even one.",he:"בחלק מהערים באמריקה חשבון הארנונה כל כך גבוה שהוא הופך בשקט נכס להשכרה סביר לנכס שרק מאזן את עצמו.",l:5}
+  ],
+  "Square footage":[
+    {s:"What is the square footage?",he:"מה השטח של הדירה?",l:1},
+    {s:"The square footage is bigger than I expected.",he:"השטח גדול יותר ממה שציפיתי.",l:2},
+    {s:"The listing says a thousand square feet, but the real square footage is smaller.",he:"במודעה כתוב אלף רגל רבוע, אבל השטח האמיתי קטן יותר.",l:3},
+    {s:"Two apartments can have the exact same square footage and still feel completely different because of the layout.",he:"לשתי דירות יכול להיות בדיוק אותו שטח והן עדיין ירגישו שונות לגמרי בגלל התכנון.",l:4},
+    {s:"Comparing square footage is the fastest way to size up two buildings, but it hides everything that actually matters, like ceiling height, light and layout.",he:"השוואת שטח היא הדרך הכי מהירה להעריך שני בניינים, אבל היא מסתירה את כל מה שבאמת חשוב, כמו גובה תקרה, אור ותכנון.",l:5}
+  ],
+  "Homeowner":[
+    {s:"I am a homeowner now.",he:"אני בעל בית עכשיו.",l:1},
+    {s:"Every homeowner pays for repairs.",he:"כל בעל בית משלם על תיקונים.",l:2},
+    {s:"As a homeowner you pay for the water heater yourself, and nobody helps you.",he:"כבעל בית אתה משלם על הדוד בעצמך, ואף אחד לא עוזר לך.",l:3},
+    {s:"Becoming a homeowner felt amazing until the first winter, when the roof started leaking during a storm.",he:"להיות בעל בית הרגיש מדהים עד החורף הראשון, כשהגג התחיל לדלוף בסערה.",l:4},
+    {s:"Being a homeowner is really being a small business owner: you hold one illiquid asset, and every problem inside it lands on your desk.",he:"להיות בעל בית זה בעצם להיות בעל עסק קטן: אתה מחזיק נכס אחד לא נזיל, וכל בעיה שקורית בו נוחתת עליך.",l:5}
+  ],
+  "Sublet":[
+    {s:"We sublet the room.",he:"אנחנו משכירים את החדר בשכירות משנה.",l:1},
+    {s:"He wants to sublet his apartment for the summer.",he:"הוא רוצה להשכיר את הדירה שלו בשכירות משנה לקיץ.",l:2},
+    {s:"The lease says we cannot sublet without asking the landlord first.",he:"בחוזה כתוב שאסור לנו להשכיר בשכירות משנה בלי לשאול קודם את בעל הבית.",l:3},
+    {s:"She moved to New York for six months and found someone to sublet her place while she was gone.",he:"היא עברה לניו יורק לחצי שנה ומצאה מישהו שייכנס לשכירות משנה בדירה שלה בזמן שהיא לא הייתה.",l:4},
+    {s:"A sublet is convenient for the tenant and a headache for the owner, because the person actually living there never signed anything with you.",he:"שכירות משנה נוחה לשוכר וכאב ראש לבעלים, כי מי שגר שם בפועל מעולם לא חתם מולך על שום דבר.",l:5}
+  ],
+  "Security deposit":[
+    {s:"I paid a security deposit.",he:"שילמתי פיקדון ביטחון.",l:1},
+    {s:"The security deposit is one month of rent.",he:"פיקדון הביטחון הוא בגובה שכר דירה של חודש.",l:2},
+    {s:"They took part of my security deposit for cleaning the apartment.",he:"הם לקחו חלק מפיקדון הביטחון בשביל ניקיון הדירה.",l:3},
+    {s:"If the tenant breaks something, the landlord takes it out of the security deposit and returns the rest.",he:"אם השוכר שובר משהו, בעל הבית מוריד את זה מפיקדון הביטחון ומחזיר את השאר.",l:4},
+    {s:"A security deposit only covers small damage; against a tenant who stops paying for six months it is basically symbolic.",he:"פיקדון ביטחון מכסה רק נזק קטן; מול שוכר שמפסיק לשלם במשך חצי שנה הוא בעצם סמלי.",l:5}
+  ],
+  "Return":[
+    {s:"The return was very good.",he:"התשואה הייתה טובה מאוד.",l:1},
+    {s:"This fund gave a seven percent return last year.",he:"הקרן הזאת נתנה תשואה של שבעה אחוזים בשנה שעברה.",l:2},
+    {s:"I care more about the return after taxes than the number on paper.",he:"מעניינת אותי יותר התשואה אחרי מס מאשר המספר על הנייר.",l:3},
+    {s:"A twelve percent return sounds great until you find out how much risk the manager took to get it.",he:"תשואה של שנים עשר אחוז נשמעת מצוין עד שאתה מגלה כמה סיכון המנהל לקח כדי להשיג אותה.",l:4},
+    {s:"Chasing the highest return is how people blow themselves up; the real goal is a decent return you can survive holding through a bad year.",he:"לרדוף אחרי התשואה הגבוהה ביותר זה איך שאנשים מתרסקים; המטרה האמיתית היא תשואה סבירה שאתה מסוגל להחזיק גם בשנה גרועה.",l:5}
+  ],
+  "Yield":[
+    {s:"This bond has a good yield.",he:"לאיגרת החוב הזו יש תשואה טובה.",l:1},
+    {s:"I want a fund with a higher yield.",he:"אני רוצה קרן עם תשואה גבוהה יותר.",l:2},
+    {s:"The apartment gives us a yield of about four percent a year.",he:"הדירה נותנת לנו תשואה של בערך ארבעה אחוזים בשנה.",l:3},
+    {s:"The building looks cheap, but after taxes and repairs the real yield drops below three percent.",he:"הבניין נראה זול, אבל אחרי מסים ותיקונים התשואה האמיתית יורדת מתחת לשלושה אחוזים.",l:4},
+    {s:"Chasing yield feels smart until you notice you are being paid a little extra to take on a lot more risk.",he:"מרדף אחרי תשואה מרגיש חכם עד שאתה שם לב שמשלמים לך קצת יותר כדי שתיקח הרבה יותר סיכון.",l:5}
+  ],
+  "Portfolio":[
+    {s:"I check my portfolio every day.",he:"אני בודק את תיק ההשקעות שלי כל יום.",l:1},
+    {s:"My portfolio is mostly stocks and bonds.",he:"תיק ההשקעות שלי מורכב בעיקר ממניות ומאיגרות חוב.",l:2},
+    {s:"The family wants a portfolio that can survive a bad year.",he:"המשפחה רוצה תיק השקעות שיכול לשרוד שנה גרועה.",l:3},
+    {s:"We rebalance the portfolio every quarter so no single position quietly takes over the whole account.",he:"אנחנו מאזנים מחדש את תיק ההשקעות בכל רבעון כדי שאף פוזיציה בודדת לא תשתלט בשקט על כל החשבון.",l:4},
+    {s:"A portfolio tells you what someone actually believes about the market, not what they say about it at dinner.",he:"תיק ההשקעות מגלה לך במה אדם באמת מאמין לגבי השוק, ולא מה שהוא אומר עליו בארוחת ערב.",l:5}
+  ],
+  "Asset":[
+    {s:"A house is an asset.",he:"בית הוא נכס.",l:1},
+    {s:"Our biggest asset is the apartment in Haifa.",he:"הנכס הגדול ביותר שלנו הוא הדירה בחיפה.",l:2},
+    {s:"Every asset in the fund has to earn its place.",he:"כל נכס בקרן חייב להצדיק את מקומו.",l:3},
+    {s:"When rates went up, almost every asset we owned fell at the same time, which really surprised the client.",he:"כשהריבית עלתה, כמעט כל נכס שהחזקנו ירד באותו הזמן, וזה ממש הפתיע את הלקוח.",l:4},
+    {s:"The most valuable asset in a family office never shows up on the balance sheet; it is the trust between the generations.",he:"הנכס היקר ביותר במשרד משפחתי לעולם אינו מופיע במאזן; הוא האמון שבין הדורות.",l:5}
+  ],
+  "Capital":[
+    {s:"We need more capital.",he:"אנחנו צריכים עוד הון.",l:1},
+    {s:"The startup raised capital from two private investors.",he:"הסטארטאפ גייס הון משני משקיעים פרטיים.",l:2},
+    {s:"Most of our capital is locked up in real estate right now.",he:"רוב ההון שלנו נעול כרגע בנדל״ן.",l:3},
+    {s:"They have plenty of good ideas but little capital, so growth depends on finding a partner this year.",he:"יש להם המון רעיונות טובים אבל מעט הון, ולכן הצמיחה תלויה במציאת שותף השנה.",l:4},
+    {s:"Capital is patient only when the person behind it is patient; the money itself never panics on its own.",he:"ההון סבלני רק כשהאדם שעומד מאחוריו סבלני; הכסף עצמו לעולם אינו נכנס לפאניקה בכוחות עצמו.",l:5}
+  ],
+  "Reward":[
+    {s:"High risk means high reward.",he:"סיכון גבוה פירושו תגמול גבוה.",l:1},
+    {s:"I want a bigger reward for my money.",he:"אני רוצה תגמול גדול יותר על הכסף שלי.",l:2},
+    {s:"Waiting ten years gave us a much bigger reward than trading every month.",he:"המתנה של עשר שנים העניקה לנו תגמול גדול בהרבה ממסחר בכל חודש.",l:3},
+    {s:"Before we commit, I want to see whether the reward really justifies locking up the money for seven years.",he:"לפני שנתחייב, אני רוצה לראות אם התגמול באמת מצדיק נעילה של הכסף לשבע שנים.",l:4},
+    {s:"In this business the reward almost never arrives on schedule, so the people who actually get paid are the ones who can wait.",he:"בתחום הזה התגמול כמעט לעולם לא מגיע בזמן, ולכן מי שבאמת מקבל את הכסף הם אלה שיודעים לחכות.",l:5}
+  ],
+  "Diversification":[
+    {s:"Diversification lowers your risk.",he:"פיזור השקעות מפחית את הסיכון שלך.",l:1},
+    {s:"My advisor keeps talking about diversification.",he:"היועץ שלי לא מפסיק לדבר על פיזור השקעות.",l:2},
+    {s:"Real diversification means owning things that do not fall together.",he:"פיזור השקעות אמיתי פירושו להחזיק דברים שלא יורדים יחד.",l:3},
+    {s:"Buying ten tech companies is not diversification; it is one big bet spread across ten different tickers.",he:"לקנות עשר חברות טכנולוגיה זה לא פיזור השקעות; זה הימור אחד גדול שפרוס על עשרה סימולים שונים.",l:4},
+    {s:"Diversification is the only free lunch in investing, and it feels like a mistake right up until the moment it saves you.",he:"פיזור השקעות הוא ארוחת החינם היחידה בעולם ההשקעות, והוא מרגיש כמו טעות בדיוק עד לרגע שבו הוא מציל אותך.",l:5}
+  ],
+  "Compound interest":[
+    {s:"Compound interest makes money grow.",he:"ריבית דריבית מגדילה את הכסף.",l:1},
+    {s:"Compound interest works better over many years.",he:"ריבית דריבית עובדת טוב יותר לאורך שנים רבות.",l:2},
+    {s:"Thanks to compound interest, small monthly deposits turn into real money.",he:"בזכות ריבית דריבית, הפקדות חודשיות קטנות הופכות לכסף אמיתי.",l:3},
+    {s:"He started saving at twenty two, and compound interest did more work than any stock he ever picked.",he:"הוא התחיל לחסוך בגיל עשרים ושתיים, וריבית דריבית עשתה יותר עבודה מכל מניה שהוא בחר אי פעם.",l:4},
+    {s:"Compound interest is boring for about fifteen years, and then it quietly becomes the only thing that ever really mattered.",he:"ריבית דריבית משעממת במשך כחמש עשרה שנה, ואז היא הופכת בשקט לדבר היחיד שבאמת היה חשוב אי פעם.",l:5}
+  ],
+  "Principal":[
+    {s:"I got my principal back.",he:"קיבלתי בחזרה את קרן ההשקעה שלי.",l:1},
+    {s:"The fund pays interest and protects the principal.",he:"הקרן משלמת ריבית ושומרת על קרן ההשקעה.",l:2},
+    {s:"We live off the returns and never touch the principal.",he:"אנחנו חיים מהתשואות ולעולם לא נוגעים בקרן ההשקעה.",l:3},
+    {s:"If the borrower defaults, we could lose part of the principal, not just the interest we were promised.",he:"אם הלווה לא יעמוד בתשלומים, אנחנו עלולים לאבד חלק מקרן ההשקעה, ולא רק את הריבית שהובטחה לנו.",l:4},
+    {s:"The first job is to protect the principal, and the second job is to remember that the first job never changes.",he:"התפקיד הראשון הוא לשמור על קרן ההשקעה, והתפקיד השני הוא לזכור שהתפקיד הראשון לעולם לא משתנה.",l:5}
+  ],
+  "Stock":[
+    {s:"I bought a tech stock.",he:"קניתי מניה של חברת טכנולוגיה.",l:1},
+    {s:"The stock went up after the earnings report.",he:"המניה עלתה אחרי דוח הרווחים.",l:2},
+    {s:"I would rather own a boring stock that pays a steady dividend.",he:"אני מעדיף להחזיק מניה משעממת שמחלקת דיבידנד קבוע.",l:3},
+    {s:"The stock dropped twelve percent in one day, and the client called me before the market even closed.",he:"המניה צנחה בשנים עשר אחוזים ביום אחד, והלקוח התקשר אליי עוד לפני שהשוק בכלל נסגר.",l:4},
+    {s:"When you buy a stock you are buying a piece of a real business, not a number that is supposed to go up every quarter.",he:"כשאתה קונה מניה אתה קונה חלק מעסק אמיתי, ולא מספר שאמור לעלות בכל רבעון.",l:5}
+  ],
+  "Share":[
+    {s:"Each share costs ten dollars.",he:"כל מניה עולה עשרה דולר.",l:1},
+    {s:"I own two hundred shares of that company.",he:"אני מחזיק מאתיים מניות של החברה הזו.",l:2},
+    {s:"The price per share went from forty dollars to sixty.",he:"המחיר למניה עלה מארבעים דולר לשישים.",l:3},
+    {s:"They issued new shares to raise money, so my piece of the company got a little smaller.",he:"הם הנפיקו מניות חדשות כדי לגייס כסף, ולכן החלק שלי בחברה נעשה קצת קטן יותר.",l:4},
+    {s:"One share of a great business held for twenty years will quietly beat a hundred clever trades in a mediocre one.",he:"מניה אחת של עסק מצוין שמוחזקת עשרים שנה תנצח בשקט מאה עסקאות חכמות בעסק בינוני.",l:5}
+  ],
+  "Capital gains":[
+    {s:"I have capital gains.",he:"יש לי רווחי הון.",l:1},
+    {s:"My capital gains were small this year.",he:"רווחי ההון שלי היו קטנים השנה.",l:2},
+    {s:"I sold the stock and reported the capital gains on my tax return.",he:"מכרתי את המניה ודיווחתי על רווחי ההון בדוח המס שלי.",l:3},
+    {s:"If we sell the apartment now, the capital gains tax will eat a big chunk of the profit.",he:"אם נמכור את הדירה עכשיו, מס רווחי ההון יבלע נתח גדול מהרווח.",l:4},
+    {s:"Most of my clients would rather hold a position for another year than trigger short term capital gains at their top marginal rate.",he:"רוב הלקוחות שלי מעדיפים להחזיק פוזיציה עוד שנה מאשר ליצור רווחי הון לטווח קצר לפי שיעור המס השולי הגבוה שלהם.",l:5}
+  ],
+  "Deduction":[
+    {s:"I get a small deduction.",he:"אני מקבל ניכוי קטן.",l:1},
+    {s:"The mortgage interest gives us a nice deduction.",he:"הריבית על המשכנתא נותנת לנו ניכוי יפה.",l:2},
+    {s:"Every donation to that charity counts as a deduction on your tax return.",he:"כל תרומה לעמותה הזאת נחשבת ניכוי בדוח המס שלך.",l:3},
+    {s:"My accountant found a deduction for the home office, and it saved me about two thousand dollars.",he:"רואה החשבון שלי מצא ניכוי על המשרד בבית, וזה חסך לי בערך אלפיים דולר.",l:4},
+    {s:"The whole deal only works after tax, because the depreciation deduction is what turns an average building into a decent return.",he:"כל העסקה עובדת רק אחרי מס, כי ניכוי הפחת הוא מה שהופך בניין ממוצע לתשואה סבירה.",l:5}
+  ],
+  "Balance sheet":[
+    {s:"I read the balance sheet.",he:"אני קורא את המאזן.",l:1},
+    {s:"Their balance sheet looks strong this quarter.",he:"המאזן שלהם נראה חזק ברבעון הזה.",l:2},
+    {s:"Before we invest, I want to see the last three balance sheets.",he:"לפני שנשקיע, אני רוצה לראות את שלושת המאזנים האחרונים.",l:3},
+    {s:"Their balance sheet is loaded with debt, so one bad quarter could put them in real trouble.",he:"המאזן שלהם עמוס בחובות, ולכן רבעון גרוע אחד עלול להכניס אותם לצרות אמיתיות.",l:4},
+    {s:"A clean balance sheet buys you patience, because you can sit through a downturn instead of selling assets at the bottom.",he:"מאזן נקי קונה לך סבלנות, כי אתה יכול לשבת בשקט לאורך משבר במקום למכור נכסים בתחתית.",l:5}
+  ],
+  "Cash flow":[
+    {s:"Cash flow is important.",he:"תזרים מזומנים זה חשוב.",l:1},
+    {s:"The rental gives us steady cash flow every month.",he:"ההשכרה נותנת לנו תזרים מזומנים יציב כל חודש.",l:2},
+    {s:"I care more about monthly cash flow than about the future sale price.",he:"אכפת לי יותר מהתזרים החודשי מאשר ממחיר המכירה העתידי.",l:3},
+    {s:"The property looks great on paper, but after the mortgage and the repairs the cash flow is barely positive.",he:"הנכס נראה מצוין על הנייר, אבל אחרי המשכנתא והתיקונים התזרים בקושי חיובי.",l:4},
+    {s:"Appreciation is a story you tell yourself, while cash flow is what actually pays the bills when the market goes quiet.",he:"עליית ערך היא סיפור שאתה מספר לעצמך, בעוד שתזרים המזומנים הוא מה שבאמת משלם את החשבונות כשהשוק שוקט.",l:5}
+  ],
+  "Net worth":[
+    {s:"My net worth is growing.",he:"השווי הנקי שלי גדל.",l:1},
+    {s:"His net worth went up last year.",he:"השווי הנקי שלו עלה בשנה שעברה.",l:2},
+    {s:"Take everything you own, subtract your debts, and that is your net worth.",he:"קח את כל מה שיש לך, תחסיר את החובות, וזה השווי הנקי שלך.",l:3},
+    {s:"Most of her net worth is tied up in the business, so she has very little cash on hand.",he:"רוב השווי הנקי שלה תקוע בעסק, ולכן יש לה מעט מאוד מזומן זמין.",l:4},
+    {s:"Net worth on paper means very little until you try to sell, because illiquid assets shrink the moment you actually need the money.",he:"שווי נקי על הנייר שווה מעט מאוד עד שמנסים למכור, כי נכסים לא נזילים מתכווצים בדיוק ברגע שבאמת צריך את הכסף.",l:5}
+  ],
+  "Break even":[
+    {s:"We break even this month.",he:"אנחנו מגיעים לאיזון החודש.",l:1},
+    {s:"The cafe should break even by the summer.",he:"בית הקפה אמור להגיע לנקודת איזון עד הקיץ.",l:2},
+    {s:"After two years of losses, the fund finally broke even last quarter.",he:"אחרי שנתיים של הפסדים, הקרן סוף סוף הגיעה לנקודת איזון ברבעון שעבר.",l:3},
+    {s:"If rents stay flat, we break even in year four and only start making real money after that.",he:"אם שכר הדירה יישאר קבוע, נגיע לנקודת איזון בשנה הרביעית ורק אחר כך נתחיל להרוויח באמת.",l:4},
+    {s:"Everyone models the upside, but the number that keeps me up at night is how long it takes to break even.",he:"כולם בונים מודל לתרחיש החיובי, אבל המספר שמדיר שינה מעיניי הוא כמה זמן לוקח להגיע לנקודת האיזון.",l:5}
+  ],
+  "Fee":[
+    {s:"The bank charges a fee.",he:"הבנק גובה עמלה.",l:1},
+    {s:"I paid a small fee for the transfer.",he:"שילמתי עמלה קטנה על ההעברה.",l:2},
+    {s:"The fund charges a one percent management fee every single year.",he:"הקרן גובה עמלת ניהול של אחוז אחד בכל שנה.",l:3},
+    {s:"That advisor looked cheap until I found the fee buried in the fine print of the contract.",he:"היועץ הזה נראה זול עד שמצאתי את העמלה קבורה באותיות הקטנות של החוזה.",l:4},
+    {s:"A one and a half percent fee sounds harmless, but over thirty years it quietly eats close to a third of your returns.",he:"עמלה של אחוז וחצי נשמעת תמימה, אבל על פני שלושים שנה היא אוכלת בשקט כמעט שליש מהתשואה שלך.",l:5}
+  ],
+  "Commission":[
+    {s:"The agent gets a commission.",he:"המתווך מקבל עמלה.",l:1},
+    {s:"He earns a commission on every apartment he sells.",he:"הוא מקבל עמלת תיווך על כל דירה שהוא מוכר.",l:2},
+    {s:"The broker takes a two percent commission when the deal closes.",he:"המתווך לוקח עמלה של שני אחוזים כשהעסקה נסגרת.",l:3},
+    {s:"Remember that the agent works on commission, so of course he wants you to close as fast as possible.",he:"תזכור שהמתווך עובד על עמלה, אז ברור שהוא רוצה שתסגור כמה שיותר מהר.",l:4},
+    {s:"Anyone paid on commission has a built in incentive to make the deal happen, so listen to their advice with that in mind.",he:"לכל מי שמשולם לפי עמלה יש אינטרס מובנה שהעסקה תצא לפועל, אז כדאי להקשיב לעצות שלו עם זה בראש.",l:5}
+  ],
+  "Liability":[
+    {s:"The loan is a liability.",he:"ההלוואה היא התחייבות.",l:1},
+    {s:"Every mortgage is a liability on paper.",he:"כל משכנתא היא התחייבות על הנייר.",l:2},
+    {s:"Assets go on one side and every liability goes on the other.",he:"הנכסים נמצאים בצד אחד וכל התחייבות נמצאת בצד השני.",l:3},
+    {s:"That empty apartment stopped being an asset and became a liability once the taxes started piling up.",he:"הדירה הריקה הפסיקה להיות נכס והפכה להתחייבות ברגע שהמסים התחילו להצטבר.",l:4},
+    {s:"Serious investors spend more time on the liability side of the balance sheet, because that is where the quiet risk usually hides.",he:"משקיעים רציניים מבלים יותר זמן בצד ההתחייבויות של המאזן, כי שם בדרך כלל מסתתר הסיכון השקט.",l:5}
+  ],
+  "Wealth":[
+    {s:"Wealth takes time to build.",he:"לוקח זמן לבנות עושר.",l:1},
+    {s:"The family built its wealth in real estate.",he:"המשפחה בנתה את העושר שלה בנדל״ן.",l:2},
+    {s:"Real wealth is built slowly, over decades, not in one lucky trade.",he:"עושר אמיתי נבנה לאט, לאורך עשורים, ולא בעסקה אחת ממוזלת.",l:3},
+    {s:"We help families protect their wealth across generations, which is mostly about taxes, structure, and avoiding big mistakes.",he:"אנחנו עוזרים למשפחות לשמור על העושר שלהן לאורך דורות, וזה בעיקר עניין של מסים, מבנה נכון והימנעות מטעויות גדולות.",l:4},
+    {s:"Wealth is not the number in your account; it is how many years you could stop working and still live the same way.",he:"עושר הוא לא המספר בחשבון, אלא כמה שנים אתה יכול להפסיק לעבוד ועדיין לחיות בדיוק אותו הדבר.",l:5}
+  ],
+  "Bubble":[
+    {s:"This market is a bubble.",he:"השוק הזה הוא בועה.",l:1},
+    {s:"Tech stocks are in a bubble again.",he:"מניות הטכנולוגיה שוב נמצאות בבועה.",l:2},
+    {s:"Everyone says housing is a bubble, but prices keep going up.",he:"כולם אומרים ששוק הדיור הוא בועה, אבל המחירים ממשיכים לעלות.",l:3},
+    {s:"He sold his crypto early because he was sure the bubble would pop within a year.",he:"הוא מכר את הקריפטו שלו מוקדם כי היה בטוח שהבועה תתפוצץ תוך שנה.",l:4},
+    {s:"The tricky thing about a bubble is that it looks exactly like a healthy bull market until the day it stops being one.",he:"הדבר המסובך בבועה הוא שהיא נראית בדיוק כמו שוק שורי בריא, עד היום שבו היא מפסיקה להיות כזה.",l:5}
+  ],
+  "Crash":[
+    {s:"The market crashed today.",he:"השוק קרס היום.",l:1},
+    {s:"My portfolio lost a lot in the crash.",he:"התיק שלי הפסיד הרבה בקריסה.",l:2},
+    {s:"After the crash in 2008, my father stopped buying stocks completely.",he:"אחרי הקריסה של 2008, אבא שלי הפסיק לקנות מניות לגמרי.",l:3},
+    {s:"We always keep cash on the side so that a crash becomes an opportunity instead of a disaster.",he:"אנחנו תמיד שומרים מזומן בצד, כדי שקריסה תהפוך להזדמנות במקום לאסון.",l:4},
+    {s:"Every crash feels different while you are living through it, but they all end the same way, with the patient buyers owning everything.",he:"כל קריסה מרגישה שונה כשאתה חי אותה, אבל כולן נגמרות באותו אופן, כשהקונים הסבלניים מחזיקים בהכל.",l:5}
+  ],
+  "Recession":[
+    {s:"A recession is coming.",he:"מיתון מתקרב.",l:1},
+    {s:"During a recession people spend much less money.",he:"בזמן מיתון אנשים מוציאים הרבה פחות כסף.",l:2},
+    {s:"The recession made it much harder to raise money for new funds.",he:"המיתון הקשה הרבה יותר על גיוס הכסף לקרנות חדשות.",l:3},
+    {s:"Our tenants kept paying rent through the whole recession, which is exactly why we like boring apartment buildings.",he:"הדיירים שלנו המשיכו לשלם שכר דירה לאורך כל המיתון, ובדיוק בגלל זה אנחנו אוהבים בנייני מגורים משעממים.",l:4},
+    {s:"A recession punishes leverage first, so the funds that come out alive are usually the ones that were boring enough to sit on cash.",he:"מיתון מעניש קודם כל את המינוף, ולכן הקרנות שיוצאות מזה בחיים הן בדרך כלל אלה שהיו משעממות מספיק כדי לשבת על מזומן.",l:5}
+  ],
+  "Trade":[
+    {s:"I made a good trade.",he:"עשיתי עסקה טובה.",l:1},
+    {s:"He closed the trade this morning at a profit.",he:"הוא סגר את העסקה הבוקר ברווח.",l:2},
+    {s:"That trade made us about twenty thousand dollars in two weeks.",he:"העסקה הזאת הכניסה לנו בערך עשרים אלף דולר בתוך שבועיים.",l:3},
+    {s:"She walked the client through the trade: buy the bonds now, sell them after the rate cut.",he:"היא הסבירה ללקוח את העסקה שלב אחר שלב: לקנות את אגרות החוב עכשיו, ולמכור אותן אחרי הורדת הריבית.",l:4},
+    {s:"The best trade I ever made was one I sat on for three years without touching, while everyone around me stayed busy being clever.",he:"העסקה הכי טובה שעשיתי בחיים הייתה אחת שישבתי עליה שלוש שנים בלי לגעת, בזמן שכולם סביבי היו עסוקים בלהיות חכמים.",l:5}
+  ],
+  "Shareholder":[
+    {s:"I am a shareholder now.",he:"אני בעל מניות עכשיו.",l:1},
+    {s:"Every shareholder gets a vote at the meeting.",he:"כל בעל מניות מקבל זכות הצבעה באסיפה.",l:2},
+    {s:"As a shareholder, you own a small piece of the company.",he:"כבעל מניות, אתה מחזיק בחלק קטן מהחברה.",l:3},
+    {s:"The biggest shareholder blocked the sale because he wanted a higher price for his stake.",he:"בעל המניות הגדול ביותר חסם את המכירה כי הוא רצה מחיר גבוה יותר על ההחזקה שלו.",l:4},
+    {s:"Once you become a shareholder, you stop reading the news like a customer and start reading it like an owner.",he:"ברגע שאתה הופך לבעל מניות, אתה מפסיק לקרוא את החדשות כמו לקוח ומתחיל לקרוא אותן כמו בעלים.",l:5}
+  ],
+  "Equity":[
+    {s:"I have some equity now.",he:"יש לי קצת הון עצמי עכשיו.",l:1},
+    {s:"We paid down the mortgage and built equity slowly.",he:"הקטנו את המשכנתא ובנינו הון עצמי לאט לאט.",l:2},
+    {s:"After five years of payments, our equity in the apartment doubled.",he:"אחרי חמש שנים של תשלומים, ההון העצמי שלנו בדירה הוכפל.",l:3},
+    {s:"He sold half the company but kept enough equity to stay in control of the board.",he:"הוא מכר חצי מהחברה אבל שמר מספיק הון עצמי כדי להישאר בשליטה על הדירקטוריון.",l:4},
+    {s:"The bank will happily lend against your equity, but borrowing against it turns your safety cushion into someone else's collateral.",he:"הבנק ישמח להלוות לך כנגד ההון העצמי שלך, אבל הלוואה כזאת הופכת את כרית הביטחון שלך לבטוחה של מישהו אחר.",l:5}
+  ],
+  "Dividend":[
+    {s:"I got a dividend today.",he:"קיבלתי היום דיבידנד.",l:1},
+    {s:"The company pays a dividend every three months.",he:"החברה משלמת דיבידנד כל שלושה חודשים.",l:2},
+    {s:"I reinvest every dividend instead of spending the cash.",he:"אני משקיע מחדש כל דיבידנד במקום לבזבז את המזומן.",l:3},
+    {s:"They cut the dividend last quarter, and the stock dropped before the investor call even ended.",he:"הם קיצצו את הדיבידנד ברבעון שעבר, והמניה צנחה עוד לפני ששיחת המשקיעים בכלל הסתיימה.",l:4},
+    {s:"A rising dividend tells you more about management's confidence than any earnings call, because cash is much harder to fake than a forecast.",he:"דיבידנד שעולה מספר לך יותר על הביטחון של ההנהלה מכל שיחת משקיעים, כי הרבה יותר קשה לזייף מזומן מאשר תחזית.",l:5}
+  ],
+  "Broker":[
+    {s:"My broker called me.",he:"הברוקר שלי התקשר אליי.",l:1},
+    {s:"I asked my broker to buy ten shares.",he:"ביקשתי מהברוקר שלי לקנות עשר מניות.",l:2},
+    {s:"A good broker fills your order fast and charges low fees.",he:"ברוקר טוב מבצע את הפקודה שלך מהר וגובה עמלות נמוכות.",l:3},
+    {s:"Our broker moved the whole portfolio to a new platform without telling us about the extra fees.",he:"הברוקר שלנו העביר את כל התיק לפלטפורמה חדשה בלי לספר לנו על העמלות הנוספות.",l:4},
+    {s:"Any broker who calls you with a hot tip is usually selling something he could not sell to someone smarter.",he:"כל ברוקר שמתקשר אליך עם טיפ חם בדרך כלל מוכר משהו שהוא לא הצליח למכור למישהו חכם יותר.",l:5}
+  ],
+  "Stock exchange":[
+    {s:"The stock exchange is closed.",he:"הבורסה סגורה.",l:1},
+    {s:"The Tel Aviv stock exchange opens on Sunday.",he:"הבורסה בתל אביב נפתחת ביום ראשון.",l:2},
+    {s:"The company listed on the New York stock exchange last month.",he:"החברה נרשמה למסחר בבורסה של ניו יורק בחודש שעבר.",l:3},
+    {s:"Trading stopped on the stock exchange for an hour after prices fell more than seven percent.",he:"המסחר בבורסה נעצר לשעה אחרי שהמחירים ירדו ביותר משבעה אחוזים.",l:4},
+    {s:"The stock exchange is not the economy; it is a crowd of people betting on what the economy will look like next year.",he:"הבורסה היא לא הכלכלה; היא המון של אנשים שמהמרים על איך הכלכלה תיראה בשנה הבאה.",l:5}
+  ],
+  "Index":[
+    {s:"The index went up today.",he:"המדד עלה היום.",l:1},
+    {s:"The index fell two percent this morning.",he:"המדד ירד שני אחוזים הבוקר.",l:2},
+    {s:"Most managers fail to beat the index over ten years.",he:"רוב המנהלים לא מצליחים להכות את המדד לאורך עשר שנים.",l:3},
+    {s:"Only a few big tech stocks pushed the index higher, while most of the market actually fell.",he:"רק כמה מניות טכנולוגיה גדולות דחפו את המדד למעלה, בזמן שרוב השוק בעצם ירד.",l:4},
+    {s:"An index is just a rule that someone wrote down, so before you trust it, ask which companies it quietly leaves out.",he:"מדד הוא בסך הכול כלל שמישהו כתב, אז לפני שאתה סומך עליו, תשאל אילו חברות הוא משאיר בחוץ בשקט.",l:5}
+  ],
+  "Index fund":[
+    {s:"I own an index fund.",he:"יש לי קרן מחקה מדד.",l:1},
+    {s:"An index fund costs less than an active fund.",he:"קרן מחקה מדד עולה פחות מקרן מנוהלת.",l:2},
+    {s:"Every month I put a thousand shekels into an index fund.",he:"כל חודש אני שם אלף שקלים בקרן מחקה מדד.",l:3},
+    {s:"She moved her savings into a cheap index fund after paying high fees for years.",he:"היא העבירה את החסכונות שלה לקרן מחקה מדד זולה אחרי שנים של עמלות גבוהות.",l:4},
+    {s:"The boring index fund usually wins because it protects you from yourself; there is nothing clever left to do at midnight.",he:"הקרן המחקה המשעממת בדרך כלל מנצחת כי היא מגנה עליך מפני עצמך; לא נשאר שום דבר חכם לעשות בחצות.",l:5}
+  ],
+  "Bull market":[
+    {s:"It is a bull market.",he:"זה שוק עולה.",l:1},
+    {s:"Everyone makes money in a bull market.",he:"כולם מרוויחים כסף בשוק עולה.",l:2},
+    {s:"In a bull market, even weak companies look like brilliant ideas.",he:"בשוק עולה, אפילו חברות חלשות נראות כמו רעיונות מבריקים.",l:3},
+    {s:"The bull market lasted almost ten years, and people slowly forgot that prices can actually fall.",he:"השוק העולה נמשך כמעט עשר שנים, ואנשים שכחו לאט לאט שמחירים יכולים גם לרדת.",l:4},
+    {s:"In a long bull market everybody feels like a genius, until the tide goes out and luck finally gets separated from skill.",he:"בשוק עולה ממושך כולם מרגישים גאונים, עד שהמים נסוגים והמזל סוף סוף נפרד מהמיומנות.",l:5}
+  ],
+  "Bear market":[
+    {s:"This is a bear market.",he:"זה שוק יורד.",l:1},
+    {s:"Prices keep falling in a bear market.",he:"המחירים ממשיכים לרדת בשוק יורד.",l:2},
+    {s:"A bear market usually means prices dropped more than twenty percent.",he:"שוק יורד בדרך כלל אומר שהמחירים ירדו ביותר מעשרים אחוזים.",l:3},
+    {s:"He kept buying through the whole bear market, and three years later that patience paid for the apartment.",he:"הוא המשיך לקנות לאורך כל השוק היורד, ושלוש שנים אחר כך הסבלנות הזאת שילמה על הדירה.",l:4},
+    {s:"A bear market does not ask how smart you are; it asks whether you can watch your account shrink and still do nothing.",he:"שוק יורד לא שואל כמה אתה חכם; הוא שואל אם אתה מסוגל לראות את החשבון שלך מתכווץ ובכל זאת לא לעשות כלום.",l:5}
+  ],
+  "Volatility":[
+    {s:"I hate market volatility.",he:"אני שונא תנודתיות בשוק.",l:1},
+    {s:"Volatility went up after the news.",he:"התנודתיות עלתה אחרי החדשות.",l:2},
+    {s:"Crypto has much higher volatility than government bonds.",he:"לקריפטו יש תנודתיות הרבה יותר גבוהה מאשר לאגרות חוב ממשלתיות.",l:3},
+    {s:"Our clients can accept some volatility as long as we explain it before the market drops.",he:"הלקוחות שלנו יכולים לקבל קצת תנודתיות כל עוד אנחנו מסבירים אותה לפני שהשוק יורד.",l:4},
+    {s:"Volatility is not really risk; the real risk is being forced to sell at the bottom because you suddenly needed the money.",he:"תנודתיות היא לא באמת סיכון; הסיכון האמיתי הוא להיאלץ למכור בתחתית כי פתאום היית צריך את הכסף.",l:5}
+  ],
+  "Valuation":[
+    {s:"The valuation is high.",he:"הערכת השווי גבוהה.",l:1},
+    {s:"We got a valuation for the building last week.",he:"קיבלנו הערכת שווי לבניין בשבוע שעבר.",l:2},
+    {s:"The startup raised money at a valuation of two hundred million.",he:"הסטארט-אפ גייס כסף לפי הערכת שווי של מאתיים מיליון.",l:3},
+    {s:"I like the company, but at this valuation you are paying for ten years of perfect execution.",he:"אני אוהב את החברה, אבל בהערכת שווי כזו אתה משלם על עשר שנים של ביצוע מושלם.",l:4},
+    {s:"Valuation is the thing that turns a great business into a bad investment, and most people learn that the hard way.",he:"הערכת השווי היא הדבר שהופך עסק מצוין להשקעה גרועה, ורוב האנשים לומדים את זה בדרך הקשה.",l:5}
+  ],
+  "Market cap":[
+    {s:"Its market cap is small.",he:"שווי השוק שלה קטן.",l:1},
+    {s:"Apple has the biggest market cap in the world.",he:"לאפל יש את שווי השוק הגדול ביותר בעולם.",l:2},
+    {s:"The stock fell ten percent and lost four billion in market cap overnight.",he:"המניה ירדה עשרה אחוזים ואיבדה ארבעה מיליארד בשווי שוק בן לילה.",l:3},
+    {s:"We only look at companies with a market cap above one billion, because anything smaller is too hard to sell quickly.",he:"אנחנו בוחנים רק חברות עם שווי שוק מעל מיליארד, כי כל דבר קטן יותר קשה מדי למכור מהר.",l:4},
+    {s:"People forget that market cap is just price times shares, so a company can double its market cap without earning a single extra dollar.",he:"אנשים שוכחים ששווי שוק הוא פשוט מחיר כפול מספר המניות, ולכן חברה יכולה להכפיל את שווי השוק שלה בלי להרוויח דולר אחד נוסף.",l:5}
+  ],
+  "Earnings":[
+    {s:"Earnings are up this year.",he:"הרווחים עלו השנה.",l:1},
+    {s:"The company reports its earnings on Thursday morning.",he:"החברה מדווחת על הרווחים שלה ביום חמישי בבוקר.",l:2},
+    {s:"Their earnings beat expectations, so the stock jumped seven percent.",he:"הרווחים שלהם עקפו את התחזיות, ולכן המניה קפצה שבעה אחוזים.",l:3},
+    {s:"Revenue keeps growing, but earnings are flat because they are spending everything on new warehouses and salaries.",he:"ההכנסות ממשיכות לצמוח, אבל הרווחים עומדים במקום כי הם מוציאים הכל על מחסנים חדשים ומשכורות.",l:4},
+    {s:"Over one quarter the market trades on the story, but over ten years it tracks earnings almost perfectly, and nothing else really matters.",he:"ברבעון אחד השוק נסחר לפי הסיפור, אבל לאורך עשר שנים הוא עוקב אחרי הרווחים כמעט במדויק, ושום דבר אחר לא באמת משנה.",l:5}
+  ],
+  "IPO":[
+    {s:"The IPO is next month.",he:"ההנפקה היא בחודש הבא.",l:1},
+    {s:"My brother bought shares in the IPO last year.",he:"אחי קנה מניות בהנפקה בשנה שעברה.",l:2},
+    {s:"The company delayed its IPO because the market suddenly turned bad.",he:"החברה דחתה את ההנפקה שלה כי השוק פתאום נהיה גרוע.",l:3},
+    {s:"After the IPO the founders could finally sell some shares, but they agreed to wait six months first.",he:"אחרי ההנפקה המייסדים יכלו סוף סוף למכור חלק מהמניות, אבל הם הסכימו לחכות שישה חודשים קודם.",l:4},
+    {s:"An IPO is the one day the sellers know more than the buyers, which is exactly why I rarely buy on the first morning.",he:"הנפקה היא היום היחיד שבו המוכרים יודעים יותר מהקונים, ובדיוק בגלל זה אני כמעט אף פעם לא קונה בבוקר הראשון.",l:5}
+  ],
+  "Blue chip":[
+    {s:"I own blue chip stocks.",he:"יש לי מניות בלו צ׳יפ.",l:1},
+    {s:"My parents only invest in big blue chip companies.",he:"ההורים שלי משקיעים רק בחברות בלו צ׳יפ גדולות.",l:2},
+    {s:"A blue chip like Coca-Cola pays a dividend every quarter without fail.",he:"מניית בלו צ׳יפ כמו קוקה קולה מחלקת דיבידנד כל רבעון בלי יוצא מן הכלל.",l:3},
+    {s:"After the crash he moved everything into blue chip names, because he wanted companies that survive a bad decade.",he:"אחרי המפולת הוא העביר הכל למניות בלו צ׳יפ, כי הוא רצה חברות ששורדות עשור גרוע.",l:4},
+    {s:"Every blue chip was once a risky small company, and every blue chip eventually turns slow, so nothing stays safe forever.",he:"כל מניית בלו צ׳יפ הייתה פעם חברה קטנה ומסוכנת, וכל מניית בלו צ׳יפ בסוף נעשית איטית, אז שום דבר לא נשאר בטוח לנצח.",l:5}
+  ],
+  "Bond":[
+    {s:"I own a government bond.",he:"יש לי אגרת חוב ממשלתית.",l:1},
+    {s:"The bond pays four percent every year.",he:"אגרת החוב משלמת ארבעה אחוזים בכל שנה.",l:2},
+    {s:"When interest rates go up, the price of my bond goes down.",he:"כשהריבית עולה, המחיר של אגרת החוב שלי יורד.",l:3},
+    {s:"He put half the family money into a ten year bond so his wife would stop worrying about the market.",he:"הוא שם חצי מכספי המשפחה באגרת חוב לעשר שנים כדי שאשתו תפסיק לדאוג מהשוק.",l:4},
+    {s:"A bond is a promise from someone who may not keep it, so you are really being paid for trust rather than for growth.",he:"אגרת חוב היא הבטחה של מישהו שאולי לא יעמוד בה, כך שלמעשה משלמים לך על אמון ולא על צמיחה.",l:5}
+  ],
+  "Holding":[
+    {s:"It is my biggest holding.",he:"זו ההחזקה הכי גדולה שלי.",l:1},
+    {s:"That holding is about ten percent of my portfolio.",he:"ההחזקה הזו היא בערך עשרה אחוזים מהתיק שלי.",l:2},
+    {s:"We sold the holding after three years and doubled our money.",he:"מכרנו את ההחזקה אחרי שלוש שנים והכפלנו את הכסף.",l:3},
+    {s:"The fund cut its holding in the airline but kept a small position in case things turn around.",he:"הקרן צמצמה את ההחזקה שלה בחברת התעופה אבל שמרה פוזיציה קטנה למקרה שהמצב יתהפך.",l:4},
+    {s:"Your worst holding teaches you more than your best one, because you keep it long enough to understand exactly what you got wrong.",he:"ההחזקה הגרועה ביותר שלך מלמדת אותך יותר מהטובה ביותר, כי אתה מחזיק בה מספיק זמן כדי להבין בדיוק במה טעית.",l:5}
+  ],
+  "Stake":[
+    {s:"He owns a small stake.",he:"יש לו נתח בעלות קטן.",l:1},
+    {s:"We bought a twenty percent stake in the company.",he:"קנינו נתח בעלות של עשרים אחוז בחברה.",l:2},
+    {s:"The family sold half its stake in the hotel to a foreign investor.",he:"המשפחה מכרה חצי מהנתח שלה במלון למשקיע זר.",l:3},
+    {s:"He kept a controlling stake so nobody could push him out of the business he built.",he:"הוא שמר על נתח שליטה כדי שאף אחד לא יוכל לדחוף אותו החוצה מהעסק שהוא בנה.",l:4},
+    {s:"A minority stake without board seats is just an expensive opinion, since you take all the risk and get none of the control.",he:"נתח מיעוט בלי מושבים בדירקטוריון הוא רק דעה יקרה, כי אתה לוקח את כל הסיכון ולא מקבל שום שליטה.",l:5}
+  ],
+  "Due diligence":[
+    {s:"We start due diligence today.",he:"אנחנו מתחילים בדיקת נאותות היום.",l:1},
+    {s:"The lawyers are doing due diligence on the deal.",he:"עורכי הדין עושים בדיקת נאותות לעסקה.",l:2},
+    {s:"During due diligence we found that half their contracts expire next year.",he:"במהלך בדיקת הנאותות גילינו שחצי מהחוזים שלהם יפוגו בשנה הבאה.",l:3},
+    {s:"He skipped proper due diligence because the seller was a friend, and it cost him almost a million dollars.",he:"הוא דילג על בדיקת נאותות רצינית כי המוכר היה חבר, וזה עלה לו כמעט מיליון דולר.",l:4},
+    {s:"Real due diligence is not about confirming what you already believe; it is hunting for the one fact that kills the deal.",he:"בדיקת נאותות אמיתית היא לא אישור של מה שאתה כבר מאמין בו; היא חיפוש אחרי העובדה האחת שהורגת את העסקה.",l:5}
+  ],
+  "Fundamentals":[
+    {s:"The fundamentals look strong.",he:"נתוני היסוד נראים חזקים.",l:1},
+    {s:"I check the fundamentals before I buy a stock.",he:"אני בודק את נתוני היסוד לפני שאני קונה מניה.",l:2},
+    {s:"The price dropped, but the fundamentals of the business did not change at all.",he:"המחיר ירד, אבל נתוני היסוד של העסק לא השתנו בכלל.",l:3},
+    {s:"Everyone panicked over one bad quarter, yet the fundamentals were fine, with growing cash flow and almost no debt.",he:"כולם נכנסו לפאניקה בגלל רבעון גרוע אחד, אבל נתוני היסוד היו בסדר, עם תזרים מזומנים צומח וכמעט בלי חובות.",l:4},
+    {s:"In the short run the market votes on mood, but in the long run it weighs fundamentals, and that gap is where patient money lives.",he:"בטווח הקצר השוק מצביע לפי מצב רוח, אבל בטווח הארוך הוא שוקל את נתוני היסוד, והפער הזה הוא המקום שבו חי הכסף הסבלני.",l:5}
+  ],
+  "Benchmark":[
+    {s:"The S&P is our benchmark.",he:"מדד S&P הוא מדד הייחוס שלנו.",l:1},
+    {s:"Our portfolio beat the benchmark last year.",he:"התיק שלנו היכה את מדד הייחוס בשנה שעברה.",l:2},
+    {s:"Every manager compares his returns to a benchmark like the S&P 500.",he:"כל מנהל משווה את התשואות שלו למדד ייחוס כמו S&P 500.",l:3},
+    {s:"He charges high fees but has trailed his benchmark for three straight years now.",he:"הוא גובה דמי ניהול גבוהים אבל מפגר אחרי מדד הייחוס שלו כבר שלוש שנים ברציפות.",l:4},
+    {s:"Picking a weak benchmark is the oldest trick in the book: measure yourself against something slow enough and you always look brilliant.",he:"לבחור מדד ייחוס חלש זה הטריק הכי ישן בעולם: תמדוד את עצמך מול משהו איטי מספיק ותמיד תיראה מבריק.",l:5}
+  ],
+  "Allocation":[
+    {s:"Our allocation is very simple.",he:"הקצאת הנכסים שלנו מאוד פשוטה.",l:1},
+    {s:"Our allocation is sixty percent stocks and forty percent bonds.",he:"הקצאת הנכסים שלנו היא שישים אחוז מניות וארבעים אחוז אגרות חוב.",l:2},
+    {s:"The family wants a bigger allocation to income producing property this year.",he:"המשפחה רוצה הקצאה גדולה יותר לנכסים מניבים השנה.",l:3},
+    {s:"Most of your return over twenty years comes from allocation, not from picking the right individual stocks.",he:"רוב התשואה שלך לאורך עשרים שנה מגיעה מהקצאת הנכסים, ולא מבחירת המניות הבודדות הנכונות.",l:4},
+    {s:"Clients love talking about hot stocks, but the allocation decision quietly does ninety percent of the work in the background.",he:"לקוחות אוהבים לדבר על מניות חמות, אבל החלטת הקצאת הנכסים עושה בשקט תשעים אחוז מהעבודה ברקע.",l:5}
+  ],
+  "Rebalance":[
+    {s:"We rebalance once a year.",he:"אנחנו מאזנים את התיק מחדש פעם בשנה.",l:1},
+    {s:"I rebalance the portfolio every three months.",he:"אני מאזן מחדש את התיק כל שלושה חודשים.",l:2},
+    {s:"Stocks jumped, so we should rebalance and move some money back into bonds.",he:"המניות זינקו, אז כדאי לאזן מחדש ולהעביר חלק מהכסף בחזרה לאגרות חוב.",l:3},
+    {s:"Nobody likes to rebalance after a crash, because it means buying more of whatever just hurt you.",he:"אף אחד לא אוהב לאזן מחדש אחרי מפולת, כי זה אומר לקנות עוד ממה שבדיוק פגע בך.",l:4},
+    {s:"Rebalancing is disciplined selling of your winners: emotionally awful, but mathematically the closest thing to free money we have.",he:"איזון מחדש הוא מכירה ממושמעת של המנצחים שלך: רגשית זה נורא, אבל מתמטית זה הדבר הכי קרוב לכסף חינם שיש לנו.",l:5}
+  ],
+  "Liquidity":[
+    {s:"We need more liquidity now.",he:"אנחנו צריכים יותר נזילות עכשיו.",l:1},
+    {s:"The fund has enough liquidity to pay us back.",he:"לקרן יש מספיק נזילות כדי להחזיר לנו את הכסף.",l:2},
+    {s:"Real estate pays well, but it gives you almost no liquidity.",he:"נדל״ן משלם יפה, אבל הוא נותן לך כמעט אפס נזילות.",l:3},
+    {s:"The deal looked great until we saw the money is locked up for eight years with no liquidity.",he:"העסקה נראתה מצוינת עד שראינו שהכסף נעול לשמונה שנים בלי שום נזילות.",l:4},
+    {s:"Liquidity is like oxygen: you never think about it until the market freezes and suddenly nobody will buy at any price.",he:"נזילות היא כמו חמצן: אתה לא חושב עליה עד שהשוק קופא ופתאום אף אחד לא קונה בשום מחיר.",l:5}
+  ],
+  "Leverage":[
+    {s:"He uses too much leverage.",he:"הוא משתמש ביותר מדי מינוף.",l:1},
+    {s:"They bought the building with a lot of leverage.",he:"הם קנו את הבניין עם הרבה מינוף.",l:2},
+    {s:"Leverage makes the good years better and the bad years much worse.",he:"מינוף הופך את השנים הטובות לטובות יותר ואת הרעות לגרועות בהרבה.",l:3},
+    {s:"The fund returned thirty percent, but only because it was running three times leverage on a boring portfolio.",he:"הקרן עשתה שלושים אחוז, אבל רק כי היא עבדה עם מינוף פי שלושה על תיק משעמם.",l:4},
+    {s:"Leverage does not create returns, it only borrows them from the future and charges you interest until the day the market corrects.",he:"מינוף לא יוצר תשואה, הוא רק לווה אותה מהעתיד וגובה ממך ריבית עד היום שבו השוק מתקן.",l:5}
+  ],
+  "Hedge":[
+    {s:"We hedge the currency risk.",he:"אנחנו מגדרים את סיכון המטבע.",l:1},
+    {s:"We bought gold to hedge against inflation.",he:"קנינו זהב כדי לגדר מפני אינפלציה.",l:2},
+    {s:"Since most of our income is in shekels, we hedge the dollar exposure.",he:"מכיוון שרוב ההכנסה שלנו בשקלים, אנחנו מגדרים את החשיפה לדולר.",l:3},
+    {s:"The client wanted to hedge the downside, so we bought puts and gave up some of the upside.",he:"הלקוח רצה לגדר את הסיכון לירידות, אז קנינו אופציות מכר וויתרנו על חלק מהעלייה.",l:4},
+    {s:"A hedge that costs you nothing is usually not a hedge at all; you are simply being paid to take the same risk somewhere else.",he:"גידור שלא עולה לך כלום הוא בדרך כלל בכלל לא גידור: פשוט משלמים לך כדי לקחת את אותו סיכון במקום אחר.",l:5}
+  ],
+  "Exposure":[
+    {s:"We have too much exposure.",he:"יש לנו יותר מדי חשיפה.",l:1},
+    {s:"I want less exposure to tech stocks.",he:"אני רוצה פחות חשיפה למניות טכנולוגיה.",l:2},
+    {s:"Half our exposure is to the American market, which worries my father.",he:"חצי מהחשיפה שלנו היא לשוק האמריקאי, וזה מדאיג את אבא שלי.",l:3},
+    {s:"On paper we own eleven funds, but they all give us the same exposure to big American tech.",he:"על הנייר יש לנו אחת עשרה קרנות, אבל כולן נותנות לנו את אותה חשיפה לטכנולוגיה האמריקאית הגדולה.",l:4},
+    {s:"Most investors think they are diversified until one bad week shows them their real exposure was a single crowded trade all along.",he:"רוב המשקיעים חושבים שהם מפוזרים, עד ששבוע רע אחד מראה להם שהחשיפה האמיתית שלהם הייתה כל הזמן פוזיציה צפופה אחת.",l:5}
+  ],
+  "Speculation":[
+    {s:"That deal is pure speculation.",he:"העסקה הזאת היא ספקולציה טהורה.",l:1},
+    {s:"Buying that coin was pure speculation, not investing.",he:"לקנות את המטבע הזה היה ספקולציה טהורה, לא השקעה.",l:2},
+    {s:"There is a real difference between investing in a business and speculation on its price.",he:"יש הבדל אמיתי בין להשקיע בעסק לבין ספקולציה על המחיר שלו.",l:3},
+    {s:"He calls it a patient position, but buying an empty lot on a rumor is speculation.",he:"הוא קורא לזה פוזיציה סבלנית, אבל לקנות מגרש ריק על סמך שמועה זו ספקולציה.",l:4},
+    {s:"Speculation is fine as long as you admit that is what you are doing and size the position so it cannot really hurt you.",he:"ספקולציה זה בסדר כל עוד אתה מודה שזה מה שאתה עושה ומתאים את גודל הפוזיציה כך שהיא לא תוכל באמת לפגוע בך.",l:5}
+  ],
+  "Long-term":[
+    {s:"We are long-term investors.",he:"אנחנו משקיעים לטווח ארוך.",l:1},
+    {s:"This apartment is a long-term investment for us.",he:"הדירה הזאת היא השקעה לטווח ארוך בשבילנו.",l:2},
+    {s:"Over a long-term horizon the market goes up, but the ride is rough.",he:"לאורך אופק ארוך טווח השוק עולה, אבל הדרך מטלטלת.",l:3},
+    {s:"We tell every client the same thing: this money is long-term and should not be touched for a decade.",he:"אנחנו אומרים לכל לקוח את אותו דבר: הכסף הזה הוא לטווח ארוך ואסור לגעת בו במשך עשור.",l:4},
+    {s:"Everyone says they are long-term until the portfolio drops twenty percent and their long-term horizon suddenly becomes next Tuesday.",he:"כולם אומרים שהם לטווח ארוך, עד שהתיק יורד עשרים אחוז והאופק ארוך הטווח שלהם הופך פתאום ליום שלישי הקרוב.",l:5}
+  ],
+  "Short-term":[
+    {s:"This is a short-term trade.",he:"זו עסקה לטווח קצר.",l:1},
+    {s:"We keep some cash for short-term needs.",he:"אנחנו שומרים קצת מזומן לצרכים לטווח קצר.",l:2},
+    {s:"Short-term moves in the market tell you almost nothing about real value.",he:"תנועות לטווח קצר בשוק לא מספרות לך כמעט כלום על השווי האמיתי.",l:3},
+    {s:"If you need the money within two years, keep it in short-term bonds instead of stocks.",he:"אם אתה צריך את הכסף בתוך שנתיים, תחזיק אותו באגרות חוב לטווח קצר במקום במניות.",l:4},
+    {s:"The whole industry is built to sell you short-term excitement while quietly charging you for a decision that should take five minutes a year.",he:"כל התעשייה בנויה כדי למכור לך ריגוש לטווח קצר, ובשקט לגבות ממך על החלטה שאמורה לקחת חמש דקות בשנה.",l:5}
+  ],
 };
 
 // ── APP STATE ──
@@ -6851,6 +7581,7 @@ function showTab(t){
   if(t==='progress')renderProgress();
   if(t==='settings')loadSettings();
   if(t==='add')renderRecent();
+  if(t==='read')closeArticle();
 }
 
 // ── STUDY ──
@@ -7399,6 +8130,346 @@ document.addEventListener('keydown',e=>{
   else if(k==='/'){e.preventDefault();showTab('words');setTimeout(()=>{const s=document.getElementById('wlSearch');if(s)s.focus();},60);}
   else if(k==='?')document.getElementById('shortcutsModal').classList.toggle('active');
 });
+
+
+// ══════════════════════════════════════════════════════════════
+//  READING — קטעי קריאה מעולם ההשקעות והפמילי אופיס
+//  לכל מאמר: טקסט אנגלי, תרגום מלא לעברית, ומילון למונחים
+//  שלא נמצאים באוצר המילים.
+// ══════════════════════════════════════════════════════════════
+const ARTICLES = [
+{
+  id:'art_rockefeller', topic:'Family Office', level:3, emoji:'🏛️',
+  title:'The Family Office Was Invented by One Man',
+  sub:'John D. Rockefeller, 1882',
+  text:`By 1882, John D. Rockefeller had a problem that almost nobody in history had faced before. He was earning money faster than he could manage it.
+
+His oil company was producing enormous profits, but there was no bank, no fund and no adviser built to handle a single fortune of that size. So he built one himself. He hired a small team whose only client was his family. Their job was to protect the capital, invest it, handle the tax, and keep the whole thing quiet.
+
+That office still exists today. It is the reason we use the words family office at all.
+
+The idea spread slowly. For a hundred years it stayed rare, because you needed an enormous amount of wealth to justify hiring a full team. Today there are thousands of family offices around the world, and most of them do exactly what Rockefeller's did: manage one family's assets across generations.
+
+The interesting part is what changed and what did not. The tools are modern now. The goal is identical. A family office is not trying to beat the market every quarter. It is trying to make sure the money is still there in eighty years, when the people who earned it are gone.`,
+  he:`עד 1882, לג'ון די. רוקפלר הייתה בעיה שכמעט אף אחד בהיסטוריה לא נתקל בה קודם. הוא הרוויח כסף מהר יותר משהספיק לנהל אותו.
+
+חברת הנפט שלו ייצרה רווחים עצומים, אבל לא היה בנק, קרן או יועץ שנבנו לטפל בהון יחיד בסדר גודל כזה. אז הוא בנה אחד בעצמו. הוא שכר צוות קטן שהלקוח היחיד שלו היה המשפחה שלו. התפקיד שלהם היה להגן על ההון, להשקיע אותו, לטפל במס, ולשמור על כל העניין בשקט.
+
+המשרד הזה קיים עד היום. זו הסיבה שאנחנו בכלל משתמשים במילים פמילי אופיס.
+
+הרעיון התפשט לאט. במשך מאה שנה הוא נשאר נדיר, כי היית צריך כמות עצומה של עושר כדי להצדיק העסקת צוות שלם. היום יש אלפי פמילי אופיסים ברחבי העולם, ורובם עושים בדיוק את מה שהמשרד של רוקפלר עשה: לנהל את הנכסים של משפחה אחת לאורך דורות.
+
+החלק המעניין הוא מה השתנה ומה לא. הכלים מודרניים היום. המטרה זהה. פמילי אופיס לא מנסה לנצח את השוק בכל רבעון. הוא מנסה לוודא שהכסף עדיין יהיה שם בעוד שמונים שנה, כשהאנשים שהרוויחו אותו כבר לא יהיו.`,
+  gloss:{
+    "fortune":{he:"הון עתק",ph:"פוֹר-צֶ'ן"},
+    "adviser":{he:"יועץ",ph:"אַד-וַיי-זֶר"},
+    "generations":{he:"דורות",ph:"גֶ'נֶ-רֵיי-שֶׁנְז"},
+    "justify":{he:"להצדיק",ph:"גַ'אס-טִי-פַיי"},
+    "identical":{he:"זהה",ph:"אַיי-דֶנ-טִי-קֶל"},
+    "quarter":{he:"רבעון",ph:"קְווֹר-טֶר"},
+    "enormous":{he:"עצום",ph:"אִי-נוֹר-מֶס"},
+  }
+},
+{
+  id:'art_whatitdoes', topic:'Family Office', level:3, emoji:'🗂️',
+  title:'What a Family Office Actually Does All Day',
+  sub:'The unglamorous version',
+  text:`People imagine a family office as a room full of traders. In reality most of the work is much quieter than that.
+
+A family office manages the wealth of one family. Unlike a fund, it does not raise capital from outside investors, and it does not need to report a return to anyone except the family itself. That single fact changes everything about how it behaves.
+
+A typical week involves reviewing the portfolio, checking cash flow, meeting a broker, reading a balance sheet, arguing about allocation, and signing something boring but important. There is usually a real estate holding somewhere that needs attention. There is almost always a tax question.
+
+The hardest part is not picking investments. It is saying no. Every wealthy family receives a steady stream of opportunities, and most of them are bad. A good family office is a filter.
+
+The second hardest part is people. The family grows. Children become adults with their own opinions about risk. A structure that worked for one generation has to survive being handed to the next one, and that is where most family fortunes quietly disappear.`,
+  he:`אנשים מדמיינים פמילי אופיס כחדר מלא בסוחרים. במציאות רוב העבודה הרבה יותר שקטה מזה.
+
+פמילי אופיס מנהל את ההון של משפחה אחת. בניגוד לקרן, הוא לא מגייס הון ממשקיעים חיצוניים, והוא לא צריך לדווח על תשואה לאף אחד מלבד המשפחה עצמה. העובדה הבודדת הזאת משנה הכל באופן שבו הוא מתנהג.
+
+שבוע טיפוסי כולל סקירת תיק ההשקעות, בדיקת תזרים מזומנים, פגישה עם ברוקר, קריאת מאזן, ויכוח על הקצאת נכסים, וחתימה על משהו משעמם אבל חשוב. בדרך כלל יש איזו החזקת נדל"ן שדורשת תשומת לב. כמעט תמיד יש שאלת מס.
+
+החלק הקשה ביותר הוא לא בחירת השקעות. הוא לומר לא. כל משפחה עשירה מקבלת זרם קבוע של הזדמנויות, ורובן גרועות. פמילי אופיס טוב הוא מסנן.
+
+החלק השני בקושי הוא אנשים. המשפחה גדלה. ילדים הופכים למבוגרים עם דעות משלהם על סיכון. מבנה שעבד לדור אחד צריך לשרוד את המעבר לדור הבא, ושם רוב הונות המשפחה נעלמים בשקט.`,
+  gloss:{
+    "unglamorous":{he:"לא זוהר",ph:"אַן-גְלַא-מֶ-רֶס"},
+    "traders":{he:"סוחרים",ph:"טְרֵיי-דֶרְז"},
+    "behaves":{he:"מתנהג",ph:"בִּי-הֵייבְז"},
+    "typical":{he:"טיפוסי",ph:"טִי-פִּי-קֶל"},
+    "steady":{he:"קבוע ויציב",ph:"סְטֶ-דִי"},
+    "filter":{he:"מסנן",ph:"פִיל-טֶר"},
+    "structure":{he:"מבנה",ph:"סְטְרַאק-צֶ'ר"},
+    "survive":{he:"לשרוד",ph:"סֶר-וַייב"},
+  }
+},
+{
+  id:'art_zell', topic:'Real Estate', level:4, emoji:'🏢',
+  title:'The Man Who Sold Everything at the Top',
+  sub:'Sam Zell, February 2007',
+  text:`Sam Zell called himself the Grave Dancer. He built his fortune buying real estate that everyone else had given up on, usually from owners in trouble, usually at a price that looked embarrassing later.
+
+In early 2007 he did the opposite. He sold Equity Office Properties, the largest office landlord in the United States, for around thirty nine billion dollars. At the time, plenty of people thought he had sold too cheap. The market was strong, prices were still climbing, and the buyer looked confident.
+
+Within eighteen months the property market had collapsed. Buildings that traded at record valuations in 2007 were worth a fraction of that by 2009. The deal is now studied as one of the best exits in the history of the industry.
+
+Zell's own explanation was almost boring. He said that when someone offers you a price that makes no sense, you take it. He was not predicting a crash. He was noticing that the numbers had stopped matching reality, and he was willing to look wrong for a while.
+
+That is the uncomfortable part of the story. Selling at the top feels like a mistake for months before it feels like genius.`,
+  he:`סם זל קרא לעצמו רוקד הקברים. הוא בנה את הונו בקניית נדל"ן שכל השאר כבר ויתרו עליו, בדרך כלל מבעלים בצרות, בדרך כלל במחיר שנראה מביך בדיעבד.
+
+בתחילת 2007 הוא עשה את ההפך. הוא מכר את Equity Office Properties, בעל משרדים להשכרה הגדול בארצות הברית, בכשלושים ותשעה מיליארד דולר. באותה עת, לא מעט אנשים חשבו שהוא מכר בזול מדי. השוק היה חזק, המחירים עדיין טיפסו, והקונה נראה בטוח בעצמו.
+
+תוך שמונה עשר חודשים שוק הנדל"ן קרס. בניינים שנסחרו בהערכות שווי שיא ב-2007 היו שווים חלק קטן מזה עד 2009. העסקה נלמדת היום כאחת מיציאות ההשקעה הטובות בהיסטוריה של הענף.
+
+ההסבר של זל עצמו היה כמעט משעמם. הוא אמר שכשמישהו מציע לך מחיר שאין בו היגיון, אתה לוקח אותו. הוא לא חזה קריסה. הוא שם לב שהמספרים הפסיקו להתאים למציאות, והוא היה מוכן להיראות טועה לזמן מה.
+
+זה החלק הלא נוח בסיפור. מכירה בשיא מרגישה כמו טעות במשך חודשים לפני שהיא מרגישה כמו גאונות.`,
+  gloss:{
+    "given up on":{he:"ויתרו עליו",ph:"גִי-וֶן אַפּ אוֹן"},
+    "embarrassing":{he:"מביך",ph:"אִים-בַּ-רֶ-סִינְג"},
+    "collapsed":{he:"קרס",ph:"קֶ-לַאפְּסְט"},
+    "fraction":{he:"חלק קטן",ph:"פְרַאק-שֶׁן"},
+    "exits":{he:"יציאות מהשקעה",ph:"אֶק-סִיטְס"},
+    "industry":{he:"ענף",ph:"אִינ-דֶס-טְרִי"},
+    "predicting":{he:"לחזות",ph:"פְּרִי-דִיק-טִינְג"},
+    "genius":{he:"גאונות",ph:"גִ'י-נְיֶס"},
+  }
+},
+{
+  id:'art_snowball', topic:'Markets', level:3, emoji:'❄️',
+  title:'Almost All of It Came After He Turned Fifty',
+  sub:'Warren Buffett and compound interest',
+  text:`Warren Buffett started investing as a child. He bought his first stock at eleven. By thirty he was already a millionaire, which was a serious amount of money at the time.
+
+And yet the overwhelming majority of his wealth arrived after his fiftieth birthday, and a large part of it after his sixtieth.
+
+Nothing dramatic changed in his method. He did not discover a better strategy at fifty. What happened was compound interest, which is boring for decades and then suddenly is not. Money that grows at a steady rate doubles, then doubles again, and each doubling is larger than everything that came before it.
+
+This is the part most people understand in theory and ignore in practice. The return matters, but time matters more. An average return held for forty years beats a brilliant return held for ten.
+
+Buffett's real skill may not be picking stocks at all. It may be that he started early, avoided ruin, and simply refused to interrupt the process. He has said that his life has been a product of finding a long hill and rolling a snowball down it.`,
+  he:`וורן באפט התחיל להשקיע כילד. הוא קנה את המניה הראשונה שלו בגיל אחת עשרה. עד גיל שלושים הוא כבר היה מיליונר, שזה היה סכום כסף רציני באותה תקופה.
+
+ובכל זאת, הרוב המכריע של ההון שלו הגיע אחרי יום ההולדת החמישים שלו, וחלק גדול ממנו אחרי השישים.
+
+שום דבר דרמטי לא השתנה בשיטה שלו. הוא לא גילה אסטרטגיה טובה יותר בגיל חמישים. מה שקרה היה ריבית דריבית, שהיא משעממת במשך עשורים ואז פתאום לא. כסף שצומח בקצב קבוע מכפיל את עצמו, ואז מכפיל שוב, וכל הכפלה גדולה מכל מה שקדם לה.
+
+זה החלק שרוב האנשים מבינים בתיאוריה ומתעלמים ממנו בפועל. התשואה חשובה, אבל הזמן חשוב יותר. תשואה ממוצעת שמוחזקת ארבעים שנה מנצחת תשואה מבריקה שמוחזקת עשר.
+
+ייתכן שהכישרון האמיתי של באפט הוא בכלל לא בחירת מניות. ייתכן שהוא פשוט התחיל מוקדם, נמנע מחורבן, וסירב להפריע לתהליך. הוא אמר שהחיים שלו היו תוצר של מציאת גבעה ארוכה וגלגול כדור שלג במורדה.`,
+  gloss:{
+    "overwhelming":{he:"מכריע",ph:"אוֹ-וֶר-וֶול-מִינְג"},
+    "majority":{he:"רוב",ph:"מֶ-ג'וֹ-רִי-טִי"},
+    "dramatic":{he:"דרמטי",ph:"דְרֶ-מַא-טִיק"},
+    "strategy":{he:"אסטרטגיה",ph:"סְטְרַא-טֶ-גִ'י"},
+    "decades":{he:"עשורים",ph:"דֶ-קֵיידְז"},
+    "doubles":{he:"מכפיל את עצמו",ph:"דַא-בֶּלְז"},
+    "theory":{he:"תיאוריה",ph:"תִ'י-אֶ-רִי"},
+    "brilliant":{he:"מבריק",ph:"בְּרִיל-יֶנְט"},
+    "ruin":{he:"חורבן כלכלי",ph:"רוּ-אִין"},
+    "interrupt":{he:"להפריע",ph:"אִינ-טֶ-רַאפְּט"},
+  }
+},
+{
+  id:'art_capratestory', topic:'Real Estate', level:3, emoji:'🔑',
+  title:'The Building Nobody Wanted',
+  sub:'How a cap rate actually works',
+  text:`A small office building sits on a quiet street. The owner is tired, the paint is old, and half the floors are empty. The asking price is two million dollars.
+
+The building brings in one hundred and sixty thousand dollars a year in rent. After property tax, insurance and repairs, about one hundred and twenty thousand is left. Divide that by the price and you get six percent. That number is the cap rate, and it is the first thing any real estate investor calculates.
+
+Six percent is not exciting. But the vacancy rate is the real story here. Half the space is empty, so the income is only half of what the building could produce. A buyer is not really paying for six percent. They are paying for the chance to fix something.
+
+If a new owner spends money on renovation, fills the empty floors and raises the rent slightly, the income might reach two hundred and forty thousand. At the same six percent cap rate, the building is now worth four million.
+
+That is the whole game in one paragraph. You do not make money in real estate by buying good buildings. You make it by buying fixable ones.`,
+  he:`בניין משרדים קטן עומד ברחוב שקט. הבעלים עייף, הצבע ישן, ומחצית הקומות ריקות. מחיר המבוקש הוא שני מיליון דולר.
+
+הבניין מכניס מאה שישים אלף דולר בשנה בשכר דירה. אחרי ארנונה, ביטוח ותיקונים, נשארים בערך מאה עשרים אלף. תחלק את זה במחיר ותקבל שישה אחוזים. המספר הזה הוא שיעור התשואה על הנכס, וזה הדבר הראשון שכל משקיע נדל"ן מחשב.
+
+שישה אחוזים זה לא מרגש. אבל שיעור הדירות הריקות הוא הסיפור האמיתי כאן. מחצית השטח ריקה, אז ההכנסה היא רק מחצית ממה שהבניין יכול לייצר. קונה לא באמת משלם על שישה אחוזים. הוא משלם על ההזדמנות לתקן משהו.
+
+אם בעלים חדש ישקיע כסף בשיפוץ, ימלא את הקומות הריקות ויעלה מעט את שכר הדירה, ההכנסה עשויה להגיע למאתיים ארבעים אלף. באותו שיעור תשואה של שישה אחוזים, הבניין שווה עכשיו ארבעה מיליון.
+
+זה כל המשחק בפסקה אחת. לא מרוויחים כסף בנדל"ן בקניית בניינים טובים. מרוויחים בקניית בניינים שאפשר לתקן.`,
+  gloss:{
+    "asking price":{he:"מחיר מבוקש",ph:"אַס-קִינְג פְּרַייס"},
+    "insurance":{he:"ביטוח",ph:"אִינ-שׁוּ-רֶנְס"},
+    "repairs":{he:"תיקונים",ph:"רִי-פֵּרְז"},
+    "divide":{he:"לחלק",ph:"דִי-וַייד"},
+    "calculates":{he:"מחשב",ph:"קַאל-קְיוּ-לֵייטְס"},
+    "produce":{he:"לייצר",ph:"פְּרֶ-דוּס"},
+    "slightly":{he:"במעט",ph:"סְלַייט-לִי"},
+    "fixable":{he:"ניתן לתיקון",ph:"פִיק-סֶ-בֶּל"},
+    "paragraph":{he:"פסקה",ph:"פַּא-רֶ-גְרַאף"},
+  }
+},
+];
+
+
+// ── מילים נפוצות מדי מכדי לסמן ──
+const READ_SKIP = new Set(('a an the and or but if of to in on at for with from by as is are was were be been being ' +
+ 'it its this that these those he she they we you i him her them us my your his their our not no yes do does did done ' +
+ 'have has had will would can could should may might must so than then there here when where what which who how why ' +
+ 'all any both each few more most other some such only own same very just also into over under about after before ' +
+ 'up down out off again once because while during through between against one two three four five six seven eight ' +
+ 'nine ten first last next new old good bad big small long short high low much many now still even ever never always ' +
+ 'like get got go went make made take took come came know knew think thought say said see saw want need way thing ' +
+ 'time year day week month people man woman part place work life world').split(' '));
+
+// ── בונה מילון חיפוש: אוצר המילים + המילון של המאמר ──
+function readLex(art){
+  const m=new Map();
+  allWords().forEach(w=>m.set(w.en.trim().toLowerCase(),{en:w.en,he:w.he,ph:w.ph||'',ex:w.ex||'',id:w.id,src:'vocab'}));
+  if(art&&art.gloss)Object.entries(art.gloss).forEach(([k,v])=>{
+    const key=k.trim().toLowerCase();
+    if(!m.has(key))m.set(key,{en:k,he:v.he,ph:v.ph||'',ex:'',id:'g_'+key.replace(/\W+/g,'_'),src:'gloss'});
+  });
+  return m;
+}
+// מנסה גם צורות נטויות
+function lexLookup(m,w){
+  const t=w.toLowerCase();
+  if(m.has(t))return m.get(t);
+  const tries=[t.replace(/ies$/,'y'),t.replace(/es$/,''),t.replace(/s$/,''),
+               t.replace(/ed$/,''),t.replace(/ed$/,'e'),t.replace(/ing$/,''),t.replace(/ing$/,'e')];
+  for(const x of tries)if(x&&x!==t&&m.has(x))return m.get(x);
+  return null;
+}
+
+let curArticle=null, tappedWords=new Set();
+
+function renderArtList(){
+  const el=document.getElementById('artList');if(!el)return;
+  const saved=(appData.savedTexts||[]);
+  const items=[...saved.map(t=>({...t,saved:true})),...ARTICLES];
+  el.innerHTML=items.map((a,i)=>{
+    const lex=readLex(a);
+    let unknown=0;
+    tokenizeWords(a.text).forEach(w=>{
+      if(READ_SKIP.has(w.toLowerCase()))return;
+      const e=lexLookup(lex,w);
+      if(e&&(e.src==='gloss'||getProgress(e.id).status!=='mastered'))unknown++;
+    });
+    const lvl={1:'A1',2:'A2',3:'B1',4:'B2',5:'C1'}[a.level||3];
+    return '<div class="art-card" onclick="openArticle('+(a.saved?'\'s'+i+'\'':'\''+a.id+'\'')+')">'+
+      '<div class="art-emoji">'+esc(a.emoji||'📄')+'</div>'+
+      '<div class="art-title">'+esc(a.title)+'</div>'+
+      (a.sub?'<div class="art-sub">'+esc(a.sub)+'</div>':'')+
+      '<div class="art-meta"><span>'+esc(a.topic||'My text')+'</span><span>'+lvl+'</span><span>'+
+        a.text.split(/\s+/).length+' words</span><span>'+unknown+' to learn</span></div></div>';
+  }).join('')||'<div style="color:var(--muted);font-size:.85rem;">No articles yet.</div>';
+}
+
+function tokenizeWords(t){return (t.match(/[A-Za-z][A-Za-z'-]*/g)||[]);}
+
+function findArticle(id){
+  if(String(id).startsWith('s'))return (appData.savedTexts||[])[+String(id).slice(1)];
+  return ARTICLES.find(a=>a.id===id);
+}
+
+function openArticle(id){
+  const a=findArticle(id);if(!a)return;
+  curArticle=a; tappedWords=new Set();
+  document.getElementById('readList').style.display='none';
+  document.getElementById('readView').style.display='block';
+  document.getElementById('readTitle').textContent=a.title;
+  document.getElementById('readSub').textContent=a.sub||'';
+  document.getElementById('readHe').textContent=a.he||'';
+  document.getElementById('readHe').classList.remove('on');
+  document.getElementById('readHeBtn').style.display=a.he?'inline-flex':'none';
+  document.getElementById('readBody').innerHTML=markupText(a);
+  updateTapped();
+  if(window.scrollTo)window.scrollTo(0,0);
+}
+function closeArticle(){
+  curArticle=null;
+  document.getElementById('readView').style.display='none';
+  document.getElementById('readList').style.display='block';
+  renderArtList();
+}
+function toggleReadHe(){document.getElementById('readHe').classList.toggle('on');}
+
+// מסמן כל מילה "טיפה מסובכת" שאנחנו מכירים
+function markupText(a){
+  const lex=readLex(a);
+  const parts=a.text.split(/([A-Za-z][A-Za-z'-]*)/g);
+  let out='';
+  for(let i=0;i<parts.length;i++){
+    if(i%2===0){out+=esc(parts[i]);continue;}
+    const w=parts[i];
+    if(READ_SKIP.has(w.toLowerCase())||w.length<4){out+=esc(w);continue;}
+    const e=lexLookup(lex,w);
+    if(!e){out+=esc(w);continue;}
+    const known=e.src==='vocab'&&getProgress(e.id).status==='mastered';
+    out+='<span class="rw'+(known?' known':'')+'" onclick="openRW(\''+esc(e.en).replace(/'/g,'&#39;')+'\')">'+esc(w)+'</span>';
+  }
+  return out;
+}
+
+function openRW(en){
+  const lex=readLex(curArticle);
+  const e=lexLookup(lex,en)||lex.get(en.toLowerCase());
+  if(!e)return;
+  tappedWords.add(e.en); updateTapped();
+  const ex=(EXTRA_EXAMPLES[e.en]&&EXTRA_EXAMPLES[e.en][1])||null;
+  const sample=ex?ex.s:(e.ex||'');
+  const sampleHe=ex?ex.he:'';
+  const known=e.src==='vocab'&&getProgress(e.id).status==='mastered';
+  document.getElementById('rwBody').innerHTML=
+    '<div class="rw-word">'+esc(e.en)+' <button class="exp-speak" onclick="speak('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')" title="Listen">🔊</button></div>'+
+    (e.ph?'<div class="rw-ph">'+esc(e.ph)+'</div>':'')+
+    '<div class="rw-he">'+esc(e.he)+'</div>'+
+    (sample?'<div class="rw-ex">'+esc(sample)+(sampleHe?'<br><span style="color:var(--muted);opacity:.8;">'+esc(sampleHe)+'</span>':'')+'</div>':'')+
+    '<div style="display:flex;gap:8px;margin-top:14px;">'+
+      (known?'<button class="btn btn-outline btn-sm" style="flex:1;" onclick="rwLearn('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')">↩︎ Study again</button>'
+            :'<button class="btn btn-gold btn-sm" style="flex:1;" onclick="rwLearn('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')">+ Add to study</button>')+
+      '<button class="btn btn-outline btn-sm" style="flex:1;" onclick="rwKnow('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')">✓ I know it</button>'+
+    '</div>';
+  document.getElementById('rwModal').classList.add('active');
+}
+function closeRW(){document.getElementById('rwModal').classList.remove('active');}
+
+function rwLearn(en){
+  const lex=readLex(curArticle); const e=lexLookup(lex,en)||lex.get(en.toLowerCase()); if(!e)return;
+  if(e.src==='gloss'){
+    if(!isDup(e.en)){
+      const w=makeUserWord(e.en,e.he,curArticle&&/estate|building/i.test(curArticle.topic||'')?'realestate':'investing','📖',e.ph,'','word');
+      if(w){appData.userAddedWords.push(w);saveData();updateHeaderCount();}
+    }
+    toast('✅ Added to your words');
+  }else{
+    setProgress(e.id,{status:'learning',nextReviewAt:0});
+    toast('✅ Added to your study list');
+  }
+  closeRW(); if(curArticle)document.getElementById('readBody').innerHTML=markupText(curArticle);
+}
+function rwKnow(en){
+  const lex=readLex(curArticle); const e=lexLookup(lex,en)||lex.get(en.toLowerCase()); if(!e)return;
+  if(e.src==='vocab'){setProgress(e.id,{status:'mastered',streak:3,nextReviewAt:Date.now()+14*86400000});toast('Marked as known');}
+  else toast('Not in your list yet');
+  closeRW(); if(curArticle)document.getElementById('readBody').innerHTML=markupText(curArticle);
+}
+function updateTapped(){
+  const el=document.getElementById('readTapped');if(!el)return;
+  el.textContent=tappedWords.size?tappedWords.size+' words looked up':'';
+}
+
+// ── טקסט שהמשתמש מדביק ──
+function readPasted(){
+  const en=(document.getElementById('pasteEn').value||'').trim();
+  const he=(document.getElementById('pasteHe').value||'').trim();
+  if(en.length<40){toast('Paste a bit more text first','err');return;}
+  if(!appData.savedTexts)appData.savedTexts=[];
+  const title=en.split(/[.\n]/)[0].slice(0,60)+(en.length>60?'…':'');
+  appData.savedTexts.unshift({id:'my_'+Date.now(),title:title,sub:'Your text',topic:'My text',
+    level:3,emoji:'📋',text:en,he:he,gloss:{}});
+  appData.savedTexts=appData.savedTexts.slice(0,20);
+  saveData();
+  document.getElementById('pasteEn').value='';document.getElementById('pasteHe').value='';
+  renderArtList(); openArticle('s0');
+}
 
 // ── LOGIN ──
 const AUTH={u:'yonatan',p:'english123'};
