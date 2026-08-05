@@ -594,7 +594,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
         <button class="btn btn-outline btn-sm" onclick="exportData()">Export</button></div>
     </div>
     <div class="backup-reminder">⚠️ Your progress is saved in this browser only. Export a backup regularly to avoid losing data.</div>
-    <div style="text-align:center;margin-top:14px;font-size:.72rem;color:var(--muted);">English Flashcards v2.0 · <span id="totalWordCount"></span> words total</div>
+    <div style="text-align:center;margin-top:14px;font-size:.72rem;color:var(--muted);">English Flashcards · <span id="totalWordCount"></span> words · build <span id="buildId">local</span></div>
   </div>
 </div>
 
@@ -8482,6 +8482,9 @@ function readPasted(){
   renderArtList(); openArticle('s0');
 }
 
+const BUILD='9fa22bc5';
+try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_b)_b.textContent=BUILD; } }catch(e){}
+
 // ── LOGIN ──
 const AUTH={u:'yonatan',p:'english123'};
 function checkLogin(){return sessionStorage.getItem('fc_auth')==='1';}
@@ -8526,6 +8529,11 @@ try{init();}catch(err){
 if('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('sw.js').then(function(reg){
+      // בודק עדכון בכל פתיחה, וגם בכל פעם שחוזרים לאפליקציה
+      try{ reg.update(); }catch(e){}
+      document.addEventListener('visibilitychange',function(){
+        if(document.visibilityState==='visible'){ try{ reg.update(); }catch(e){} }
+      });
       // אם יש גרסה חדשה — מרעננים פעם אחת כדי שהאפליקציה תמיד תהיה עדכנית
       reg.addEventListener('updatefound', function(){
         const nw = reg.installing;
