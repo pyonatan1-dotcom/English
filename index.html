@@ -140,8 +140,9 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .card-front{background:linear-gradient(135deg,#1a1500,#111000);border-top:4px solid var(--gold);}
 .card-back{background:linear-gradient(135deg,#0a140a,#0d0d0d);border-top:4px solid var(--green);transform:rotateY(180deg);}
 .card-badge{position:absolute;top:16px;right:16px;font-size:.65rem;padding:4px 10px;border-radius:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
-.c-speak-btn{position:absolute;bottom:14px;left:16px;width:32px;height:32px;border-radius:50%;background:none;border:none;color:rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;transition:color .2s;padding:0;}
-.c-speak-btn:hover{color:var(--gold);}
+.c-speak-btn{position:absolute;top:54px;right:16px;width:64px;height:64px;border-radius:50%;background:rgba(201,168,76,.10);border:2px solid var(--gold);color:var(--gold-l);display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0;}
+.c-speak-btn:hover{background:rgba(201,168,76,.24);color:var(--gold);}
+.c-speak-btn:active{transform:scale(.94);}
 .c-status-dot{position:absolute;top:18px;left:16px;width:10px;height:10px;border-radius:50%;}
 .card-word{font-family:'Frank Ruhl Libre',serif;font-size:3.2rem;font-weight:700;color:var(--gold-l);text-align:center;line-height:1.15;}
 .card-word.he-word{color:var(--green-l);direction:rtl;}
@@ -412,7 +413,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
             <button class="c-ph-btn" id="cPhBtn" onclick="togglePh(event)">🔤 Phonetic</button>
             <div class="card-hint" id="cHint">Tap to reveal →</div>
             <button class="c-speak-btn" id="cSpeakBtn" onclick="speakCurrent(event)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="15" height="15" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="30" height="30" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </button>
           </div>
           <div class="card-face card-back">
@@ -8482,7 +8483,7 @@ function readPasted(){
   renderArtList(); openArticle('s0');
 }
 
-const BUILD='9fa22bc5';
+const BUILD='6adcc7fb';
 try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_b)_b.textContent=BUILD; } }catch(e){}
 
 // ── LOGIN ──
