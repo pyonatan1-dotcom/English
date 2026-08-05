@@ -99,6 +99,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .s-area.active{display:flex;}
 .s-topbar{width:100%;max-width:1120px;display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .study-row{display:flex;gap:20px;justify-content:center;align-items:flex-start;width:100%;max-width:1120px;margin-bottom:12px;}
+.study-col{display:flex;flex-direction:column;align-items:center;width:100%;max-width:640px;flex-shrink:0;}
 
 /* EXAMPLE PANEL */
 .ex-panel{width:380px;flex-shrink:0;height:560px;background:linear-gradient(145deg,#080f1a,#0a1020);border:1px solid rgba(92,107,192,.25);border-top:4px solid var(--blue);border-radius:24px;padding:24px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
@@ -305,15 +306,25 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .login-err{color:var(--red-l);font-size:.82rem;text-align:center;min-height:18px;}
 
 /* ─── RESPONSIVE ─── */
+/* ─── מובייל ─── */
 @media(max-width:480px){
-  .card-scene{height:440px;}
+  .card-scene{height:400px;margin-bottom:8px;}
   .card-word{font-size:2.2rem;}
   .card-answer{font-size:2.3rem;}
-  .form-row{grid-template-columns:1fr;}
+  .mark-row{margin-bottom:6px;}
   .mark-row .btn{font-size:.78rem;padding:9px 10px;}
+  .s-controls{margin-bottom:4px;}
+  .ex-panel{margin-top:6px;}
+  .form-row{grid-template-columns:1fr;}
   .comp-stats{gap:7px;}
   .stats-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}
 }
+/* מסך נמוך (אייפון SE, מצב אופקי) — מקטין רק את גובה הכרטיסייה,
+   הטקסט נשאר באותו גודל, כדי שכפתורי הסימון יישארו בלי גלילה */
+@media(max-height:700px){
+  .card-scene{height:300px;}
+}
+
 
 /* ── READ — קטעי קריאה ── */
 .read-wrap{max-width:720px;margin:0 auto;padding:18px 16px;}
@@ -390,7 +401,8 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
     </div>
 
     <div class="study-row">
-      <div class="card-scene" id="cardScene" onclick="flipCard()">
+      <div class="study-col">
+        <div class="card-scene" id="cardScene" onclick="flipCard()">
         <div class="card-inner">
           <div class="card-face card-front">
             <div class="card-badge" id="cBadge"></div>
@@ -410,7 +422,20 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
           </div>
         </div>
       </div>
-
+        <div class="mark-row">
+      <button class="btn btn-green" onclick="markWord(3)">✅ Got it</button>
+      <button class="btn btn-blue" onclick="markWord(2)">🤔 Almost</button>
+      <button class="btn btn-orange" onclick="markWord(1)">🔄 Learning</button>
+    </div>
+        <div class="s-controls">
+      <button class="btn btn-outline btn-sm" onclick="navigate(-1)">← Prev</button>
+      <button class="btn btn-outline btn-sm" onclick="shuffleQ()">🔀 Shuffle</button>
+      <button class="btn btn-outline btn-sm" onclick="navigate(1)">Next →</button>
+    </div>
+        <div class="undo-row">
+      <button class="btn btn-outline btn-sm" id="undoBtn" onclick="undoLast()" style="display:none;">↩ Undo last</button>
+    </div>
+      </div>
       <div class="ex-panel" id="exPanel">
         <div class="exp-label-row">
           <div class="exp-label">Example Sentences</div>
@@ -419,20 +444,6 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
         <div class="exp-word" id="expWord"></div>
         <div class="exp-list" id="expList"></div>
       </div>
-    </div>
-
-    <div class="s-controls">
-      <button class="btn btn-outline btn-sm" onclick="navigate(-1)">← Prev</button>
-      <button class="btn btn-outline btn-sm" onclick="shuffleQ()">🔀 Shuffle</button>
-      <button class="btn btn-outline btn-sm" onclick="navigate(1)">Next →</button>
-    </div>
-    <div class="mark-row">
-      <button class="btn btn-green" onclick="markWord(3)">✅ Got it</button>
-      <button class="btn btn-blue" onclick="markWord(2)">🤔 Almost</button>
-      <button class="btn btn-orange" onclick="markWord(1)">🔄 Learning</button>
-    </div>
-    <div class="undo-row">
-      <button class="btn btn-outline btn-sm" id="undoBtn" onclick="undoLast()" style="display:none;">↩ Undo last</button>
     </div>
   </div>
 
