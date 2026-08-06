@@ -8173,6 +8173,7 @@ The interesting part is what changed and what did not. The tools are modern now.
 
 החלק המעניין הוא מה השתנה ומה לא. הכלים מודרניים היום. המטרה זהה. פמילי אופיס לא מנסה לנצח את השוק בכל רבעון. הוא מנסה לוודא שהכסף עדיין יהיה שם בעוד שמונים שנה, כשהאנשים שהרוויחו אותו כבר לא יהיו.`,
   gloss:{
+    "fund":{he:"קרן השקעות",ph:"פַאנְד"},
     "fortune":{he:"הון עתק",ph:"פוֹר-צֶ'ן"},
     "adviser":{he:"יועץ",ph:"אַד-וַיי-זֶר"},
     "generations":{he:"דורות",ph:"גֶ'נֶ-רֵיי-שֶׁנְז"},
@@ -8205,6 +8206,9 @@ The second hardest part is people. The family grows. Children become adults with
 
 החלק השני בקושי הוא אנשים. המשפחה גדלה. ילדים הופכים למבוגרים עם דעות משלהם על סיכון. מבנה שעבד לדור אחד צריך לשרוד את המעבר לדור הבא, ושם רוב הונות המשפחה נעלמים בשקט.`,
   gloss:{
+    "fund":{he:"קרן השקעות",ph:"פַאנְד"},
+    "report":{he:"לדווח",ph:"רִי-פּוֹרְט"},
+    "raise":{he:"לגייס כסף",ph:"רֵייז"},
     "unglamorous":{he:"לא זוהר",ph:"אַן-גְלַא-מֶ-רֶס"},
     "traders":{he:"סוחרים",ph:"טְרֵיי-דֶרְז"},
     "behaves":{he:"מתנהג",ph:"בִּי-הֵייבְז"},
@@ -8238,6 +8242,9 @@ That is the uncomfortable part of the story. Selling at the top feels like a mis
 
 זה החלק הלא נוח בסיפור. מכירה בשיא מרגישה כמו טעות במשך חודשים לפני שהיא מרגישה כמו גאונות.`,
   gloss:{
+    "called":{he:"כינה / קרא ל־",ph:"קוֹלְד"},
+    "traded":{he:"נסחר",ph:"טְרֵיי-דֶד"},
+    "offers":{he:"מציע",ph:"אוֹ-פֶרְז"},
     "given up on":{he:"ויתרו עליו",ph:"גִי-וֶן אַפּ אוֹן"},
     "embarrassing":{he:"מביך",ph:"אִים-בַּ-רֶ-סִינְג"},
     "collapsed":{he:"קרס",ph:"קֶ-לַאפְּסְט"},
@@ -8271,6 +8278,8 @@ Buffett's real skill may not be picking stocks at all. It may be that he started
 
 ייתכן שהכישרון האמיתי של באפט הוא בכלל לא בחירת מניות. ייתכן שהוא פשוט התחיל מוקדם, נמנע מחורבן, וסירב להפריע לתהליך. הוא אמר שהחיים שלו היו תוצר של מציאת גבעה ארוכה וגלגול כדור שלג במורדה.`,
   gloss:{
+    "method":{he:"שיטה",ph:"מֶ-ת'ֶד"},
+    "rolling":{he:"לגלגל",ph:"רוֹו-לִינְג"},
     "overwhelming":{he:"מכריע",ph:"אוֹ-וֶר-וֶול-מִינְג"},
     "majority":{he:"רוב",ph:"מֶ-ג'וֹ-רִי-טִי"},
     "dramatic":{he:"דרמטי",ph:"דְרֶ-מַא-טִיק"},
@@ -8306,6 +8315,9 @@ That is the whole game in one paragraph. You do not make money in real estate by
 
 זה כל המשחק בפסקה אחת. לא מרוויחים כסף בנדל"ן בקניית בניינים טובים. מרוויחים בקניית בניינים שאפשר לתקן.`,
   gloss:{
+    "brings in":{he:"מכניס כסף",ph:"בְּרִינְגְז אִין"},
+    "left":{he:"נשאר",ph:"לֶפְט"},
+    "fills":{he:"ממלא",ph:"פִילְז"},
     "asking price":{he:"מחיר מבוקש",ph:"אַס-קִינְג פְּרַייס"},
     "insurance":{he:"ביטוח",ph:"אִינ-שׁוּ-רֶנְס"},
     "repairs":{he:"תיקונים",ph:"רִי-פֵּרְז"},
@@ -8334,19 +8346,30 @@ const READ_SKIP = new Set(('a an the and or but if of to in on at for with from 
 function readLex(art){
   const m=new Map();
   allWords().forEach(w=>m.set(w.en.trim().toLowerCase(),{en:w.en,he:w.he,ph:w.ph||'',ex:w.ex||'',id:w.id,src:'vocab'}));
+  // המילון של המאמר גובר על המילון הכללי — כי משמעות תלויה בהקשר.
+  // "fund" באוצר המילים הוא לממן, אבל במאמר הוא קרן.
   if(art&&art.gloss)Object.entries(art.gloss).forEach(([k,v])=>{
     const key=k.trim().toLowerCase();
-    if(!m.has(key))m.set(key,{en:k,he:v.he,ph:v.ph||'',ex:'',id:'g_'+key.replace(/\W+/g,'_'),src:'gloss'});
+    const base=m.get(key);
+    m.set(key, base
+      ? {...base, he:v.he, ph:v.ph||base.ph}      // שומר את ה-id כדי שלא ייווצר כפל
+      : {en:k,he:v.he,ph:v.ph||'',ex:'',id:'g_'+key.replace(/\W+/g,'_'),src:'gloss'});
   });
   return m;
 }
-// מנסה גם צורות נטויות
+// מנסה גם צורות נטויות — אבל רק אם הן באמת אותה מילה.
+// בלי המגן הזה "asking" היה מותאם ל-"Ask" (לשאול), וזה תרגום שגוי לגמרי.
 function lexLookup(m,w){
-  const t=w.toLowerCase();
+  const t=String(w).toLowerCase().trim();
   if(m.has(t))return m.get(t);
-  const tries=[t.replace(/ies$/,'y'),t.replace(/es$/,''),t.replace(/s$/,''),
-               t.replace(/ed$/,''),t.replace(/ed$/,'e'),t.replace(/ing$/,''),t.replace(/ing$/,'e')];
-  for(const x of tries)if(x&&x!==t&&m.has(x))return m.get(x);
+  const cands=[t.replace(/ies$/,'y'),t.replace(/ves$/,'fe'),t.replace(/es$/,''),t.replace(/s$/,''),
+               t.replace(/ed$/,''),t.replace(/ed$/,'e'),t.replace(/ing$/,''),t.replace(/ing$/,'e'),
+               t.replace(/([a-z])\1ing$/,'$1'),t.replace(/([a-z])\1ed$/,'$1')];
+  for(const x of cands){
+    if(!x||x===t||!m.has(x))continue;
+    let pre=0; while(pre<x.length&&pre<t.length&&x[pre]===t[pre])pre++;
+    if(pre>=4)return m.get(x);   // חייב שיתוף של 4 אותיות פתיחה לפחות
+  }
   return null;
 }
 
@@ -8403,21 +8426,38 @@ function closeArticle(){
 }
 function toggleReadHe(){document.getElementById('readHe').classList.toggle('on');}
 
-// מסמן כל מילה "טיפה מסובכת" שאנחנו מכירים
+// מסמן כל מילה "טיפה מסובכת" שאנחנו מכירים.
+// מחפש קודם ביטויים של 3 ואז 2 מילים ("asking price", "cap rate"),
+// ורק אחר כך מילה בודדת — אחרת ביטויים היו מתפרקים ומקבלים תרגום שגוי.
 function markupText(a){
   const lex=readLex(a);
-  const parts=a.text.split(/([A-Za-z][A-Za-z'-]*)/g);
-  let out='';
-  for(let i=0;i<parts.length;i++){
-    if(i%2===0){out+=esc(parts[i]);continue;}
-    const w=parts[i];
-    if(READ_SKIP.has(w.toLowerCase())||w.length<4){out+=esc(w);continue;}
-    const e=lexLookup(lex,w);
-    if(!e){out+=esc(w);continue;}
+  const parts=a.text.split(/([A-Za-z][A-Za-z'-]*)/g);   // זוגי=מפריד, אי-זוגי=מילה
+  const span=(e,raw)=>{
     const known=e.src==='vocab'&&getProgress(e.id).status==='mastered';
-    out+='<span class="rw'+(known?' known':'')+'" onclick="openRW(\''+esc(e.en).replace(/'/g,'&#39;')+'\')">'+esc(w)+'</span>';
+    return '<span class="rw'+(known?' known':'')+'" onclick="openRW(\''+
+      esc(e.en).replace(/'/g,'&#39;')+'\')">'+esc(raw)+'</span>';
+  };
+  const out=[];
+  for(let i=0;i<parts.length;i++){
+    if(i%2===0){out.push(esc(parts[i]));continue;}
+    let hit=false;
+    for(let n=3;n>=2&&!hit;n--){
+      const last=i+2*(n-1);
+      if(last>=parts.length)continue;
+      let ok=true;
+      for(let k=0;k<n-1;k++){ if(parts[i+2*k+1]!==' '){ok=false;break;} }
+      if(!ok)continue;
+      const words=[];for(let k=0;k<n;k++)words.push(parts[i+2*k]);
+      const e=lexLookup(lex,words.join(' '));
+      if(e){out.push(span(e,parts.slice(i,last+1).join('')));i=last;hit=true;}
+    }
+    if(hit)continue;
+    const w=parts[i];
+    if(READ_SKIP.has(w.toLowerCase())||w.length<4){out.push(esc(w));continue;}
+    const e=lexLookup(lex,w);
+    out.push(e?span(e,w):esc(w));
   }
-  return out;
+  return out.join('');
 }
 
 function openRW(en){
@@ -8483,7 +8523,7 @@ function readPasted(){
   renderArtList(); openArticle('s0');
 }
 
-const BUILD='223ad664';
+const BUILD='48973fc7';
 try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_b)_b.textContent=BUILD; } }catch(e){}
 
 // ── LOGIN ──

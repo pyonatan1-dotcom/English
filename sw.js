@@ -1,6 +1,6 @@
 // Service Worker — מאפשר לאפליקציה לעבוד בלי אינטרנט, ומוודא שהיא תמיד מתעדכנת.
 // המחרוזת הבאה מוחלפת אוטומטית בכל העלאה ע"י deploy-english.sh:
-const VERSION = '223ad664';
+const VERSION = '48973fc7';
 const CACHE = 'english-' + VERSION;
 
 const CORE = ['./', './index.html', './manifest.json',
