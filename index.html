@@ -1367,7 +1367,7 @@ const WORDS = [
   {prio:1,en:"Suggest",he:"להציע",emoji:"🙋",cat:"verbs",type:"word",ph:"סֶ-גֶ'סְט",ex:"Can I suggest something?"},
   {prio:1,en:"Assume",he:"להניח",emoji:"🤔",cat:"verbs",type:"word",ph:"אַ-סוּם",ex:"I assumed you already knew."},
   {prio:1,en:"Realize",he:"להבין פתאום",emoji:"💡",cat:"verbs",type:"word",ph:"רִי-אַ-לַייז",ex:"I didn't realize it was so late."},
-  {prio:1,en:"Notice",he:"לשים לב",emoji:"👀",cat:"verbs",type:"word",ph:"נוֹ-טִיס",ex:"Did you notice the new painting?"},
+  {prio:1,en:"Notice",he:"לשים לב",emoji:"👀",cat:"verbs",type:"word",ph:"נוֹ-טִיס",ex:"Did you notice the new painting?",forms:"Noticed = שמתי לב"},
   {prio:1,en:"Prefer",he:"להעדיף",emoji:"⭐",cat:"verbs",type:"word",ph:"פְּרִי-פֶר",ex:"I prefer coffee in the morning."},
   {prio:1,en:"Avoid",he:"להימנע",emoji:"🚫",cat:"verbs",type:"word",ph:"אַ-וֹויְד",ex:"I try to avoid the highway at rush hour."},
   // adj — רגשות ותיאורים
@@ -1546,6 +1546,17 @@ const WORDS = [
   {inv:1,en:"Wealth",he:"עושר",emoji:"👑",cat:"finance",type:"word",ph:"וֶולְת'",ex:"Wealth is built slowly."},
   {inv:1,en:"Savings",he:"חסכונות",emoji:"🐷",cat:"finance",type:"word",ph:"סֵיי-וִינְגְז",ex:"We keep our savings in the bank."},
   {inv:1,en:"Statement",he:"דוח חשבון",emoji:"📄",cat:"finance",type:"word",ph:"סְטֵייט-מֶנְט",ex:"Check your bank statement."},
+  {inv:1,en:"Internship",he:"התמחות",emoji:"🎓",cat:"work",type:"word",ph:"אִינ-טֶרְן-שִׁיפּ",ex:"She did an internship at a law firm."},
+  {inv:1,en:"Relationship",he:"יחס / קשר",emoji:"🤝",cat:"people",type:"word",ph:"רִי-לֵיי-שֶׁן-שִׁיפּ",ex:"They have a very good relationship."},
+  {inv:1,en:"Constantly",he:"כל הזמן / באופן עקבי",emoji:"🔁",cat:"time",type:"word",ph:"קוֹנ-סְטֶנְט-לִי",ex:"He is constantly checking his phone."},
+  {inv:1,en:"Rise",he:"עלייה",emoji:"⬆️",cat:"investing",type:"word",ph:"רַייז",ex:"There was a sharp rise in prices."},
+  {inv:1,en:"Fall",he:"ירידה",emoji:"⬇️",cat:"investing",type:"word",ph:"פוֹל",ex:"The market saw a big fall last week."},
+  {inv:1,en:"Shelter",he:"מקלט",emoji:"🛖",cat:"home",type:"word",ph:"שֶׁל-טֶר",ex:"We ran to the shelter."},
+  {inv:1,en:"Chemistry",he:"כימיה",emoji:"⚗️",cat:"concepts",type:"word",ph:"קֶ-מִיס-טְרִי",ex:"The two of them have great chemistry."},
+  {inv:1,en:"Department",he:"מחלקה",emoji:"🏢",cat:"work",type:"word",ph:"דִי-פַּארְט-מֶנְט",ex:"She works in the finance department."},
+  {inv:1,en:"Shape",he:"צורה",emoji:"🔷",cat:"concepts",type:"word",ph:"שֵׁייפּ",ex:"What shape is it?"},
+  {inv:1,en:"Industry",he:"תעשייה / ענף",emoji:"🏭",cat:"work",type:"word",ph:"אִינ-דֶס-טְרִי",ex:"He works in the tech industry."},
+  {inv:1,en:"On the job training",he:"הכשרה תוך כדי עבודה",emoji:"🛠️",cat:"work",type:"phrase",ph:"אוֹן דֶ ג'וֹב טְרֵיי-נִינְג",ex:"Most of it was on the job training."},
 ];
 
 // ── CATEGORIES ──
@@ -7435,6 +7446,83 @@ const EXTRA_EXAMPLES = {
     {s:"If you need the money within two years, keep it in short-term bonds instead of stocks.",he:"אם אתה צריך את הכסף בתוך שנתיים, תחזיק אותו באגרות חוב לטווח קצר במקום במניות.",l:4},
     {s:"The whole industry is built to sell you short-term excitement while quietly charging you for a decision that should take five minutes a year.",he:"כל התעשייה בנויה כדי למכור לך ריגוש לטווח קצר, ובשקט לגבות ממך על החלטה שאמורה לקחת חמש דקות בשנה.",l:5}
   ],
+  "Internship":[
+    {s:"I have an internship.",he:"יש לי התמחות.",l:1},
+    {s:"She did an internship at a law firm.",he:"היא עשתה התמחות במשרד עורכי דין.",l:2},
+    {s:"The internship lasts three months and is not paid.",he:"ההתמחות נמשכת שלושה חודשים ואינה בתשלום.",l:3},
+    {s:"He got the job because of the internship he did there two summers ago.",he:"הוא קיבל את העבודה בזכות ההתמחות שעשה שם לפני שני קיצים.",l:4},
+    {s:"A good internship teaches you less about the work and more about whether you actually want it.",he:"התמחות טובה מלמדת אותך פחות על העבודה ויותר על השאלה אם אתה באמת רוצה אותה.",l:5}
+  ],
+  "Relationship":[
+    {s:"We have a good relationship.",he:"יש לנו קשר טוב.",l:1},
+    {s:"They have a very good relationship.",he:"יש להם יחסים מאוד טובים.",l:2},
+    {s:"My relationship with her family got easier over time.",he:"הקשר שלי עם המשפחה שלה נעשה קל יותר עם הזמן.",l:3},
+    {s:"The relationship between the two companies changed after the deal fell apart.",he:"היחסים בין שתי החברות השתנו אחרי שהעסקה התפרקה.",l:4},
+    {s:"Every long relationship is really a series of small repairs nobody else ever sees.",he:"כל מערכת יחסים ארוכה היא בעצם סדרה של תיקונים קטנים שאף אחד אחר לא רואה.",l:5}
+  ],
+  "Constantly":[
+    {s:"He talks constantly.",he:"הוא מדבר כל הזמן.",l:1},
+    {s:"He is constantly checking his phone.",he:"הוא בודק את הטלפון שלו כל הזמן.",l:2},
+    {s:"Prices here are constantly going up and down.",he:"המחירים כאן עולים ויורדים כל הזמן.",l:3},
+    {s:"I was constantly translating in my head, and that is what made me so tired.",he:"תרגמתי בראש כל הזמן, וזה מה שעייף אותי כל כך.",l:4},
+    {s:"Markets are constantly reacting to news that will not matter at all in a year.",he:"השווקים מגיבים כל הזמן לחדשות שלא יהיו רלוונטיות בכלל בעוד שנה.",l:5}
+  ],
+  "Rise":[
+    {s:"Prices rise every year.",he:"המחירים עולים כל שנה.",l:1},
+    {s:"There was a sharp rise in prices.",he:"הייתה עלייה חדה במחירים.",l:2},
+    {s:"We saw a steady rise in rental income after the renovation.",he:"ראינו עלייה יציבה בהכנסה משכירות אחרי השיפוץ.",l:3},
+    {s:"The rise in interest rates changed what we could afford to buy.",he:"העלייה בריבית שינתה את מה שיכולנו להרשות לעצמנו לקנות.",l:4},
+    {s:"Every rise looks obvious afterwards and impossible to trust while it is happening.",he:"כל עלייה נראית מובנת מאליה בדיעבד, ובלתי אפשרית לסמוך עליה בזמן שהיא קורית.",l:5}
+  ],
+  "Fall":[
+    {s:"Prices fall sometimes.",he:"מחירים יורדים לפעמים.",l:1},
+    {s:"The market saw a big fall last week.",he:"השוק חווה ירידה גדולה בשבוע שעבר.",l:2},
+    {s:"A fall of ten percent is normal and nothing to panic about.",he:"ירידה של עשרה אחוזים היא נורמלית ואין ממה להיבהל.",l:3},
+    {s:"After the fall in valuations, buildings that looked expensive suddenly looked reasonable.",he:"אחרי הירידה בהערכות השווי, בניינים שנראו יקרים נראו פתאום סבירים.",l:4},
+    {s:"The people who do well in a fall are simply the ones who still have cash when everyone else does not.",he:"מי שמצליחים בירידה הם פשוט אלה שעדיין יש להם מזומן כשלכל השאר אין.",l:5}
+  ],
+  "Shelter":[
+    {s:"We need a shelter.",he:"אנחנו צריכים מקלט.",l:1},
+    {s:"We ran to the shelter.",he:"רצנו למקלט.",l:2},
+    {s:"The building has a shelter on the ground floor.",he:"בבניין יש מקלט בקומת הקרקע.",l:3},
+    {s:"Food, water and shelter are the three things people need before anything else.",he:"אוכל, מים ומקלט הם שלושת הדברים שאנשים צריכים לפני כל דבר אחר.",l:4},
+    {s:"In finance people also use shelter to mean protecting money from tax, not from weather.",he:"בעולם הפיננסי משתמשים במילה shelter גם במובן של הגנה על כסף ממס, לא ממזג אוויר.",l:5}
+  ],
+  "Chemistry":[
+    {s:"I studied chemistry.",he:"למדתי כימיה.",l:1},
+    {s:"The two of them have great chemistry.",he:"לשניהם יש כימיה נהדרת.",l:2},
+    {s:"There was no chemistry between us at the first meeting.",he:"לא הייתה בינינו כימיה בפגישה הראשונה.",l:3},
+    {s:"The numbers looked fine, but the chemistry with the partner was wrong from the start.",he:"המספרים נראו בסדר, אבל הכימיה עם השותף הייתה שגויה מההתחלה.",l:4},
+    {s:"Chemistry is the one thing in a partnership you cannot fix with a better contract.",he:"כימיה היא הדבר היחיד בשותפות שאי אפשר לתקן עם חוזה טוב יותר.",l:5}
+  ],
+  "Department":[
+    {s:"Which department?",he:"איזו מחלקה?",l:1},
+    {s:"She works in the finance department.",he:"היא עובדת במחלקת הכספים.",l:2},
+    {s:"The legal department has to approve it first.",he:"המחלקה המשפטית צריכה לאשר את זה קודם.",l:3},
+    {s:"Nobody knew which department was actually responsible, so nothing moved for a month.",he:"אף אחד לא ידע איזו מחלקה באמת אחראית, אז שום דבר לא זז במשך חודש.",l:4},
+    {s:"In a small family office there is no department for anything, which is exactly why things get done.",he:"בפמילי אופיס קטן אין מחלקה לשום דבר, וזו בדיוק הסיבה שדברים נעשים.",l:5}
+  ],
+  "Shape":[
+    {s:"What shape is it?",he:"איזו צורה זו?",l:1},
+    {s:"The table has a round shape.",he:"לשולחן יש צורה עגולה.",l:2},
+    {s:"The apartment is in good shape after the renovation.",he:"הדירה במצב טוב אחרי השיפוץ.",l:3},
+    {s:"The deal is starting to take shape, but nothing is signed yet.",he:"העסקה מתחילה לקבל צורה, אבל עוד לא נחתם כלום.",l:4},
+    {s:"Shape works for objects, for buildings and for plans, and in English the third meaning is the most useful.",he:"Shape עובד על חפצים, על מבנים ועל תוכניות, ובאנגלית המשמעות השלישית היא השימושית ביותר.",l:5}
+  ],
+  "Industry":[
+    {s:"He works in industry.",he:"הוא עובד בתעשייה.",l:1},
+    {s:"He works in the tech industry.",he:"הוא עובד בתעשיית ההייטק.",l:2},
+    {s:"The whole industry changed after that one company went public.",he:"כל הענף השתנה אחרי שאותה חברה אחת הונפקה.",l:3},
+    {s:"People inside the industry saw it coming a year before anyone wrote about it.",he:"אנשים מתוך הענף ראו את זה מגיע שנה לפני שמישהו כתב על זה.",l:4},
+    {s:"Every industry looks simple from outside and impossibly complicated once you are actually in it.",he:"כל ענף נראה פשוט מבחוץ, ומסובך להחריד ברגע שאתה באמת בתוכו.",l:5}
+  ],
+  "On the job training":[
+    {s:"I got on the job training.",he:"קיבלתי הכשרה תוך כדי עבודה.",l:1},
+    {s:"Most of it was on the job training.",he:"רוב זה היה הכשרה תוך כדי עבודה.",l:2},
+    {s:"They offer on the job training, so you learn while you work.",he:"הם מציעים הכשרה תוך כדי עבודה, אז אתה לומד בזמן שאתה עובד.",l:3},
+    {s:"There was no course and no manual, just on the job training and a lot of questions.",he:"לא היה קורס ולא היה מדריך, רק הכשרה תוך כדי עבודה והרבה שאלות.",l:4},
+    {s:"On the job training is how almost everyone actually learns a profession, whatever their diploma says.",he:"הכשרה תוך כדי עבודה היא הדרך שבה כמעט כולם באמת לומדים מקצוע, לא משנה מה כתוב בתעודה שלהם.",l:5}
+  ],
 };
 
 // ── APP STATE ──
@@ -8523,7 +8611,7 @@ function readPasted(){
   renderArtList(); openArticle('s0');
 }
 
-const BUILD='48973fc7';
+const BUILD='d1da5dd0';
 try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_b)_b.textContent=BUILD; } }catch(e){}
 
 // ── LOGIN ──
