@@ -1,6 +1,6 @@
 // Service Worker — מאפשר לאפליקציה לעבוד בלי אינטרנט, ומוודא שהיא תמיד מתעדכנת.
 // המחרוזת הבאה מוחלפת אוטומטית בכל העלאה ע"י deploy-english.sh:
-const VERSION = 'one-address-1';
+const VERSION = 'cloud-sync-2';
 const CACHE = 'english-' + VERSION;
 
 // The page is cached under './' only. Inside the personal site (Vercel, cleanUrls) './index.html' answers
@@ -15,10 +15,11 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  // מוחק כל מטמון של גרסה ישנה
+  // מוחק רק מטמונים ישנים של האפליקציה הזו (english-*). The personal site's own service worker keeps its
+  // caches (yonatan-*) on the same origin — they must not be touched.
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('english-') && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -26,10 +27,24 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+
+  // The site's storage API (cloud sync) must always hit the server — never answer it from the cache.
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
+
+  // The site's events list ("words from life"): fresh from the network, the last copy when offline.
+  if (url.origin === self.location.origin && url.pathname === '/events.json') {
+    e.respondWith(
+      fetch(req)
+        .then(res => { if (res.ok) { const cp = res.clone(); caches.open(CACHE).then(c => c.put(req, cp)).catch(() => {}); } return res; })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
 
   // הדף עצמו: קודם מהרשת (כדי שתמיד תקבל את הגרסה העדכנית), ורק אם אין חיבור — מהמטמון
   const isPage = req.mode === 'navigate' || req.destination === 'document' ||
-                 new URL(req.url).pathname.endsWith('/index.html');
+                 url.pathname.endsWith('/index.html');
   if (isPage) {
     e.respondWith(
       fetch(req)

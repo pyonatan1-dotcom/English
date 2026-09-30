@@ -45,6 +45,16 @@ label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-w
 .hdr{position:sticky;top:0;z-index:50;height:var(--hdr);background:linear-gradient(135deg,#0d0d0d,#1a1500);border-bottom:1px solid #2a2200;display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:12px;}
 .logo{font-family:'Frank Ruhl Libre',serif;font-size:1.1rem;color:var(--gold);font-weight:900;white-space:nowrap;}
 .logo small{color:var(--muted);font-size:.72rem;font-family:'Heebo',sans-serif;font-weight:400;margin-left:8px;}
+.hdr-right{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.logo{min-width:0;overflow:hidden;text-overflow:ellipsis;}
+@media (max-width:400px){.hdr{padding:0 12px;gap:8px;}.logo small{margin-left:5px;}.hs-lbl{display:none;}}
+.hdr-sync{background:none;border:none;padding:3px;display:flex;align-items:center;color:var(--muted);opacity:.55;transition:color .3s,opacity .3s;}
+.hdr-sync .hs-slash{display:none;}
+.hdr-sync.ok{color:var(--teal-l);opacity:.7;}
+.hdr-sync.busy{color:var(--gold);opacity:.9;animation:hsPulse 1.2s ease-in-out infinite;}
+.hdr-sync.off{color:var(--muted);opacity:.5;}
+.hdr-sync.off .hs-slash{display:inline;}
+@keyframes hsPulse{50%{opacity:.35;}}
 .hdr-streak{font-size:.82rem;color:var(--orange-l);white-space:nowrap;background:rgba(255,111,0,.1);border:1px solid rgba(255,111,0,.2);border-radius:20px;padding:4px 10px;}
 
 /* BOTTOM NAV */
@@ -246,6 +256,45 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .tslider:before{content:'';position:absolute;width:17px;height:17px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
 .toggle input:checked+.tslider{background:var(--gold);}
 .toggle input:checked+.tslider:before{transform:translateX(19px);}
+/* quick add + words from life */
+.qa-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin:18px 0 0;font-size:.8rem;color:var(--muted);}
+.qa-card summary{cursor:pointer;color:var(--gold);font-weight:500;}
+.qa-body{margin-top:10px;line-height:1.7;}
+.qa-code{display:block;margin-top:6px;padding:6px 9px;background:var(--bg3);border-radius:6px;color:var(--gold-l);font-size:.74rem;word-break:break-all;text-align:left;}
+.qa-bm{display:inline-flex;margin-top:8px;}
+.lw-wrap{margin-top:22px;}
+.lw-head{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.lw-head h3{font-size:.95rem;color:var(--gold);font-weight:700;}
+.lw-sub{font-size:.76rem;color:var(--muted);line-height:1.6;margin:4px 0 10px;}
+.lw-empty{font-size:.8rem;color:var(--muted);padding:8px 0;}
+.lw-item{border-bottom:1px solid var(--border);padding:10px 0;}
+.lw-item:last-child{border-bottom:none;}
+.lw-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;direction:ltr;justify-content:flex-end;}
+.lw-en{font-weight:700;color:var(--text);font-size:.95rem;direction:ltr;}
+.lw-ctx{font-size:.7rem;color:var(--muted);direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%;}
+.lw-row{display:flex;gap:6px;align-items:center;margin-top:6px;}
+.lw-row input{flex:1;padding:6px 10px;font-size:.82rem;}
+.lw-row .btn{padding:6px 10px;font-size:.74rem;flex-shrink:0;}
+.lw-tr{font-size:.72rem;color:var(--gold-d);text-decoration:underline;flex-shrink:0;}
+.lw-x{background:none;border:none;color:var(--muted);font-size:.9rem;padding:4px 6px;flex-shrink:0;}
+/* progress over time */
+.lvl-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:22px;}
+.lvl-top{display:flex;align-items:center;gap:14px;}
+.lvl-code{font-family:'Frank Ruhl Libre',serif;font-size:2.1rem;font-weight:900;color:var(--gold);line-height:1;}
+.lvl-name{font-size:.9rem;font-weight:700;}
+.lvl-sub{font-size:.74rem;color:var(--muted);margin-top:2px;line-height:1.5;}
+.lvl-bar{height:6px;background:var(--bg4);border-radius:4px;margin-top:12px;overflow:hidden;}
+.lvl-bar>div{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:4px;}
+.lvl-tutor{font-size:.74rem;color:var(--teal-l);margin-top:8px;}
+.growth{margin-bottom:22px;}
+.growth svg{width:100%;height:auto;display:block;}
+.growth-empty{font-size:.78rem;color:var(--muted);line-height:1.6;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;padding:12px 14px;}
+.talk-item{border-bottom:1px solid var(--border);padding:9px 0;}
+.talk-item:last-child{border-bottom:none;}
+.talk-top{display:flex;justify-content:space-between;gap:8px;font-size:.84rem;}
+.talk-meta{font-size:.72rem;color:var(--muted);}
+.talk-sum{font-size:.78rem;color:var(--muted);margin-top:3px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.talk-empty{font-size:.8rem;color:var(--muted);line-height:1.7;}
 .backup-reminder{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:10px 14px;font-size:.78rem;color:var(--gold-d);margin-top:12px;}
 
 /* ─── BADGE COLORS ─── */
@@ -352,7 +401,13 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 
 <header class="hdr">
   <div class="logo">English Flashcards <small id="hWordCount"></small></div>
-  <div class="hdr-streak">🔥 <span id="hStreak">0</span> day streak</div>
+  <div class="hdr-right">
+    <!-- Cloud sync state (see CLOUD SYNC in the script). Tap → Settings, where the full status is. -->
+    <button class="hdr-sync" id="hSync" onclick="showTab('settings')" aria-label="מצב סנכרון" title="">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H7a5 5 0 1 1 1.1-9.88A6 6 0 0 1 19.6 11 4 4 0 0 1 17.5 19z"/><path class="hs-slash" d="M4 4l16 16"/></svg>
+    </button>
+    <div class="hdr-streak" title="day streak">🔥 <span id="hStreak">0</span><span class="hs-lbl"> day streak</span></div>
+  </div>
 </header>
 
 <!-- ═══ TAB: STUDY ═══ -->
@@ -506,6 +561,27 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
       </div>
       <button class="btn btn-gold" style="width:100%;" onclick="addBulk()">Add All Words</button>
     </div>
+    <!-- ⚡ Quick add from anywhere: /english/?add=word opens this form pre-filled (see QUICK ADD) -->
+    <details class="qa-card" dir="rtl">
+      <summary>⚡ הוספה מהירה מכל מקום</summary>
+      <div class="qa-body">
+        <div>קישור שפותח את הטופס הזה עם המילה כבר בפנים — אפשר לשמור כסימנייה או כקיצור דרך בטלפון:</div>
+        <code class="qa-code" id="qaUrl" dir="ltr"></code>
+        <div style="margin-top:8px;">או גרור את הכפתור הזה לסרגל הסימניות. מסמנים מילה באנגלית בכל דף ולוחצים עליו:</div>
+        <a class="btn btn-outline btn-sm qa-bm" id="qaBookmarklet" href="#" onclick="toast('גרור את הכפתור לסרגל הסימניות');return false;">➕ למילון שלי</a>
+      </div>
+    </details>
+
+    <!-- 💡 Words from life: English terms from the site's events that aren't in the library yet (see LIFE WORDS) -->
+    <div class="lw-wrap" dir="rtl">
+      <div class="lw-head">
+        <h3>💡 מילים מהאירועים</h3>
+        <button class="btn btn-outline btn-sm" onclick="loadLifeSuggestions(true)" style="padding:4px 10px;font-size:.72rem;">רענן</button>
+      </div>
+      <div class="lw-sub">מונחים באנגלית מתוך האירועים באתר שעוד אין לך בספרייה. בדוק את התרגום ולחץ "הוסף" — או הסתר מילה שלא מעניינת אותך, והיא לא תוצע שוב.</div>
+      <div id="lifeList"><div class="lw-empty">טוען…</div></div>
+    </div>
+
     <div class="recent-wrap">
       <h3>Recently Added</h3>
       <div id="recentlyAdded"><div style="color:var(--muted);font-size:.82rem;padding:8px 0;">No words added yet.</div></div>
@@ -544,6 +620,15 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
     <div class="stats-grid" id="statsGrid"></div>
     <div class="chart-label">Words reviewed — last 7 days</div>
     <div class="bar-chart" id="barChart"></div>
+    <!-- Level + progress over time (see PROGRESS OVER TIME) -->
+    <div class="lvl-card" id="levelCard" dir="rtl"></div>
+    <div class="chart-label">Known words over time</div>
+    <div class="growth" id="growthChart"></div>
+    <div class="chart-label">Reviews per week — last 12 weeks</div>
+    <div class="bar-chart" id="weekChart"></div>
+    <div class="sg" dir="rtl" style="margin-top:4px;"><div class="sg-title">🗣️ שיחות עם המורה</div>
+      <div id="talkList"></div>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px;">
       <button class="btn btn-outline btn-sm" onclick="exportData()">⬇️ Export JSON</button>
       <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
@@ -578,6 +663,11 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
       <div class="sr"><div><div class="sr-l">Show phonetic button</div><div class="sr-d">Hebrew pronunciation help</div></div>
         <label class="toggle"><input type="checkbox" id="stShowPh" onchange="saveSetting('showPhonetic',this.checked)"><span class="tslider"></span></label></div>
     </div>
+    <div class="sg" dir="rtl"><div class="sg-title">☁️ סנכרון בענן</div>
+      <div class="sr"><div><div class="sr-l">מצב</div><div class="sr-d" id="syncStatus">…</div></div>
+        <button class="btn btn-outline btn-sm" onclick="syncNow({manual:true})">סנכרן עכשיו</button></div>
+      <div class="sr-d" style="padding-top:8px;line-height:1.65;">ההתקדמות נשמרת במכשיר וגם בענן של האתר, ומתמזגת בין מכשירים: לכל מילה נשמרת החזרה האחרונה, ולכל יום — הרשומה המלאה יותר. בלי חיבור הכול ממשיך לעבוד ונשמר במכשיר, ויסונכרן כשהחיבור יחזור.</div>
+    </div>
     <div class="sg"><div class="sg-title">Data</div>
       <div class="sr"><div><div class="sr-l">Reset all progress</div><div class="sr-d">Type RESET to confirm</div></div>
         <div style="display:flex;gap:6px;"><input id="resetInput" placeholder="RESET" style="width:75px;font-size:.8rem;"><button class="btn btn-red btn-sm" onclick="maybeReset()">Reset</button></div></div>
@@ -587,7 +677,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
       <div class="sr"><div><div class="sr-l">Import backup</div><div class="sr-d">Load a JSON backup (e.g. from the old address)</div></div>
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">Import</button></div>
     </div>
-    <div class="backup-reminder">⚠️ Your progress is saved in this browser only, and only at this web address. Export a backup regularly to avoid losing data.</div>
+    <div class="backup-reminder" id="storageNote">⚠️ Your progress is saved in this browser only, and only at this web address. Export a backup regularly to avoid losing data.</div>
     <div style="text-align:center;margin-top:14px;font-size:.72rem;color:var(--muted);">English Flashcards · <span id="totalWordCount"></span> words · build <span id="buildId">local</span></div>
   </div>
 </div>
@@ -7527,7 +7617,12 @@ const DATA_KEY='englishAppData';
 // A fresh, empty data object. Separate from loadData() so "Replace" on import can start from a truly
 // clean state (loadData() returns what is already stored, not the defaults).
 function defaultData(){
-  return {version:2,progress:{},settings:{direction:'en-he',dailyGoal:20,autoSpeak:false,speakAfterFlip:false,showExamples:true,showPhonetic:true,geminiKey:''},history:{},userAddedWords:[],longestStreak:0,talkMistakes:[],talkSessions:[],talkLevel:null,talkLevelHistory:[]};
+  return {version:2,progress:{},settings:{direction:'en-he',dailyGoal:20,autoSpeak:false,speakAfterFlip:false,showExamples:true,showPhonetic:true,geminiKey:''},history:{},userAddedWords:[],longestStreak:0,talkMistakes:[],talkSessions:[],talkLevel:null,talkLevelHistory:[],
+    // Added for cloud sync / progress over time:
+    levelLog:{},      // day → {m,r,l,t}: mastered / reviewing / learning counts that day (t = when recorded)
+    deletedWords:{},  // lower-case English → time it was deleted, so a delete on one device sticks on the others
+    baseAt:0,         // time of the last Reset / Replace: older progress & history from other devices is ignored
+    settingsAt:0};    // time settings were last changed here (newest wins between devices)
 }
 // Old saves (and old backup files) used status 'learned' — same thing as 'mastered' today.
 function normalizeProgress(prog){
@@ -7549,7 +7644,12 @@ function loadData(){
 }
 // Returns false if the browser refused to store (e.g. storage full / blocked) so callers that must not
 // fail silently — like import — can tell the user.
-function saveData(){try{localStorage.setItem(DATA_KEY,JSON.stringify(appData));return true;}catch(e){console.error(e);return false;}}
+// Every successful save also schedules a cloud sync (3 s after the last change) — see CLOUD SYNC.
+function saveData(){
+  try{localStorage.setItem(DATA_KEY,JSON.stringify(appData));}catch(e){console.error(e);return false;}
+  if(!syncSuppress){syncDirty=true;scheduleSync();}
+  return true;
+}
 
 function getProgress(id){
   return appData.progress[id]||{status:'new',timesSeen:0,timesKnown:0,timesAlmost:0,timesLearning:0,streak:0,easeScore:2.5,lastReviewedAt:null,nextReviewAt:null};
@@ -7616,7 +7716,7 @@ function getStudyCat(){
   return (c&&(c==='all'||CATS.some(x=>x.id===c)))?c:'all';
 }
 function setStudyCat(id){
-  appData.settings.studyCat=id;saveData();
+  appData.settings.studyCat=id;appData.settingsAt=Date.now();saveData();
   renderTopicChips();updatePickerSub();
   const t=TOPIC_GROUPS.find(x=>x.id===id);
   toast('Studying: '+(t?t.label:id));
@@ -7685,16 +7785,22 @@ function showTab(t){
   if(t==='words'){if(!wlFiltersBuilt)buildWLFilters();renderWL();}
   if(t==='progress')renderProgress();
   if(t==='settings')loadSettings();
-  if(t==='add')renderRecent();
+  if(t==='add'){renderRecent();renderQuickAddInfo();loadLifeSuggestions(false);}
   if(t==='read')closeArticle();
 }
 
 // ── STUDY ──
+// Words waiting for study now (new, still learning, or their review date has come). Also sent to the
+// site in the cloud summary (see syncSummary).
+function countDue(words,now){
+  now=now||Date.now();
+  return words.filter(w=>{const p=getProgress(w.id);return!p.lastReviewedAt||p.status==='new'||p.status==='learning'||(p.nextReviewAt&&p.nextReviewAt<=now);}).length;
+}
 function updatePickerSub(){
   const now=Date.now(), cat=getStudyCat();
   const all=allWords();
   const scope=cat==='all'?all:all.filter(w=>w.cat===cat);
-  const due=scope.filter(w=>{const p=getProgress(w.id);return!p.lastReviewedAt||p.status==='new'||p.status==='learning'||(p.nextReviewAt&&p.nextReviewAt<=now);}).length;
+  const due=countDue(scope,now);
   const known=scope.filter(w=>getProgress(w.id).status==='mastered').length;
   const el=document.getElementById('pickerSub');
   if(!el)return;
@@ -7858,7 +7964,8 @@ function markWord(quality){
 function undoLast(){
   if(!undoStack.length)return;
   const prev=undoStack.pop();
-  setProgress(prev.wordId,prev.prevProg);
+  // editedAt makes the undone state count as the newest copy when devices merge (see progStamp)
+  setProgress(prev.wordId,Object.assign({},prev.prevProg,{editedAt:Date.now()}));
   if(prev.prevHist)appData.history[todayKey()]=prev.prevHist;
   else delete appData.history[todayKey()];
   session.idx=prev.idx;session.known=prev.sk;session.almost=prev.sa;session.learning=prev.sl;
@@ -7909,7 +8016,7 @@ function speak(txt){
 function speakCurrent(e){e.stopPropagation();if(session)speak(session.queue[session.idx].en);}
 
 // ── DIRECTION ──
-function setDir(dir){appData.settings.direction=dir;saveData();updateDirBtns();if(session)renderCard();}
+function setDir(dir){appData.settings.direction=dir;appData.settingsAt=Date.now();saveData();updateDirBtns();if(session)renderCard();}
 function updateDirBtns(){
   const dir=appData.settings.direction||'en-he';
   const en=document.getElementById('dirEnBtn'),he=document.getElementById('dirHeBtn');
@@ -8049,6 +8156,8 @@ function renderWL(){
 function deleteWord(id,e){
   e.stopPropagation();
   if(!confirm('Delete this word from your list?'))return;
+  const dw=appData.userAddedWords.find(w=>w.id===id);
+  if(dw){if(!isObj(appData.deletedWords))appData.deletedWords={};appData.deletedWords[dw.en.trim().toLowerCase()]=Date.now();}
   appData.userAddedWords=appData.userAddedWords.filter(w=>w.id!==id);
   delete appData.progress[id];
   saveData();renderWL();updateHeaderCount();
@@ -8070,8 +8179,10 @@ function computeStreak(){
 
 function updateStreak(){
   const s=computeStreak();
-  appData.longestStreak=Math.max(appData.longestStreak||0,s);
-  saveData();
+  const best=Math.max(appData.longestStreak||0,s);
+  const changed=recordLevel()||best!==appData.longestStreak;
+  appData.longestStreak=best;
+  if(changed)saveData();
   const el=document.getElementById('hStreak');if(el)el.textContent=s;
 }
 
@@ -8110,6 +8221,7 @@ function renderProgress(){
     col.innerHTML='<div class="bar-val">'+(v||'')+'</div><div class="bar-fill" style="height:'+Math.max(4,pct)+'%;"></div><div class="bar-day">'+label+'</div>';
     chart.appendChild(col);
   });
+  renderLevelCard();renderGrowthChart();renderWeekChart();renderTalkSessions();
 }
 
 // ── SETTINGS ──
@@ -8124,11 +8236,12 @@ function loadSettings(){
   el('stShowPh',s.showPhonetic!==false);
   const tc=document.getElementById('totalWordCount');if(tc)tc.textContent=allWords().length;
 }
-function saveSetting(k,v){appData.settings[k]=v;saveData();}
+function saveSetting(k,v){appData.settings[k]=v;appData.settingsAt=Date.now();saveData();}
 function maybeReset(){
   const inp=document.getElementById('resetInput');
   if(!inp||inp.value!=='RESET'){toast('Type RESET to confirm','err');return;}
-  appData.progress={};appData.history={};appData.longestStreak=0;
+  appData.progress={};appData.history={};appData.longestStreak=0;appData.levelLog={};
+  appData.baseAt=Date.now();   // other devices drop their older progress when they sync
   saveData();inp.value='';
   toast('Progress has been reset.');
   updateStreak();updateHeaderCount();updatePickerSub();
@@ -8152,41 +8265,161 @@ function exportData(){
 // Keys that must never be copied from a file into our objects (prototype pollution).
 const BAD_KEY=k=>k==='__proto__'||k==='constructor'||k==='prototype';
 const isObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
-// Merge a parsed backup into the current data without losing anything newer here.
-// Used by Import (Merge) and by the one-click move between addresses.
-function mergeIntoApp(d){
-  const inProg=isObj(d.progress)?normalizeProgress(d.progress):{};
-  const inHist=isObj(d.history)?d.history:{};
-  const inWords=Array.isArray(d.userAddedWords)?d.userAddedWords.map(sanitizeWord).filter(Boolean):[];
-      const DEF=defaultData();
-  // Progress: per word keep whichever copy was reviewed more recently, so importing an older
-  // backup never rolls back newer study.
-  Object.keys(inProg).forEach(k=>{
-    if(BAD_KEY(k)||!isObj(inProg[k]))return;
-    const cur=appData.progress[k];
-    if(!cur||(inProg[k].lastReviewedAt||0)>(cur.lastReviewedAt||0))appData.progress[k]=inProg[k];
+// Merge a parsed backup (or the cloud copy) into the current data without losing anything newer here.
+// Used by Import (Merge), the one-click move between addresses, and cloud sync ({sync:true}).
+// In sync mode every rule is symmetric (same result whichever device merges into which), so two devices
+// that merged each other's copies end up identical and stop re-uploading.
+const dayOf=t=>new Date(t).toISOString().slice(0,10);
+// When a progress record was last changed: a review, or an undo (editedAt).
+const progStamp=p=>Math.max(+(p&&p.lastReviewedAt)||0,+(p&&p.editedAt)||0);
+// JSON with sorted keys — the same data always gives the same string (used for comparisons / tie-breaks).
+function stableStringify(v){
+  if(Array.isArray(v))return '['+v.map(x=>x===undefined?'null':stableStringify(x)).join(',')+']';
+  if(v&&typeof v==='object')return '{'+Object.keys(v).sort().filter(k=>v[k]!==undefined&&typeof v[k]!=='function')
+    .map(k=>JSON.stringify(k)+':'+stableStringify(v[k])).join(',')+'}';
+  return v===undefined?'null':JSON.stringify(v);
+}
+// Identity of an item in the talk lists (sessions / mistakes / level history), whatever shape it has.
+const itemKey=x=>{
+  if(!x||typeof x!=='object')return String(x);
+  const id=x.id!=null?x.id:x.at!=null?x.at:x.date!=null?x.date:x.ts!=null?x.ts:x.startedAt;
+  return id!=null?String(id):stableStringify(x);
+};
+// Tie-break for sync: two different records with the same rank → both devices keep the same one.
+const tieWins=(mine,theirs)=>stableStringify(theirs)>stableStringify(mine);
+// Drop what an epoch started at time t (a Reset or a Replace) has superseded.
+function dropBefore(data,t){
+  const day=dayOf(t);
+  ['progress','history','levelLog'].forEach(f=>{if(!isObj(data[f]))data[f]={};});
+  Object.keys(data.progress).forEach(k=>{if(progStamp(data.progress[k])<=t)delete data.progress[k];});
+  Object.keys(data.history).forEach(k=>{if(k<=day)delete data.history[k];});
+  Object.keys(data.levelLog).forEach(k=>{if(k<=day)delete data.levelLog[k];});
+  data.longestStreak=0;
+}
+function mergeIntoApp(d,opts){
+  const sync=!!(opts&&opts.sync);
+  const DEF=defaultData();
+  ['progress','history','settings','levelLog','deletedWords'].forEach(f=>{if(!isObj(appData[f]))appData[f]={};});
+  if(!Array.isArray(appData.userAddedWords))appData.userAddedWords=[];
+  // Sync compares word records field by field, so both sides must be in the same (clean) shape.
+  if(sync)appData.userAddedWords=appData.userAddedWords.map(sanitizeWord).filter(Boolean);
+  // ── Epochs (sync only): after a Reset / Replace, older study from another device must not come back.
+  // A manual import is always a plain merge — e.g. importing a backup right after a Reset restores it.
+  const inBase=sync?(+d.baseAt||0):0, myBase=sync?(+appData.baseAt||0):0;
+  if(inBase>myBase){dropBefore(appData,inBase);appData.baseAt=inBase;}
+  let src=d;
+  if(inBase<myBase){
+    src=Object.assign({},d,{progress:Object.assign({},isObj(d.progress)?d.progress:{}),
+      history:Object.assign({},isObj(d.history)?d.history:{}),levelLog:Object.assign({},isObj(d.levelLog)?d.levelLog:{})});
+    dropBefore(src,myBase);
+  }
+  const inProg=isObj(src.progress)?normalizeProgress(src.progress):{};
+  const inHist=isObj(src.history)?src.history:{};
+  const inWords=Array.isArray(src.userAddedWords)?src.userAddedWords.map(sanitizeWord).filter(Boolean):[];
+  const lc=w=>w.en.trim().toLowerCase();
+  // ── Deleted words: keep the latest delete mark per word, and drop words deleted after they were added.
+  const inDel=isObj(src.deletedWords)?src.deletedWords:{};
+  Object.keys(inDel).forEach(k=>{
+    if(BAD_KEY(k))return;const t=+inDel[k]||0;
+    if(t>(+appData.deletedWords[k]||0))appData.deletedWords[k]=t;
   });
-  // History: per day keep the busier record (re-importing the same file must not double counts).
+  const tomb=w=>{const t=appData.deletedWords[lc(w)];return !!t&&t>=(+w.addedAt||0);};
+  const dropIds=new Set();
+  appData.userAddedWords=appData.userAddedWords.filter(w=>{if(tomb(w)){dropIds.add(w.id);return false;}return true;});
+  // ── Words you added: add the new ones. The same word added on two devices keeps one id everywhere
+  // (the older one), and its progress follows it.
+  const remap={};   // incoming id → the id this word has here
+  inWords.forEach(w=>{
+    if(tomb(w)){
+      if(sync){dropIds.add(w.id);return;}
+      // A manual import of a deleted word brings it back (as it always did): newer than the delete.
+      delete appData.deletedWords[lc(w)];w.addedAt=Date.now();
+    }
+    const i=appData.userAddedWords.findIndex(x=>lc(x)===lc(w));
+    if(i<0){
+      // Import skips a word that is already built in. Sync copies the other device's list as is
+      // (it may hold a word added before it became built-in), so both devices end up with the same list.
+      if(!sync&&isDup(w.en))dropIds.add(w.id);
+      else appData.userAddedWords.push(w);
+      return;
+    }
+    const cur=appData.userAddedWords[i];
+    if(cur.id===w.id){
+      // Same record on both sides; if they differ, both devices keep the same one.
+      const wa=+w.addedAt||0, ca=+cur.addedAt||0;
+      if(sync&&(wa>ca||(wa===ca&&tieWins(cur,w))))appData.userAddedWords[i]=w;
+      return;
+    }
+    const wa=+w.addedAt||0, ca=+cur.addedAt||0;
+    if(sync&&(wa<ca||(wa===ca&&String(w.id)<String(cur.id)))){
+      appData.userAddedWords[i]=w;
+      const pc=appData.progress[cur.id], pw=appData.progress[w.id];
+      if(pc&&(!pw||progStamp(pc)>progStamp(pw)))appData.progress[w.id]=pc;
+      delete appData.progress[cur.id];
+    }else remap[w.id]=cur.id;
+  });
+  // ── Progress: per word keep whichever copy changed more recently, so importing an older
+  // backup never rolls back newer study.
+  Object.keys(inProg).forEach(k0=>{
+    if(BAD_KEY(k0)||!isObj(inProg[k0])||dropIds.has(k0))return;
+    const k=remap[k0]||k0, cur=appData.progress[k], ps=progStamp(inProg[k0]), cs=progStamp(cur);
+    if(!cur||ps>cs||(sync&&ps===cs&&tieWins(cur,inProg[k0])))appData.progress[k]=inProg[k0];
+  });
+  dropIds.forEach(id=>{if(!appData.userAddedWords.some(w=>w.id===id))delete appData.progress[id];});
+  // ── History: per day keep the busier record (re-importing the same file must not double counts).
   Object.keys(inHist).forEach(k=>{
     if(BAD_KEY(k)||!isObj(inHist[k]))return;
-    const cur=appData.history[k];
-    if(!cur||(+inHist[k].seen||0)>(+cur.seen||0))appData.history[k]=inHist[k];
+    const cur=appData.history[k], a=+inHist[k].seen||0, b=cur?(+cur.seen||0):-1;
+    if(!cur||a>b||(sync&&a===b&&tieWins(cur,inHist[k])))appData.history[k]=inHist[k];
   });
-  // כל מילה שמגיעה מקובץ חיצוני עוברת ניקוי לפני שהיא נשמרת
-  inWords.forEach(w=>{if(!isDup(w.en))appData.userAddedWords.push(w);});
-  if((+d.longestStreak||0)>(appData.longestStreak||0))appData.longestStreak=+d.longestStreak;
-  // Settings: take the backup's value only where this browser still has the default, so moving to a
-  // new address brings the settings along without overriding anything changed here.
-  if(isObj(d.settings))Object.keys(d.settings).forEach(k=>{
-    const v=d.settings[k];
-    if(BAD_KEY(k)||(v!==null&&typeof v==='object'))return;
-    if(appData.settings[k]===undefined||appData.settings[k]===DEF.settings[k])appData.settings[k]=v;
+  // ── Level log: per day keep the later snapshot.
+  const inLvl=isObj(src.levelLog)?src.levelLog:{};
+  Object.keys(inLvl).forEach(k=>{
+    if(BAD_KEY(k)||!isObj(inLvl[k]))return;
+    const cur=appData.levelLog[k], a=+inLvl[k].t||0, b=cur?(+cur.t||0):-1;
+    if(!cur||a>b||(sync&&a===b&&tieWins(cur,inLvl[k])))appData.levelLog[k]=inLvl[k];
   });
-  // Talk data (kept in the file even though the tab is gone): fill only if empty here.
+  if((+src.longestStreak||0)>(appData.longestStreak||0))appData.longestStreak=+src.longestStreak;
+  // ── Settings.
+  if(isObj(d.settings)){
+    const prim=(k,v)=>!BAD_KEY(k)&&k!=='geminiKey'&&(v===null||typeof v!=='object');
+    const inAt=+d.settingsAt||0, myAt=+appData.settingsAt||0;
+    if(!sync){
+      // Import: take the backup's value only where this browser still has the default, so moving to a
+      // new address brings the settings along without overriding anything changed here.
+      Object.keys(d.settings).forEach(k=>{
+        const v=d.settings[k];if(!prim(k,v))return;
+        if(appData.settings[k]===undefined||appData.settings[k]===DEF.settings[k])appData.settings[k]=v;
+      });
+    }else if(inAt>myAt){
+      // Sync: the device that changed settings last wins, as a whole.
+      const next=Object.assign({},DEF.settings,{geminiKey:appData.settings.geminiKey||''});
+      Object.keys(d.settings).forEach(k=>{const v=d.settings[k];if(prim(k,v))next[k]=v;});
+      appData.settings=next;appData.settingsAt=inAt;
+    }else if(inAt===myAt){
+      // Same age (e.g. neither side changed anything since sync started): a non-default value fills a
+      // default; two different non-defaults → the same pick on both devices.
+      Object.keys(d.settings).forEach(k=>{
+        const v=d.settings[k];if(!prim(k,v))return;
+        const mine=appData.settings[k], dv=DEF.settings[k];
+        if(mine===undefined||mine===dv)appData.settings[k]=v;
+        else if(v!==dv&&v!==mine&&String(v)>String(mine))appData.settings[k]=v;
+      });
+    }
+  }
+  // ── Talk data (ChatGPT tutor): import fills only if empty here; sync keeps the union of both lists.
   ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{
-    if(Array.isArray(d[k])&&d[k].length&&!(appData[k]||[]).length)appData[k]=d[k];
+    if(!Array.isArray(d[k])||!d[k].length)return;
+    const cur=Array.isArray(appData[k])?appData[k]:[];
+    if(!sync){if(!cur.length)appData[k]=d[k];return;}
+    const seen=new Set(cur.map(itemKey)), add=[];
+    d[k].forEach(x=>{const key=itemKey(x);if(!seen.has(key)){seen.add(key);add.push(x);}});
+    if(add.length)appData[k]=cur.concat(add);
   });
-  if(d.talkLevel!=null&&appData.talkLevel==null)appData.talkLevel=d.talkLevel;
+  if(d.talkLevel!=null){
+    if(appData.talkLevel==null)appData.talkLevel=d.talkLevel;
+    else if(sync&&d.talkLevel!==appData.talkLevel&&String(d.talkLevel)>String(appData.talkLevel))appData.talkLevel=d.talkLevel;
+  }
 }
 function importHandler(e){
   const file=e.target.files[0];if(!file)return;
@@ -8220,6 +8453,14 @@ function importHandler(e){
       clean.userAddedWords=inWords;
       ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{if(Array.isArray(d[k]))clean[k]=d[k];});
       if(d.talkLevel!==undefined)clean.talkLevel=d.talkLevel;
+      if(isObj(d.levelLog))Object.keys(d.levelLog).forEach(k=>{if(!BAD_KEY(k)&&isObj(d.levelLog[k]))clean.levelLog[k]=d.levelLog[k];});
+      // Cloud sync: this replace must win over what other devices still hold.
+      const now=Date.now(), keepEn=new Set(inWords.map(w=>w.en.trim().toLowerCase()));
+      clean.baseAt=now;clean.settingsAt=now;
+      clean.deletedWords=Object.assign({},isObj(appData.deletedWords)?appData.deletedWords:{});
+      (appData.userAddedWords||[]).forEach(w=>{const k=w.en.trim().toLowerCase();if(!keepEn.has(k))clean.deletedWords[k]=now;});
+      // A word in the backup that was deleted earlier is restored: newer than its delete mark.
+      clean.userAddedWords.forEach(w=>{const k=w.en.trim().toLowerCase();if(clean.deletedWords[k]){delete clean.deletedWords[k];w.addedAt=now;}});
       appData=clean;
     }
     if(!saveData()){
@@ -8258,6 +8499,10 @@ function updateMigrateHint(){
     el.style.display=dismissed&&empty?'none':'';
     return;
   }
+  // With cloud sync the hint is only for a first visit with nothing anywhere: never while the first sync is
+  // still running (it would flash), and never again once the cloud has held real progress.
+  const syncPending=syncEnabled&&(syncState==='idle'||syncState==='syncing')&&!syncMeta.okAt;
+  if(syncMeta.cloudHasData||syncPending){el.style.display='none';return;}
   tx.innerHTML='למדת בכתובת הקודמת? פתח את <a href="https://'+OLD_HOST+'/english/" style="color:var(--gold);text-decoration:underline;">'+OLD_HOST+'/english</a> ולחץ שם על "העבר את ההתקדמות". '
     +'או ייבא קובץ גיבוי: <a href="#" onclick="document.getElementById(\'importFile\').click();return false;" style="color:var(--gold);text-decoration:underline;">ייבוא גיבוי</a>.';
   el.style.display=(inSite&&empty&&!dismissed)?'':'none';
@@ -8720,6 +8965,511 @@ function readPasted(){
   renderArtList(); openArticle('s0');
 }
 
+// ══════════════════════════════════════════════════════════════
+//  CLOUD SYNC — ההתקדמות נשמרת גם בענן של האתר ומתמזגת בין מכשירים
+//  Contract: GET /api/store?key=english → 200 {data,updatedAt} | 404 (empty)
+//            PUT /api/store?key=english  {data} → 200 {updatedAt}
+//  Every sync is pull → merge (mergeIntoApp, sync rules) → push only if the cloud differs.
+//  Local data is always kept: a failed request changes nothing here, and the next sync retries.
+// ══════════════════════════════════════════════════════════════
+var SYNC_URL='/api/store?key=english', SYNC_META_KEY='englishSyncMeta';
+// Only over http(s) (inside the site). Opened as a local file there is no server to talk to.
+var syncEnabled=/^https?:$/.test(location.protocol);
+var syncState='idle';          // idle | syncing | ok | auth | offline | down | disabled
+var syncTimer=null, syncBusy=false, syncAgain=false, syncSuppress=false, syncDirty=false, syncLastTry=0;
+var syncMeta=(function(){try{const m=JSON.parse(localStorage.getItem(SYNC_META_KEY)||'{}');return isObj(m)?m:{};}catch(e){return{};}})();
+function saveSyncMeta(){try{localStorage.setItem(SYNC_META_KEY,JSON.stringify(syncMeta));}catch(e){}}
+// Everything that belongs in the cloud copy (the Gemini key stays on the device).
+var SYNC_FIELDS=['version','progress','settings','settingsAt','history','userAddedWords','longestStreak',
+  'talkMistakes','talkSessions','talkLevel','talkLevelHistory','levelLog','deletedWords','baseAt'];
+function syncPayload(src){
+  const o={};
+  SYNC_FIELDS.forEach(k=>{if(src[k]!==undefined)o[k]=src[k];});
+  if(isObj(o.settings)){o.settings=Object.assign({},o.settings);delete o.settings.geminiKey;}
+  return o;
+}
+// Keep the cloud copy well under the store's 1 MB: if it grows past ~700 KB, upload only the newest
+// tutor sessions / mistakes / level days (this device keeps everything; merging is a union, so nothing is lost here).
+var SYNC_SOFT_LIMIT=700000;
+function trimPayload(o){
+  if(JSON.stringify(o).length<=SYNC_SOFT_LIMIT)return o;
+  const newest=(a,n)=>Array.isArray(a)&&a.length>n?a.slice(-n):a;
+  o=Object.assign({},o,{talkSessions:newest(o.talkSessions,100),talkMistakes:newest(o.talkMistakes,300),talkLevelHistory:newest(o.talkLevelHistory,200)});
+  if(isObj(o.levelLog)){const ks=Object.keys(o.levelLog).sort();if(ks.length>400){const l={};ks.slice(-400).forEach(k=>l[k]=o.levelLog[k]);o.levelLog=l;}}
+  return o;
+}
+// A few exact numbers for the site (Today page, weekly push), computed with this app's own logic.
+function syncSummary(){return {due:countDue(allWords()),streak:computeStreak(),updatedAt:new Date().toISOString()};}
+// Order-free fingerprint of a copy: tells whether the cloud already holds exactly what we have.
+function syncCanon(d){
+  if(!isObj(d))return '';
+  const o=syncPayload(d);
+  const byKey=a=>Array.isArray(a)?a.slice().sort((x,y)=>{const p=itemKey(x),q=itemKey(y);return p<q?-1:p>q?1:0;}):a;
+  if(Array.isArray(o.userAddedWords))o.userAddedWords=o.userAddedWords.slice().sort((x,y)=>String(x.id)<String(y.id)?-1:String(x.id)>String(y.id)?1:0);
+  ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{if(o[k]!==undefined)o[k]=byKey(o[k]);});
+  return stableStringify(o);
+}
+const hasRealData=d=>isObj(d)&&((isObj(d.progress)&&Object.keys(d.progress).length>0)||(isObj(d.history)&&Object.keys(d.history).length>0)||(Array.isArray(d.userAddedWords)&&d.userAddedWords.length>0));
+function scheduleSync(delay){
+  if(!syncEnabled)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{syncTimer=null;syncNow();},delay==null?3000:delay);
+}
+async function syncNow(opts){
+  opts=opts||{};
+  if(!syncEnabled){if(opts.manual)toast('סנכרון זמין רק בתוך האתר','err');return;}
+  if(syncBusy){syncAgain=true;return;}
+  syncBusy=true;syncLastTry=Date.now();
+  clearTimeout(syncTimer);syncTimer=null;
+  setSyncState('syncing');
+  const fail=kind=>{const e=new Error(kind);e.kind=kind;return e;};
+  try{
+    // 1. Pull
+    let cloud=null, cloudSummary=null;
+    const r=await fetch(SYNC_URL,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+    if(r.status===401||r.status===403)throw fail('auth');
+    if(r.ok){
+      let j=null;try{j=await r.json();}catch(e){throw fail('down');}
+      cloud=isObj(j)&&isObj(j.data)?j.data:null;
+      cloudSummary=isObj(j)&&isObj(j.summary)?j.summary:null;
+    }else if(r.status!==404)throw fail('down');
+    // 2. Merge the cloud copy into ours (a clone — the original is compared below)
+    if(cloud){
+      if(hasRealData(cloud))syncMeta.cloudHasData=true;
+      const before=JSON.stringify(appData);
+      mergeIntoApp(JSON.parse(JSON.stringify(cloud)),{sync:true});
+      if(JSON.stringify(appData)!==before){
+        syncSuppress=true;
+        try{saveData();refreshAfterDataChange();if(document.getElementById('tab-add').classList.contains('active'))renderRecent();}
+        finally{syncSuppress=false;}
+      }
+    }
+    // 3. Push — only when the cloud is missing something (first run with an empty cloud included)
+    syncDirty=false;
+    const payload=trimPayload(syncPayload(appData)), summary=syncSummary();
+    // Also re-upload when the site's summary is out of date (e.g. more words came due since the last upload)
+    const summaryStale=!!cloudSummary&&(cloudSummary.due!==summary.due||cloudSummary.streak!==summary.streak);
+    if(!cloud||summaryStale||syncCanon(payload)!==syncCanon(cloud)){
+      const body=JSON.stringify({data:payload,summary});
+      let pr;
+      try{
+        pr=await fetch(SYNC_URL,{method:'PUT',credentials:'same-origin',cache:'no-store',
+          headers:{'Content-Type':'application/json'},body,keepalive:!!opts.keepalive&&body.length<60000});
+      }catch(e){syncDirty=true;throw e;}
+      if(!pr.ok)syncDirty=true;
+      if(pr.status===401||pr.status===403)throw fail('auth');
+      if(!pr.ok)throw fail('down');
+      if(hasRealData(payload))syncMeta.cloudHasData=true;
+    }
+    syncMeta.okAt=Date.now();saveSyncMeta();
+    setSyncState('ok');
+    if(opts.manual)toast('☁️ מסונכרן');
+  }catch(e){
+    syncDirty=true;
+    setSyncState(e&&e.kind==='auth'?'auth':e&&e.kind==='down'?'down':'offline');
+    if(opts.manual)toast(syncStatusText(),'err');
+  }finally{
+    syncBusy=false;
+    if(syncAgain){syncAgain=false;scheduleSync(800);}
+  }
+}
+function setSyncState(s){syncState=s;updateSyncUI();}
+function syncTime(t){
+  const d=new Date(t), now=new Date();
+  const hm=d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  return d.toDateString()===now.toDateString()?hm:d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'})+' '+hm;
+}
+function syncStatusText(){
+  const last=syncMeta.okAt?' (סנכרון אחרון '+syncTime(syncMeta.okAt)+')':'';
+  switch(syncState){
+    case 'disabled':return 'סנכרון בענן פועל רק בתוך האתר — נשמר במכשיר';
+    case 'ok':return 'נשמר בענן · '+syncTime(syncMeta.okAt||Date.now());
+    case 'syncing':return 'מסנכרן…';
+    case 'auth':return 'לא מחובר — נשמר במכשיר'+last;
+    case 'down':return 'הענן לא זמין כרגע — נשמר במכשיר'+last;
+    case 'offline':return 'אין חיבור — נשמר במכשיר'+last;
+    default:return 'בודק את הענן…';
+  }
+}
+function updateSyncUI(){
+  const txt=syncStatusText();
+  const h=document.getElementById('hSync');
+  if(h){
+    h.className='hdr-sync '+(syncState==='ok'?'ok':syncState==='syncing'||syncState==='idle'?'busy':'off');
+    h.title=txt;h.setAttribute('aria-label',txt);
+  }
+  const st=document.getElementById('syncStatus');if(st)st.textContent=txt;
+  const note=document.getElementById('storageNote');
+  if(note){
+    if(syncMeta.okAt&&syncEnabled){
+      note.dir='rtl';
+      note.textContent='☁️ ההתקדמות נשמרת בענן של האתר וגם בדפדפן הזה, כך שהיא זמינה בכל מכשיר. גיבוי JSON מדי פעם עדיין מומלץ.';
+    }else{
+      note.dir='ltr';
+      note.textContent='⚠️ Your progress is saved in this browser only, and only at this web address. Export a backup regularly to avoid losing data.';
+    }
+  }
+  updateMigrateHint();
+}
+function initSync(){
+  if(!syncEnabled){setSyncState('disabled');return;}
+  updateSyncUI();
+  syncNow();
+  // Leaving the app (tab switch, phone lock, close): push what is pending right away.
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden'){if(syncDirty||syncTimer)syncNow({keepalive:true});}
+    else if(Date.now()-syncLastTry>15000)syncNow();     // coming back: pick up the other device's study
+  });
+  window.addEventListener('pagehide',()=>{if(syncDirty||syncTimer)syncNow({keepalive:true});});
+  window.addEventListener('online',()=>syncNow());
+}
+
+// ══════════════════════════════════════════════════════════════
+//  QUICK ADD — /english/?add=word (אפשר גם &he=תרגום&ex=משפט) פותח את טופס ההוספה ממולא
+// ══════════════════════════════════════════════════════════════
+// Hebrew for an English term, from what the app already knows: the article glossaries and the
+// "words from life" list. Also tries plural / -ed / -ing forms (same guard as the reader).
+var heLex=null;
+function lookupHe(en){
+  if(!en)return '';
+  if(!heLex){
+    heLex=new Map();
+    LIFE_TERMS.forEach(t=>heLex.set(t[0].toLowerCase(),{he:t[1]}));
+    ARTICLES.forEach(a=>{if(a.gloss)Object.entries(a.gloss).forEach(([k,v])=>{if(v&&v.he)heLex.set(k.trim().toLowerCase(),{he:v.he});});});
+  }
+  const hit=lexLookup(heLex,en);
+  return hit?hit.he:'';
+}
+function quickAddUrl(){return location.origin+(location.pathname.replace(/[^/]*$/,''))+'?add=';}
+function renderQuickAddInfo(){
+  const u=document.getElementById('qaUrl');if(u)u.textContent=quickAddUrl()+'word';
+  const b=document.getElementById('qaBookmarklet');
+  if(b)b.href="javascript:(function(){var s=String(window.getSelection()).trim()||prompt('מילה באנגלית:');"+
+    "if(s)window.open("+JSON.stringify(quickAddUrl())+"+encodeURIComponent(s.slice(0,80)),'_blank');})()";
+}
+function openQuickAdd(en,he,ex){
+  switchAddTab('single');
+  if(en&&isDup(en)){
+    toast('"'+en+'" כבר נמצאת בספרייה');
+    const sEl=document.getElementById('wlSearch');if(sEl)sEl.value=en;
+    showTab('words');
+    return;
+  }
+  showTab('add');
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('aEn',en||'');
+  set('aHe',he||lookupHe(en)||'');
+  set('aEx',ex||'');
+  set('aType',en&&/\s/.test(en)?'phrase':'word');
+  const focusId=!en?'aEn':!document.getElementById('aHe').value?'aHe':'aEx';
+  setTimeout(()=>{const f=document.getElementById(focusId);if(f)f.focus();},80);
+  if(en)toast('✏️ השלם את הפרטים ולחץ Add Word');
+}
+function quickAddFromUrl(){
+  let p;try{p=new URLSearchParams(location.search);}catch(e){return;}
+  if(!p.has('add'))return;
+  const clean=v=>String(v||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim();
+  const en=clean(p.get('add')).slice(0,80), he=clean(p.get('he')).slice(0,120), ex=clean(p.get('ex')).slice(0,300);
+  // Drop the parameters so a reload doesn't open the form again
+  ['add','he','ex'].forEach(k=>p.delete(k));
+  const q=p.toString();
+  try{history.replaceState(null,'',location.pathname+(q?'?'+q:'')+location.hash);}catch(e){}
+  openQuickAdd(en,he,ex);
+}
+// Typing an English word with the Hebrew still empty: fill it when the app knows it.
+(function(){
+  const en=document.getElementById('aEn'), he=document.getElementById('aHe');
+  if(en&&he)en.addEventListener('change',()=>{if(!he.value.trim()){const h=lookupHe(en.value.trim());if(h)he.value=h;}});
+})();
+
+// ══════════════════════════════════════════════════════════════
+//  LIFE WORDS — מילים מהאירועים: מונחי משקיעים/סטארטאפ מתוך /events.json שעוד אין בספרייה
+//  Dismissed terms are kept locally and in the site store under key "life-words" ({dismissed:{term:time}}).
+// ══════════════════════════════════════════════════════════════
+// [English, Hebrew, category]. Matched in event titles/descriptions (plurals too). Short all-caps terms
+// (VC, LP…) only match in capitals.
+var LIFE_TERMS=[
+  ['venture capital','הון סיכון','investing'],['VC','קרן הון סיכון (VC)','investing'],['angel investor','משקיע אנג\'ל','investing'],
+  ['limited partner','שותף מוגבל — משקיע בקרן (LP)','investing'],['LP','משקיע בקרן (Limited Partner)','investing'],
+  ['general partner','שותף כללי — מנהל הקרן (GP)','investing'],['GP','מנהל הקרן (General Partner)','investing'],
+  ['CVC','הון סיכון תאגידי','investing'],['corporate venture','הון סיכון תאגידי','investing'],
+  ['fundraising','גיוס הון','investing'],['funding round','סבב גיוס','investing'],['seed round','סבב סיד','investing'],
+  ['pre-seed','פרי-סיד (השלב הכי מוקדם)','investing'],['Series A','סבב A','investing'],['valuation','הערכת שווי','investing'],
+  ['term sheet','מזכר עקרונות להשקעה','investing'],['due diligence','בדיקת נאותות','investing'],
+  ['portfolio company','חברת פורטפוליו','investing'],['deal flow','זרם עסקאות','investing'],['exit','אקזיט (מימוש)','investing'],
+  ['returns','תשואות','investing'],['equity','הון עצמי / מניות','investing'],['dilution','דילול','investing'],
+  ['cap table','טבלת בעלי המניות','investing'],['co-investment','השקעה משותפת','investing'],['family office','משרד משפחתי','investing'],
+  ['asset management','ניהול נכסים','investing'],['wealth management','ניהול עושר','investing'],['private equity','פרייבט אקוויטי (הון פרטי)','investing'],
+  ['fund of funds','קרן של קרנות','investing'],['allocation','הקצאה','investing'],['track record','היסטוריית ביצועים','investing'],
+  ['investment thesis','תזת השקעה','investing'],['liquidity','נזילות','investing'],['secondaries','עסקאות משניות','investing'],
+  ['syndicate','סינדיקט משקיעים','investing'],['ticket size','גודל ההשקעה (הצ\'ק)','investing'],['lead investor','משקיע מוביל','investing'],
+  ['IPO','הנפקה ראשונית לציבור','investing'],['M&A','מיזוגים ורכישות','investing'],['acquisition','רכישה','investing'],
+  ['merger','מיזוג','investing'],['impact investing','השקעות אימפקט','investing'],['diversification','פיזור','investing'],
+  ['accelerator','מאיץ','work'],['incubator','חממה','work'],['pitch deck','מצגת משקיעים','work'],['pitch','פיץ\' — הצגה למשקיעים','work'],
+  ['demo day','יום הדגמה','work'],['co-founder','שותף מייסד','work'],['founder','מייסד','work'],['entrepreneur','יזם','work'],
+  ['ecosystem','אקוסיסטם — מערכת אקולוגית','work'],['scale-up','סקייל-אפ — חברה בצמיחה','work'],['traction','טרקשן — אחיזה בשוק','work'],
+  ['product-market fit','התאמת מוצר-שוק','work'],['go-to-market','אסטרטגיית יציאה לשוק','work'],['runway','כמה זמן הכסף יספיק (ראנוויי)','work'],
+  ['burn rate','קצב שריפת מזומנים','work'],['recurring revenue','הכנסה חוזרת','work'],['ARR','הכנסה שנתית חוזרת','work'],
+  ['SaaS','תוכנה כשירות','work'],['B2B','עסק לעסק','work'],['MVP','מוצר מינימלי ראשון','work'],['unicorn','יוניקורן — חברה בשווי מיליארד','work'],
+  ['deep tech','טכנולוגיה עמוקה','work'],['fintech','פינטק','work'],['climate tech','טכנולוגיית אקלים','work'],
+  ['cybersecurity','אבטחת סייבר','work'],['infrastructure','תשתית','work'],['innovation','חדשנות','work'],['networking','נטוורקינג — יצירת קשרים','work'],
+  ['keynote','הרצאה מרכזית','work'],['panel','פאנל','work'],['fireside chat','שיחה אישית על הבמה','work'],['summit','כנס פסגה','work'],
+  ['roundtable','שולחן עגול','work'],['meetup','מפגש','work'],['workshop','סדנה','work'],['agenda','סדר יום','work'],
+  ['attendee','משתתף','work'],['speaker','דובר','work'],['sponsor','נותן חסות','work'],['flagship','אירוע הדגל','work'],
+  ['curated','נבחר בקפידה','work'],['executive','מנהל בכיר','work'],['decision-maker','מקבל החלטות','work'],['stakeholder','בעל עניין','work'],
+  ['partnership','שותפות','work'],['collaboration','שיתוף פעולה','work'],['opportunity','הזדמנות','work'],['insights','תובנות','work'],
+  ['industry leaders','מובילי התעשייה','work'],['thought leader','מוביל דעה','work'],['mentor','מנטור','work'],['alumni','בוגרים','work'],
+  ['hands-on','מעשי','work'],['deep-dive','צלילה לעומק','work'],['cutting-edge','חדשני ביותר','work'],['early-stage','בשלב מוקדם','work'],
+  ['growth-stage','בשלב צמיחה','work'],['top-tier','מהשורה הראשונה','work'],['one-on-one','אחד על אחד','work'],['high-tech','הייטק','work'],
+  ['automation','אוטומציה','work'],['framework','מסגרת עבודה','work'],['on-demand','לפי דרישה','work'],['RSVP','אישור הגעה','work'],
+  ['waitlist','רשימת המתנה','work'],['venue','מקום האירוע','work'],['hackathon','האקתון','work'],['competition','תחרות','work'],
+  ['enthusiasts','חובבים נלהבים','work'],['worldwide','ברחבי העולם','work'],['professionals','אנשי מקצוע','work'],['expo','תערוכה','work'],
+];
+// Generic words that show up in event pages but are not worth learning (site furniture, places, brands).
+var LIFE_JUNK=new Set(('https http www aviv yafo aviv-yafo israel israeli register registration calendar download hosted online contact '+
+  'report others featured browse search strings letters words ical outlook google yahoo apple youtube linkedin microsoft zoom '+
+  'pictures archives uncategorized categories mailing ticket tickets please location details approval october november december '+
+  'january february march april june july august september monday tuesday wednesday thursday friday saturday sunday '+
+  'minutes wondered anytime without actually something whether content going invite visible organizer events event').split(' '));
+var LIFE_LOCAL_KEY='englishLifeWords', LIFE_URL='/api/store?key=life-words';
+var lifeSugs=null, lifeLoading=false, lifeDismissed=null;
+function lifeLocal(){
+  if(lifeDismissed)return lifeDismissed;
+  let d={};try{const x=JSON.parse(localStorage.getItem(LIFE_LOCAL_KEY)||'{}');if(isObj(x)&&isObj(x.dismissed))d=x.dismissed;}catch(e){}
+  lifeDismissed={};Object.keys(d).forEach(k=>{if(!BAD_KEY(k))lifeDismissed[k]=+d[k]||1;});
+  return lifeDismissed;
+}
+function lifeSaveLocal(){try{localStorage.setItem(LIFE_LOCAL_KEY,JSON.stringify({dismissed:lifeLocal()}));}catch(e){}}
+function lifeMergeCloud(data){
+  const inD=isObj(data)&&data.dismissed;let changed=false;const mine=lifeLocal();
+  if(Array.isArray(inD))inD.forEach(k=>{k=String(k).toLowerCase();if(!BAD_KEY(k)&&!mine[k]){mine[k]=1;changed=true;}});
+  else if(isObj(inD))Object.keys(inD).forEach(k=>{if(!BAD_KEY(k)&&!mine[k]){mine[k]=+inD[k]||1;changed=true;}});
+  if(changed)lifeSaveLocal();
+  return changed;
+}
+// Pull → merge → push (only if the cloud lacks something). Fails quietly: dismissals stay on this device.
+async function lifeSync(){
+  if(!syncEnabled)return;
+  try{
+    const r=await fetch(LIFE_URL,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+    let cloud=null;
+    if(r.ok){const j=await r.json().catch(()=>null);cloud=isObj(j)&&isObj(j.data)?j.data:null;}
+    else if(r.status!==404)return;
+    lifeMergeCloud(cloud);
+    const mine=lifeLocal(), theirs=cloud&&cloud.dismissed;
+    const has=k=>Array.isArray(theirs)?theirs.includes(k):isObj(theirs)&&theirs[k]!=null;
+    if(Object.keys(mine).some(k=>!has(k)))
+      await fetch(LIFE_URL,{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{dismissed:mine}})});
+  }catch(e){}
+}
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+// Find suggestion terms in the events: curated terms first (they come with Hebrew), then other
+// longer English words that appear in 2+ events.
+function extractLifeTerms(events){
+  const lib=new Map();allWords().forEach(w=>lib.set(w.en.trim().toLowerCase(),{he:w.he}));
+  const known=t=>!!lexLookup(lib,t);
+  const dismissed=lifeLocal();
+  const docs=events.map(e=>({title:String(e.title||'').trim(),text:(String(e.title||'')+'. '+String(e.description||'')).replace(/\s+/g,' ')}))
+    .filter(x=>/[A-Za-z]/.test(x.text));
+  const out=[], taken=new Set();
+  const sentenceWith=(text,re)=>{
+    const parts=text.replace(/([.!?…])\s+/g,'$1\n').replace(/\s[•·|]\s/g,'\n').split('\n');
+    const s=parts.find(p=>re.test(p))||'';
+    re.lastIndex=0;
+    const t=s.trim();return t.length>=12&&t.length<=180?t:'';
+  };
+  LIFE_TERMS.forEach(([en,he,cat])=>{
+    const key=en.toLowerCase();
+    if(taken.has(key)||dismissed[key]||known(en))return;
+    const caps=/^[A-Z&]{2,5}$/.test(en);
+    const re=new RegExp('(^|[^A-Za-z-])'+escRe(en)+(caps?'s?':'(s|es)?')+'(?![A-Za-z])',caps?'':'i');
+    const hits=docs.filter(d=>re.test(d.text));
+    if(!hits.length)return;
+    taken.add(key);
+    out.push({en,he,cat,n:hits.length,from:hits[0].title,ex:sentenceWith(hits[0].text,re)});
+  });
+  out.sort((a,b)=>b.n-a.n);
+  // Other words: lower-case somewhere (so not just a name), 7+ letters, in at least two events
+  const count=new Map(), first=new Map();
+  docs.forEach(d=>{
+    const seen=new Set();
+    (d.text.match(/\b[a-z][a-z-]{6,}\b/g)||[]).forEach(w=>{
+      if(w.endsWith('-')||seen.has(w))return;seen.add(w);
+      count.set(w,(count.get(w)||0)+1);if(!first.has(w))first.set(w,d);
+    });
+  });
+  const extra=[...count.entries()].filter(([w,n])=>n>=2&&!LIFE_JUNK.has(w)&&!READ_SKIP.has(w)&&!taken.has(w)&&!dismissed[w]&&!known(w))
+    .sort((a,b)=>b[1]-a[1]).map(([w,n])=>{
+      const d=first.get(w), re=new RegExp('\\b'+escRe(w)+'\\b');
+      return {en:w,he:lookupHe(w),cat:'work',n,from:d.title,ex:sentenceWith(d.text,re)};
+    });
+  return out.concat(extra).slice(0,20);
+}
+async function loadLifeSuggestions(force){
+  const box=document.getElementById('lifeList');if(!box)return;
+  if(lifeSugs&&!force){renderLifeSuggestions();return;}
+  if(lifeLoading)return;
+  lifeLoading=true;
+  if(force||!lifeSugs)box.innerHTML='<div class="lw-empty">טוען…</div>';
+  try{
+    await lifeSync();
+    const r=await fetch('/events.json',{credentials:'same-origin',cache:'no-cache'});
+    if(!r.ok)throw new Error('http '+r.status);
+    const j=await r.json();
+    const events=Array.isArray(j)?j:(isObj(j)&&Array.isArray(j.events)?j.events:[]);
+    lifeSugs=extractLifeTerms(events);
+    renderLifeSuggestions();
+  }catch(e){
+    lifeSugs=null;
+    box.innerHTML='<div class="lw-empty">לא הצלחתי לטעון את האירועים — זה עובד רק בתוך האתר ועם חיבור לאינטרנט.</div>';
+  }finally{lifeLoading=false;}
+}
+function renderLifeSuggestions(){
+  const box=document.getElementById('lifeList');if(!box||!lifeSugs)return;
+  // Drop anything added or dismissed meanwhile (also from another tab / device)
+  const dismissed=lifeLocal();
+  lifeSugs=lifeSugs.filter(s=>!dismissed[s.en.toLowerCase()]&&!isDup(s.en));
+  if(!lifeSugs.length){box.innerHTML='<div class="lw-empty">אין כרגע מילים חדשות מהאירועים — כל המונחים כבר אצלך. 🎉</div>';return;}
+  box.innerHTML=lifeSugs.map((s,i)=>
+    '<div class="lw-item">'+
+      '<div class="lw-top"><span class="lw-ctx" title="'+esc(s.ex||s.from)+'">'+esc(s.from)+(s.n>1?' · +'+(s.n-1):'')+'</span>'+
+      '<span class="lw-en">'+esc(s.en)+'</span>'+
+      '<button class="lw-x" onclick="speak(lifeSugs['+i+'].en)" aria-label="השמע" title="השמע">🔊</button></div>'+
+      '<div class="lw-row">'+
+        '<input class="lw-he" id="lwHe'+i+'" dir="rtl" placeholder="תרגום לעברית" value="'+esc(s.he||'')+'">'+
+        (s.he?'':'<a class="lw-tr" href="https://translate.google.com/?sl=en&tl=iw&text='+encodeURIComponent(s.en)+'" target="_blank" rel="noopener">תרגם ↗</a>')+
+        '<button class="btn btn-gold" onclick="lwAdd('+i+')">הוסף</button>'+
+        '<button class="lw-x" onclick="lwDismiss('+i+')" aria-label="לא להציע שוב" title="לא להציע שוב">✕</button>'+
+      '</div>'+
+    '</div>').join('');
+}
+function lwAdd(i){
+  const s=lifeSugs&&lifeSugs[i];if(!s)return;
+  const inp=document.getElementById('lwHe'+i), he=(inp&&inp.value||'').trim();
+  if(!he){toast('כתוב קודם תרגום לעברית','err');if(inp)inp.focus();return;}
+  if(isDup(s.en)){toast('"'+s.en+'" כבר נמצאת בספרייה');renderLifeSuggestions();return;}
+  const w=makeUserWord(s.en,he,s.cat,'💡','',s.ex,/[\s]/.test(s.en)?'phrase':'word');
+  if(!w){toast('Those characters are not allowed','err');return;}
+  appData.userAddedWords.push(w);saveData();
+  toast('✅ "'+s.en+'" נוספה');
+  renderRecent();updateHeaderCount();renderTopicChips();updatePickerSub();renderLifeSuggestions();
+}
+function lwDismiss(i){
+  const s=lifeSugs&&lifeSugs[i];if(!s)return;
+  lifeLocal()[s.en.toLowerCase()]=Date.now();lifeSaveLocal();
+  renderLifeSuggestions();
+  clearTimeout(lwDismiss._t);lwDismiss._t=setTimeout(lifeSync,1500);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PROGRESS OVER TIME — רמה, גרף מילים ידועות, חזרות לפי שבוע, שיחות עם המורה
+// ══════════════════════════════════════════════════════════════
+// Vocabulary level, estimated from how many words you know (mastered + reviewing).
+var LEVELS=[{c:'A1',n:0,he:'מתחיל'},{c:'A2',n:100,he:'בסיסי'},{c:'B1',n:250,he:'בינוני'},{c:'B2',n:450,he:'בינוני-גבוה'},{c:'C1',n:700,he:'מתקדם'}];
+function levelCounts(){
+  let m=0,r=0,l=0;
+  allWords().forEach(w=>{const p=appData.progress[w.id];if(!p)return;
+    if(p.status==='mastered')m++;else if(p.status==='reviewing')r++;else if(p.status==='learning')l++;});
+  return {m,r,l};
+}
+// Keeps one snapshot per day of the counts above, for the chart. Returns true if it changed.
+function recordLevel(){
+  if(!isObj(appData.levelLog))appData.levelLog={};
+  const k=todayKey(), c=levelCounts(), cur=appData.levelLog[k];
+  if(cur&&cur.m===c.m&&cur.r===c.r&&cur.l===c.l)return false;
+  if(!cur&&!c.m&&!c.r&&!c.l)return false;
+  appData.levelLog[k]={m:c.m,r:c.r,l:c.l,t:Date.now()};
+  return true;
+}
+function renderLevelCard(){
+  const el=document.getElementById('levelCard');if(!el)return;
+  const c=levelCounts(), known=c.m+c.r;
+  let i=0;while(i+1<LEVELS.length&&known>=LEVELS[i+1].n)i++;
+  const L=LEVELS[i], N=LEVELS[i+1];
+  const pct=N?Math.round((known-L.n)/(N.n-L.n)*100):100;
+  const tl=appData.talkLevel;
+  el.innerHTML='<div class="lvl-top"><div class="lvl-code">'+L.c+'</div><div>'+
+    '<div class="lvl-name">רמת אוצר מילים: '+L.he+'</div>'+
+    '<div class="lvl-sub">'+known+' מילים ידועות ('+c.m+' שולטות, '+c.r+' בחזרה)'+(N?' · עוד '+(N.n-known)+' ל-'+N.c:' · הרמה הגבוהה ביותר כאן')+'</div>'+
+    '</div></div><div class="lvl-bar"><div style="width:'+Math.max(2,Math.min(100,pct))+'%"></div></div>'+
+    (tl!=null&&tl!==''?'<div class="lvl-tutor">🗣️ רמה לפי המורה: '+esc(typeof tl==='object'?(tl.level||tl.cefr||''):tl)+'</div>':'')+
+    '<div class="lvl-sub" style="margin-top:8px;">הערכה לפי מספר המילים שאתה יודע — לא מבחן רשמי.</div>';
+}
+function renderGrowthChart(){
+  const el=document.getElementById('growthChart');if(!el)return;
+  const log=isObj(appData.levelLog)?appData.levelLog:{};
+  const days=Object.keys(log).filter(k=>/^\d{4}-\d\d-\d\d$/.test(k)&&isObj(log[k])).sort().slice(-120);
+  if(days.length<2){
+    const c=levelCounts();
+    el.innerHTML='<div class="growth-empty" dir="rtl">📈 הגרף מתמלא מהיום: בכל יום שתלמד תתווסף נקודה עם מספר המילים שאתה יודע'+
+      ' (כרגע '+(c.m+c.r)+'). אחרי יומיים-שלושה תראה כאן את הקו עולה.</div>';
+    return;
+  }
+  const W=320,H=120,P={l:30,r:8,t:10,b:20};
+  const t0=new Date(days[0]+'T12:00:00').getTime(), t1=new Date(days[days.length-1]+'T12:00:00').getTime();
+  const pts=days.map(k=>({t:new Date(k+'T12:00:00').getTime(),k:(+log[k].m||0)+(+log[k].r||0),m:+log[k].m||0}));
+  const maxV=Math.max(10,...pts.map(p=>p.k));
+  const x=t=>P.l+(t1===t0?0:(t-t0)/(t1-t0))*(W-P.l-P.r), y=v=>H-P.b-(v/maxV)*(H-P.t-P.b);
+  const line=f=>pts.map((p,i)=>(i?'L':'M')+x(p.t).toFixed(1)+' '+y(p[f]).toFixed(1)).join(' ');
+  const area=line('k')+' L'+x(t1).toFixed(1)+' '+(H-P.b)+' L'+x(t0).toFixed(1)+' '+(H-P.b)+' Z';
+  const grid=LEVELS.filter(L=>L.n>0&&L.n<maxV).map(L=>
+    '<line x1="'+P.l+'" x2="'+(W-P.r)+'" y1="'+y(L.n).toFixed(1)+'" y2="'+y(L.n).toFixed(1)+'" stroke="var(--border)" stroke-dasharray="3 3"/>'+
+    '<text x="'+(P.l-4)+'" y="'+(y(L.n)+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="var(--muted)">'+L.c+'</text>').join('');
+  const fmt=k=>new Date(k+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'});
+  const last=pts[pts.length-1];
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Known words over time">'+grid+
+    '<path d="'+area+'" fill="rgba(201,168,76,.12)"/>'+
+    '<path d="'+line('m')+'" fill="none" stroke="var(--green-l)" stroke-width="1.2" stroke-dasharray="4 3"/>'+
+    '<path d="'+line('k')+'" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/>'+
+    '<circle cx="'+x(last.t).toFixed(1)+'" cy="'+y(last.k).toFixed(1)+'" r="3" fill="var(--gold)"/>'+
+    '<text x="'+P.l+'" y="'+(H-5)+'" font-size="8" fill="var(--muted)">'+fmt(days[0])+'</text>'+
+    '<text x="'+(W-P.r)+'" y="'+(H-5)+'" font-size="8" fill="var(--muted)" text-anchor="end">'+fmt(days[days.length-1])+' · '+last.k+' known</text>'+
+    '</svg><div style="font-size:.68rem;color:var(--muted);margin-top:4px;"><span style="color:var(--gold)">━</span> known (mastered + reviewing) &nbsp; <span style="color:var(--green-l)">╌</span> mastered</div>';
+}
+function renderWeekChart(){
+  const chart=document.getElementById('weekChart');if(!chart)return;
+  chart.innerHTML='';
+  const weeks=[];
+  for(let w=11;w>=0;w--){
+    let sum=0;
+    for(let d=0;d<7;d++){const dt=new Date();dt.setDate(dt.getDate()-(w*7+d));sum+=+(appData.history[dt.toISOString().slice(0,10)]||{}).seen||0;}
+    const start=new Date();start.setDate(start.getDate()-(w*7+6));
+    weeks.push({v:sum,label:start.getDate()+'/'+(start.getMonth()+1)});
+  }
+  const maxV=Math.max(1,...weeks.map(x=>x.v));
+  weeks.forEach(wk=>{
+    const col=document.createElement('div');col.className='bar-col';
+    col.innerHTML='<div class="bar-val">'+(wk.v||'')+'</div><div class="bar-fill" style="height:'+Math.max(4,Math.round(wk.v/maxV*100))+'%;"></div><div class="bar-day">'+wk.label+'</div>';
+    chart.appendChild(col);
+  });
+}
+// ChatGPT tutor sessions (appData.talkSessions). The shape isn't fixed yet, so read the common field names.
+function renderTalkSessions(){
+  const el=document.getElementById('talkList');if(!el)return;
+  const list=(Array.isArray(appData.talkSessions)?appData.talkSessions:[]).filter(s=>s!=null);
+  const when=s=>isObj(s)?(s.date||s.at||s.startedAt||s.ts||s.time||s.created_at||null):null;
+  const ms=v=>{if(v==null)return 0;const n=typeof v==='number'?v:Date.parse(v);return isNaN(n)?0:n;};
+  if(!list.length){
+    el.innerHTML='<div class="talk-empty">עוד אין שיחות. כשתתרגל שיחה באנגלית עם המורה ב-ChatGPT, הסיכום יופיע כאן: תאריך, נושא, רמה והטעויות לתרגול.</div>';
+    return;
+  }
+  const sorted=list.slice().sort((a,b)=>ms(when(b))-ms(when(a))).slice(0,12);
+  const mistakes=Array.isArray(appData.talkMistakes)?appData.talkMistakes.length:0;
+  el.innerHTML='<div class="talk-meta" style="margin-bottom:6px;">'+list.length+' שיחות'+(mistakes?' · '+mistakes+' טעויות לתרגול':'')+'</div>'+
+    sorted.map(s=>{
+      if(!isObj(s))return '<div class="talk-item"><div class="talk-top"><span>'+esc(s)+'</span></div></div>';
+      const t=ms(when(s));
+      const title=s.topic||s.title||s.subject||'שיחה';
+      const lvl=s.level||s.cefr||'';
+      const mins=s.minutes||s.durationMin||'';
+      const nm=Array.isArray(s.mistakes)?s.mistakes.length:(typeof s.mistakes==='number'?s.mistakes:0);
+      const sum=s.summary||s.notes||s.feedback||'';
+      const meta=[t?new Date(t).toLocaleDateString('he-IL',{day:'numeric',month:'short',year:'numeric'}):'',mins?mins+' דק׳':'',nm?nm+' טעויות':''].filter(Boolean).join(' · ');
+      return '<div class="talk-item"><div class="talk-top"><span dir="auto">'+esc(title)+'</span>'+(lvl?'<span style="color:var(--gold);font-weight:700;">'+esc(lvl)+'</span>':'')+'</div>'+
+        (meta?'<div class="talk-meta">'+esc(meta)+'</div>':'')+(sum?'<div class="talk-sum" dir="auto">'+esc(sum)+'</div>':'')+'</div>';
+    }).join('');
+}
+
 const BUILD='d1da5dd0';
 try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_b)_b.textContent=BUILD; } }catch(e){}
 
@@ -8735,7 +9485,7 @@ function init(){
   renderTopicChips();
   updatePickerSub();
 }
-try{init();receiveMove();}catch(err){
+try{init();receiveMove();initSync();quickAddFromUrl();}catch(err){
   document.body.insertAdjacentHTML('afterbegin','<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#c00;color:#fff;padding:12px;font-size:13px;word-break:break-all;">JS ERROR: '+err.message+' — '+err.stack+'</div>');
 }
 
