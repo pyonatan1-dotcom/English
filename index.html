@@ -294,17 +294,6 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .lvl-fb-text{color:var(--text);}
 
 /* ─── LOGIN SCREEN ─── */
-.login-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:20px;}
-.login-logo{font-family:'Frank Ruhl Libre',serif;font-size:1.6rem;color:var(--gold);font-weight:900;text-align:center;}
-.login-logo small{display:block;font-family:'Heebo',sans-serif;font-size:.75rem;color:var(--muted);font-weight:400;margin-top:4px;}
-.login-form{width:100%;display:flex;flex-direction:column;gap:12px;}
-.login-form label{font-size:.78rem;color:var(--muted);margin-bottom:3px;font-weight:500;}
-.login-form input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:.92rem;outline:none;transition:border .2s;}
-.login-form input:focus{border-color:var(--gold-d);}
-.login-btn{width:100%;padding:13px;background:var(--gold);color:#000;border:none;border-radius:10px;font-size:.95rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;transition:background .2s;margin-top:4px;}
-.login-btn:hover{background:var(--gold-l);}
-.login-err{color:var(--red-l);font-size:.82rem;text-align:center;min-height:18px;}
 
 /* ─── RESPONSIVE ─── */
 /* ─── מובייל ─── */
@@ -353,17 +342,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 <body>
 
 <!-- ═══ LOGIN OVERLAY ═══ -->
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <div class="login-logo">🇺🇸 English Flashcards<small>כניסה נדרשת</small></div>
-    <div class="login-form">
-      <div><label>שם משתמש</label><input id="loginUser" type="text" placeholder="username" autocomplete="username" autocapitalize="none"></div>
-      <div><label>סיסמא</label><input id="loginPass" type="password" placeholder="password" autocomplete="current-password"></div>
-      <div class="login-err" id="loginErr"></div>
-      <button class="login-btn" onclick="doLogin()">כניסה</button>
-    </div>
-  </div>
-</div>
+
 
 <header class="hdr">
   <div class="logo">English Flashcards <small id="hWordCount"></small></div>
@@ -376,6 +355,13 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
   <div class="s-picker" id="sPicker">
     <div class="picker-title">Today's Practice</div>
     <div class="picker-sub" id="pickerSub">Loading…</div>
+    <!-- Shown only inside the personal site while there is no progress yet — see updateMigrateHint() -->
+    <div class="backup-reminder" id="migrateHint" style="display:none;margin-top:0;max-width:420px;text-align:center;line-height:1.6;">
+      📦 Studied at the old address? Your progress stays there until you move it:
+      old address → Settings → Export backup, then here →
+      <a href="#" onclick="document.getElementById('importFile').click();return false;" style="color:var(--gold);text-decoration:underline;">Import backup</a>.
+      <button onclick="dismissMigrateHint()" aria-label="Dismiss" style="background:none;border:none;color:var(--muted);font-size:.85rem;margin-left:6px;">✕</button>
+    </div>
     <!-- בורר נושא — קובע ממה הסשן הבא ילמד -->
     <div class="wl-filters" id="topicRow" style="justify-content:center;margin:12px 0 2px;"></div>
     <div class="quick-btns">
@@ -593,8 +579,11 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
         <div style="display:flex;gap:6px;"><input id="resetInput" placeholder="RESET" style="width:75px;font-size:.8rem;"><button class="btn btn-red btn-sm" onclick="maybeReset()">Reset</button></div></div>
       <div class="sr"><div><div class="sr-l">Export backup</div><div class="sr-d">Download all data as JSON</div></div>
         <button class="btn btn-outline btn-sm" onclick="exportData()">Export</button></div>
+      <!-- Same hidden file input + handler as the Progress tab's "Import JSON" -->
+      <div class="sr"><div><div class="sr-l">Import backup</div><div class="sr-d">Load a JSON backup (e.g. from the old address)</div></div>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">Import</button></div>
     </div>
-    <div class="backup-reminder">⚠️ Your progress is saved in this browser only. Export a backup regularly to avoid losing data.</div>
+    <div class="backup-reminder">⚠️ Your progress is saved in this browser only, and only at this web address. Export a backup regularly to avoid losing data.</div>
     <div style="text-align:center;margin-top:14px;font-size:.72rem;color:var(--muted);">English Flashcards · <span id="totalWordCount"></span> words · build <span id="buildId">local</span></div>
   </div>
 </div>
@@ -7531,20 +7520,32 @@ let wlCat='all', wlStatus='all', wlFiltersBuilt=false;
 
 // ── STORAGE ──
 const DATA_KEY='englishAppData';
+// A fresh, empty data object. Separate from loadData() so "Replace" on import can start from a truly
+// clean state (loadData() returns what is already stored, not the defaults).
+function defaultData(){
+  return {version:2,progress:{},settings:{direction:'en-he',dailyGoal:20,autoSpeak:false,speakAfterFlip:false,showExamples:true,showPhonetic:true,geminiKey:''},history:{},userAddedWords:[],longestStreak:0,talkMistakes:[],talkSessions:[],talkLevel:null,talkLevelHistory:[]};
+}
+// Old saves (and old backup files) used status 'learned' — same thing as 'mastered' today.
+function normalizeProgress(prog){
+  if(prog&&typeof prog==='object')Object.keys(prog).forEach(k=>{if(prog[k]&&prog[k].status==='learned')prog[k].status='mastered';});
+  return prog;
+}
 function loadData(){
-  const DEF={version:2,progress:{},settings:{direction:'en-he',dailyGoal:20,autoSpeak:false,speakAfterFlip:false,showExamples:true,showPhonetic:true,geminiKey:''},history:{},userAddedWords:[],longestStreak:0,talkMistakes:[],talkSessions:[],talkLevel:null,talkLevelHistory:[]};
+  const DEF=defaultData();
   try{
     const raw=localStorage.getItem(DATA_KEY);
     if(raw){
       const d=JSON.parse(raw);
-      if(d.progress)Object.keys(d.progress).forEach(k=>{if(d.progress[k].status==='learned')d.progress[k].status='mastered';});
+      normalizeProgress(d.progress);
       d.userAddedWords=(d.userAddedWords||[]).map((w,i)=>({...w,id:w.id||('u_'+Date.now()+'_'+i),source:'user',type:w.type||'word'}));
       return Object.assign({},DEF,d,{settings:Object.assign({},DEF.settings,d.settings||{})});
     }
   }catch(e){console.error(e);}
-  return JSON.parse(JSON.stringify(DEF));
+  return DEF;
 }
-function saveData(){try{localStorage.setItem(DATA_KEY,JSON.stringify(appData));}catch(e){}}
+// Returns false if the browser refused to store (e.g. storage full / blocked) so callers that must not
+// fail silently — like import — can tell the user.
+function saveData(){try{localStorage.setItem(DATA_KEY,JSON.stringify(appData));return true;}catch(e){console.error(e);return false;}}
 
 function getProgress(id){
   return appData.progress[id]||{status:'new',timesSeen:0,timesKnown:0,timesAlmost:0,timesLearning:0,streak:0,easeScore:2.5,lastReviewedAt:null,nextReviewAt:null};
@@ -7697,6 +7698,7 @@ function updatePickerSub(){
   el.textContent = cat==='all'
     ? due+' words due · '+all.length+' total in library'
     : due+' due · '+known+' known · '+scope.length+' in '+(t?t.label.replace(/^\S+\s/,''):cat);
+  updateMigrateHint();
 }
 
 function startSession(mode,size){
@@ -8129,48 +8131,113 @@ function maybeReset(){
 }
 
 // ── EXPORT / IMPORT ──
+// One line describing what a data object holds — shown before import so an empty backup is obvious.
+function dataSummary(d){
+  const n=o=>(o&&typeof o==='object')?Object.keys(o).length:0;
+  return n(d.progress)+' words with progress · '+n(d.history)+' days of history · '+((d.userAddedWords||[]).length)+' words you added';
+}
 function exportData(){
   const b=new Blob([JSON.stringify(appData,null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(b);
-  a.download='flashcards_backup_'+todayKey()+'.json';
+  // The word count in the name tells an empty backup (e.g. from a fresh browser) apart from the real one.
+  a.download='flashcards_backup_'+todayKey()+'_'+Object.keys(appData.progress||{}).length+'words.json';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(a.href),100);
 }
+// Keys that must never be copied from a file into our objects (prototype pollution).
+const BAD_KEY=k=>k==='__proto__'||k==='constructor'||k==='prototype';
+const isObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
 function importHandler(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
+  reader.onerror=()=>toast('Import failed: could not read the file','err');
   reader.onload=ev=>{
-    try{
-      const d=JSON.parse(ev.target.result);
-      if(!d||(!d.progress&&!d.userAddedWords&&!d.settings))throw new Error('Invalid');
-      const merge=confirm('Import options:\n\nOK = Merge with current data (safe)\nCancel = Replace all data (⚠️ cannot be undone)\n\nProceed with merge?');
-      if(merge){
-        if(d.progress)Object.assign(appData.progress,d.progress);
-        if(d.history)Object.assign(appData.history,d.history);
-        // כל מילה שמגיעה מקובץ חיצוני עוברת ניקוי לפני שהיא נשמרת
-        if(Array.isArray(d.userAddedWords))d.userAddedWords.forEach(raw=>{
-          const w=sanitizeWord(raw);
-          if(w&&!isDup(w.en))appData.userAddedWords.push(w);
-        });
-        if(d.longestStreak>appData.longestStreak)appData.longestStreak=+d.longestStreak||0;
-        toast('✅ Data merged successfully!');
-      }else{
-        if(!confirm('⚠️ Replace ALL your progress and settings? This cannot be undone.'))return;
-        const clean=loadData();
-        if(d.progress&&typeof d.progress==='object')clean.progress=d.progress;
-        if(d.history&&typeof d.history==='object')clean.history=d.history;
-        if(d.settings&&typeof d.settings==='object')Object.assign(clean.settings,d.settings);
-        clean.longestStreak=+d.longestStreak||0;
-        clean.userAddedWords=Array.isArray(d.userAddedWords)?d.userAddedWords.map(sanitizeWord).filter(Boolean):[];
-        appData=clean;
-        toast('✅ Data replaced.');
-      }
-      saveData();updateStreak();updateHeaderCount();
-    }catch(err){toast('Import failed: invalid file format','err');}
+    let d;
+    try{d=JSON.parse(ev.target.result);}catch(err){d=null;}
+    if(!isObj(d)||(!d.progress&&!d.userAddedWords&&!d.settings)){toast('Import failed: not a flashcards backup file','err');return;}
+    const inProg=isObj(d.progress)?normalizeProgress(d.progress):{};
+    const inHist=isObj(d.history)?d.history:{};
+    const inWords=Array.isArray(d.userAddedWords)?d.userAddedWords.map(sanitizeWord).filter(Boolean):[];
+    // A backup exported from a browser that never studied is empty. Merging it does nothing and
+    // replacing with it wipes everything — so stop and say so instead of "succeeding" silently.
+    if(!Object.keys(inProg).length&&!Object.keys(inHist).length&&!inWords.length){
+      alert('This backup is empty ('+dataSummary(d)+').\n\nNothing was imported. Use the file exported where you actually studied.');
+      return;
+    }
+    const merge=confirm('Backup contains: '+dataSummary(d)+'\n\nOK = Merge with current data (safe)\nCancel = Replace all data (⚠️ cannot be undone)\n\nProceed with merge?');
+    const before=JSON.stringify(appData);
+    if(merge){
+      const DEF=defaultData();
+      // Progress: per word keep whichever copy was reviewed more recently, so importing an older
+      // backup never rolls back newer study.
+      Object.keys(inProg).forEach(k=>{
+        if(BAD_KEY(k)||!isObj(inProg[k]))return;
+        const cur=appData.progress[k];
+        if(!cur||(inProg[k].lastReviewedAt||0)>(cur.lastReviewedAt||0))appData.progress[k]=inProg[k];
+      });
+      // History: per day keep the busier record (re-importing the same file must not double counts).
+      Object.keys(inHist).forEach(k=>{
+        if(BAD_KEY(k)||!isObj(inHist[k]))return;
+        const cur=appData.history[k];
+        if(!cur||(+inHist[k].seen||0)>(+cur.seen||0))appData.history[k]=inHist[k];
+      });
+      // כל מילה שמגיעה מקובץ חיצוני עוברת ניקוי לפני שהיא נשמרת
+      inWords.forEach(w=>{if(!isDup(w.en))appData.userAddedWords.push(w);});
+      if((+d.longestStreak||0)>(appData.longestStreak||0))appData.longestStreak=+d.longestStreak;
+      // Settings: take the backup's value only where this browser still has the default, so moving to a
+      // new address brings the settings along without overriding anything changed here.
+      if(isObj(d.settings))Object.keys(d.settings).forEach(k=>{
+        const v=d.settings[k];
+        if(BAD_KEY(k)||(v!==null&&typeof v==='object'))return;
+        if(appData.settings[k]===undefined||appData.settings[k]===DEF.settings[k])appData.settings[k]=v;
+      });
+      // Talk data (kept in the file even though the tab is gone): fill only if empty here.
+      ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{
+        if(Array.isArray(d[k])&&d[k].length&&!(appData[k]||[]).length)appData[k]=d[k];
+      });
+      if(d.talkLevel!=null&&appData.talkLevel==null)appData.talkLevel=d.talkLevel;
+    }else{
+      if(!confirm('⚠️ Replace ALL your current data ('+dataSummary(appData)+') with this backup? This cannot be undone.'))return;
+      // Start from real defaults (not loadData(), which returns what is already stored).
+      const clean=defaultData();
+      Object.keys(inProg).forEach(k=>{if(!BAD_KEY(k)&&isObj(inProg[k]))clean.progress[k]=inProg[k];});
+      Object.keys(inHist).forEach(k=>{if(!BAD_KEY(k)&&isObj(inHist[k]))clean.history[k]=inHist[k];});
+      if(isObj(d.settings))Object.keys(d.settings).forEach(k=>{const v=d.settings[k];if(!BAD_KEY(k)&&(v===null||typeof v!=='object'))clean.settings[k]=v;});
+      clean.longestStreak=+d.longestStreak||0;
+      clean.userAddedWords=inWords;
+      ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{if(Array.isArray(d[k]))clean[k]=d[k];});
+      if(d.talkLevel!==undefined)clean.talkLevel=d.talkLevel;
+      appData=clean;
+    }
+    if(!saveData()){
+      appData=JSON.parse(before);
+      toast('Import failed: this browser could not save the data','err');
+      return;
+    }
+    refreshAfterDataChange();
+    toast(merge?'✅ Data merged successfully!':'✅ Data replaced.');
   };
   reader.readAsText(file);e.target.value='';
 }
+// Redraw everything that shows stored data (header, streak, study picker, settings, open tab).
+function refreshAfterDataChange(){
+  updateDirBtns();updateHeaderCount();updateStreak();renderTopicChips();updatePickerSub();loadSettings();
+  if(document.getElementById('tab-progress').classList.contains('active'))renderProgress();
+  if(document.getElementById('tab-words').classList.contains('active')&&wlFiltersBuilt)renderWL();
+}
+
+// ── MIGRATION HINT ──
+// Inside the personal site (/english/) the app lives on a different address, so the browser starts
+// there with empty progress. Until something is studied or imported, point to Import. Dismissible.
+const MIGRATE_HINT_KEY='englishMigrateHintDismissed';
+function updateMigrateHint(){
+  const el=document.getElementById('migrateHint');if(!el)return;
+  let dismissed=false;try{dismissed=localStorage.getItem(MIGRATE_HINT_KEY)==='1';}catch(e){}
+  const empty=!Object.keys(appData.progress||{}).length&&!Object.keys(appData.history||{}).length;
+  el.style.display=(location.pathname.startsWith('/english')&&empty&&!dismissed)?'':'none';
+}
+function dismissMigrateHint(){try{localStorage.setItem(MIGRATE_HINT_KEY,'1');}catch(e){}updateMigrateHint();}
 
 // ── אבטחה: בריחת תווים לפני הכנסה ל-HTML ──
 // בלי זה, מילה שמכילה תגית HTML הייתה מורצת כקוד בדף.
@@ -8614,31 +8681,8 @@ function readPasted(){
 const BUILD='d1da5dd0';
 try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_b)_b.textContent=BUILD; } }catch(e){}
 
-// ── LOGIN ──
-const AUTH={u:'yonatan',p:'english123'};
-function checkLogin(){return sessionStorage.getItem('fc_auth')==='1';}
-function doLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value;
-  const err=document.getElementById('loginErr');
-  if(u===AUTH.u&&p===AUTH.p){
-    sessionStorage.setItem('fc_auth','1');
-    document.getElementById('loginOverlay').style.display='none';
-    err.textContent='';
-  }else{
-    err.textContent='שם משתמש או סיסמא שגויים';
-    document.getElementById('loginPass').value='';
-    document.getElementById('loginPass').focus();
-  }
-}
-document.addEventListener('DOMContentLoaded',function(){
-  if(checkLogin()){document.getElementById('loginOverlay').style.display='none';}
-  else{
-    document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-    document.getElementById('loginUser').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('loginPass').focus();});
-    document.getElementById('loginUser').focus();
-  }
-});
+// Login removed at the owner's request (the credentials were visible in the page source anyway).
+
 
 // ── INIT ──
 function init(){

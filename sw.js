@@ -1,9 +1,12 @@
 // Service Worker — מאפשר לאפליקציה לעבוד בלי אינטרנט, ומוודא שהיא תמיד מתעדכנת.
 // המחרוזת הבאה מוחלפת אוטומטית בכל העלאה ע"י deploy-english.sh:
-const VERSION = 'site-menu-1';
+const VERSION = 'no-login-1';
 const CACHE = 'english-' + VERSION;
 
-const CORE = ['./', './index.html', './manifest.json',
+// The page is cached under './' only. Inside the personal site (Vercel, cleanUrls) './index.html' answers
+// with a 308 redirect to './'; a cached *redirected* response can't be used to answer a navigation, so the
+// offline fallback would fail there. './' is a plain 200 on both GitHub Pages and the Vercel proxy.
+const CORE = ['./', './manifest.json',
               './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -30,8 +33,12 @@ self.addEventListener('fetch', e => {
   if (isPage) {
     e.respondWith(
       fetch(req)
-        .then(res => { const cp = res.clone(); caches.open(CACHE).then(c => c.put('./index.html', cp)); return res; })
-        .catch(() => caches.match('./index.html').then(r => r || caches.match('./')))
+        .then(res => {
+          // Only cache a clean 200 page (not an error page or a redirect) as the offline copy
+          if (res.ok && !res.redirected) { const cp = res.clone(); caches.open(CACHE).then(c => c.put('./', cp)).catch(() => {}); }
+          return res;
+        })
+        .catch(() => caches.match('./'))
     );
     return;
   }
