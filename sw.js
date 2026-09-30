@@ -1,6 +1,6 @@
 // Service Worker — מאפשר לאפליקציה לעבוד בלי אינטרנט, ומוודא שהיא תמיד מתעדכנת.
 // המחרוזת הבאה מוחלפת אוטומטית בכל העלאה ע"י deploy-english.sh:
-const VERSION = 'move-1';
+const VERSION = 'one-address-1';
 const CACHE = 'english-' + VERSION;
 
 // The page is cached under './' only. Inside the personal site (Vercel, cleanUrls) './index.html' answers
