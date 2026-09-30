@@ -356,12 +356,10 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
     <div class="picker-title">Today's Practice</div>
     <div class="picker-sub" id="pickerSub">Loading…</div>
     <!-- Shown only inside the personal site while there is no progress yet — see updateMigrateHint() -->
-    <div class="backup-reminder" id="migrateHint" style="display:none;margin-top:0;max-width:420px;text-align:center;line-height:1.6;">
-      📦 Studied at the old address? Your progress stays there until you move it:
-      old address → Settings → Export backup, then here →
-      <a href="#" onclick="document.getElementById('importFile').click();return false;" style="color:var(--gold);text-decoration:underline;">Import backup</a>.
-      <button onclick="dismissMigrateHint()" aria-label="Dismiss" style="background:none;border:none;color:var(--muted);font-size:.85rem;margin-left:6px;">✕</button>
-    </div>
+    <div class="backup-reminder" id="migrateHint" dir="rtl" style="display:none;margin-top:0;max-width:420px;text-align:center;line-height:1.6;">
+  <span id="migrateText"></span>
+  <button onclick="dismissMigrateHint()" aria-label="סגור" style="background:none;border:none;color:var(--muted);font-size:.85rem;margin-right:6px;">✕</button>
+</div>
     <!-- בורר נושא — קובע ממה הסשן הבא ילמד -->
     <div class="wl-filters" id="topicRow" style="justify-content:center;margin:12px 0 2px;"></div>
     <div class="quick-btns">
@@ -8148,6 +8146,42 @@ function exportData(){
 // Keys that must never be copied from a file into our objects (prototype pollution).
 const BAD_KEY=k=>k==='__proto__'||k==='constructor'||k==='prototype';
 const isObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
+// Merge a parsed backup into the current data without losing anything newer here.
+// Used by Import (Merge) and by the one-click move between addresses.
+function mergeIntoApp(d){
+  const inProg=isObj(d.progress)?normalizeProgress(d.progress):{};
+  const inHist=isObj(d.history)?d.history:{};
+  const inWords=Array.isArray(d.userAddedWords)?d.userAddedWords.map(sanitizeWord).filter(Boolean):[];
+      const DEF=defaultData();
+  // Progress: per word keep whichever copy was reviewed more recently, so importing an older
+  // backup never rolls back newer study.
+  Object.keys(inProg).forEach(k=>{
+    if(BAD_KEY(k)||!isObj(inProg[k]))return;
+    const cur=appData.progress[k];
+    if(!cur||(inProg[k].lastReviewedAt||0)>(cur.lastReviewedAt||0))appData.progress[k]=inProg[k];
+  });
+  // History: per day keep the busier record (re-importing the same file must not double counts).
+  Object.keys(inHist).forEach(k=>{
+    if(BAD_KEY(k)||!isObj(inHist[k]))return;
+    const cur=appData.history[k];
+    if(!cur||(+inHist[k].seen||0)>(+cur.seen||0))appData.history[k]=inHist[k];
+  });
+  // כל מילה שמגיעה מקובץ חיצוני עוברת ניקוי לפני שהיא נשמרת
+  inWords.forEach(w=>{if(!isDup(w.en))appData.userAddedWords.push(w);});
+  if((+d.longestStreak||0)>(appData.longestStreak||0))appData.longestStreak=+d.longestStreak;
+  // Settings: take the backup's value only where this browser still has the default, so moving to a
+  // new address brings the settings along without overriding anything changed here.
+  if(isObj(d.settings))Object.keys(d.settings).forEach(k=>{
+    const v=d.settings[k];
+    if(BAD_KEY(k)||(v!==null&&typeof v==='object'))return;
+    if(appData.settings[k]===undefined||appData.settings[k]===DEF.settings[k])appData.settings[k]=v;
+  });
+  // Talk data (kept in the file even though the tab is gone): fill only if empty here.
+  ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{
+    if(Array.isArray(d[k])&&d[k].length&&!(appData[k]||[]).length)appData[k]=d[k];
+  });
+  if(d.talkLevel!=null&&appData.talkLevel==null)appData.talkLevel=d.talkLevel;
+}
 function importHandler(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
@@ -8168,35 +8202,7 @@ function importHandler(e){
     const merge=confirm('Backup contains: '+dataSummary(d)+'\n\nOK = Merge with current data (safe)\nCancel = Replace all data (⚠️ cannot be undone)\n\nProceed with merge?');
     const before=JSON.stringify(appData);
     if(merge){
-      const DEF=defaultData();
-      // Progress: per word keep whichever copy was reviewed more recently, so importing an older
-      // backup never rolls back newer study.
-      Object.keys(inProg).forEach(k=>{
-        if(BAD_KEY(k)||!isObj(inProg[k]))return;
-        const cur=appData.progress[k];
-        if(!cur||(inProg[k].lastReviewedAt||0)>(cur.lastReviewedAt||0))appData.progress[k]=inProg[k];
-      });
-      // History: per day keep the busier record (re-importing the same file must not double counts).
-      Object.keys(inHist).forEach(k=>{
-        if(BAD_KEY(k)||!isObj(inHist[k]))return;
-        const cur=appData.history[k];
-        if(!cur||(+inHist[k].seen||0)>(+cur.seen||0))appData.history[k]=inHist[k];
-      });
-      // כל מילה שמגיעה מקובץ חיצוני עוברת ניקוי לפני שהיא נשמרת
-      inWords.forEach(w=>{if(!isDup(w.en))appData.userAddedWords.push(w);});
-      if((+d.longestStreak||0)>(appData.longestStreak||0))appData.longestStreak=+d.longestStreak;
-      // Settings: take the backup's value only where this browser still has the default, so moving to a
-      // new address brings the settings along without overriding anything changed here.
-      if(isObj(d.settings))Object.keys(d.settings).forEach(k=>{
-        const v=d.settings[k];
-        if(BAD_KEY(k)||(v!==null&&typeof v==='object'))return;
-        if(appData.settings[k]===undefined||appData.settings[k]===DEF.settings[k])appData.settings[k]=v;
-      });
-      // Talk data (kept in the file even though the tab is gone): fill only if empty here.
-      ['talkMistakes','talkSessions','talkLevelHistory'].forEach(k=>{
-        if(Array.isArray(d[k])&&d[k].length&&!(appData[k]||[]).length)appData[k]=d[k];
-      });
-      if(d.talkLevel!=null&&appData.talkLevel==null)appData.talkLevel=d.talkLevel;
+      mergeIntoApp(d);
     }else{
       if(!confirm('⚠️ Replace ALL your current data ('+dataSummary(appData)+') with this backup? This cannot be undone.'))return;
       // Start from real defaults (not loadData(), which returns what is already stored).
@@ -8231,11 +8237,41 @@ function refreshAfterDataChange(){
 // Inside the personal site (/english/) the app lives on a different address, so the browser starts
 // there with empty progress. Until something is studied or imported, point to Import. Dismissible.
 const MIGRATE_HINT_KEY='englishMigrateHintDismissed';
+// The site moved from OLD_HOST to NEW_HOST. Browser storage is per address, so progress stays behind:
+// on the old address a button carries it to the new one inside the link's #fragment (never sent to a server).
+const OLD_HOST='event-intel-agent.vercel.app', NEW_HOST='yonatan-prins.vercel.app';
 function updateMigrateHint(){
-  const el=document.getElementById('migrateHint');if(!el)return;
+  const el=document.getElementById('migrateHint'),tx=document.getElementById('migrateText');if(!el||!tx)return;
   let dismissed=false;try{dismissed=localStorage.getItem(MIGRATE_HINT_KEY)==='1';}catch(e){}
   const empty=!Object.keys(appData.progress||{}).length&&!Object.keys(appData.history||{}).length;
-  el.style.display=(location.pathname.startsWith('/english')&&empty&&!dismissed)?'':'none';
+  const inSite=location.pathname.startsWith('/english');
+  if(inSite&&location.hostname===OLD_HOST){
+    // Old address: always offer the move while there is something to move.
+    tx.innerHTML=empty?'האתר עבר לכתובת חדשה: <a href="https://'+NEW_HOST+'/english/" style="color:var(--gold);text-decoration:underline;">'+NEW_HOST+'</a>'
+      :'האתר עבר לכתובת חדשה. <button class="btn btn-gold btn-sm" onclick="moveToNewAddress()" style="margin:6px auto 0;display:block;">העבר את ההתקדמות לכתובת החדשה</button>';
+    el.style.display=dismissed&&empty?'none':'';
+    return;
+  }
+  tx.innerHTML='למדת בכתובת הקודמת? פתח את <a href="https://'+OLD_HOST+'/english/" style="color:var(--gold);text-decoration:underline;">'+OLD_HOST+'/english</a> ולחץ שם על "העבר את ההתקדמות". '
+    +'או ייבא קובץ גיבוי: <a href="#" onclick="document.getElementById(\'importFile\').click();return false;" style="color:var(--gold);text-decoration:underline;">ייבוא גיבוי</a>.';
+  el.style.display=(inSite&&empty&&!dismissed)?'':'none';
+}
+function moveToNewAddress(){
+  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(appData)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  location.href='https://'+NEW_HOST+'/english/#move='+b64;
+}
+// Receiving side: merge what the old address sent, then drop it from the address bar.
+function receiveMove(){
+  const m=/^#move=([A-Za-z0-9_-]+)$/.exec(location.hash||'');if(!m)return;
+  history.replaceState(null,'',location.pathname+location.search);
+  let d=null;
+  try{d=JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/')))));}catch(e){}
+  if(!isObj(d)){toast('ההעברה נכשלה: הנתונים לא נקראו. נסה שוב מהכתובת הקודמת.','err');return;}
+  const before=JSON.stringify(appData);
+  mergeIntoApp(d);
+  if(!saveData()){appData=JSON.parse(before);toast('ההעברה נכשלה: הדפדפן לא הצליח לשמור','err');return;}
+  refreshAfterDataChange();
+  toast('✅ ההתקדמות הועברה: '+Object.keys(appData.progress||{}).length+' מילים, '+Object.keys(appData.history||{}).length+' ימי לימוד');
 }
 function dismissMigrateHint(){try{localStorage.setItem(MIGRATE_HINT_KEY,'1');}catch(e){}updateMigrateHint();}
 
@@ -8693,7 +8729,7 @@ function init(){
   renderTopicChips();
   updatePickerSub();
 }
-try{init();}catch(err){
+try{init();receiveMove();}catch(err){
   document.body.insertAdjacentHTML('afterbegin','<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#c00;color:#fff;padding:12px;font-size:13px;word-break:break-all;">JS ERROR: '+err.message+' — '+err.stack+'</div>');
 }
 
