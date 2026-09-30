@@ -572,6 +572,9 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
       </div>
     </details>
 
+    <!-- ✍️ Words saved from the site without Hebrew yet (see WAITING FOR HEBREW) -->
+    <div class="lw-wrap" dir="rtl" id="needHe" style="display:none;"></div>
+
     <!-- 💡 Words from life: English terms from the site's events that aren't in the library yet (see LIFE WORDS) -->
     <div class="lw-wrap" dir="rtl">
       <div class="lw-head">
@@ -7737,7 +7740,7 @@ function renderTopicChips(){
 }
 
 function buildQueue(mode,size){
-  let words=allWords();
+  let words=allWords().filter(hasHe);   // a word still waiting for its Hebrew is not studied yet
   const cat=getStudyCat();
   if(cat!=='all'){
     const inTopic=words.filter(w=>w.cat===cat);
@@ -7785,7 +7788,7 @@ function showTab(t){
   if(t==='words'){if(!wlFiltersBuilt)buildWLFilters();renderWL();}
   if(t==='progress')renderProgress();
   if(t==='settings')loadSettings();
-  if(t==='add'){renderRecent();renderQuickAddInfo();loadLifeSuggestions(false);}
+  if(t==='add'){renderNeedHe();renderRecent();renderQuickAddInfo();loadLifeSuggestions(false);}
   if(t==='read')closeArticle();
 }
 
@@ -7798,7 +7801,7 @@ function countDue(words,now){
 }
 function updatePickerSub(){
   const now=Date.now(), cat=getStudyCat();
-  const all=allWords();
+  const all=allWords().filter(hasHe), waiting=needHe().length;
   const scope=cat==='all'?all:all.filter(w=>w.cat===cat);
   const due=countDue(scope,now);
   const known=scope.filter(w=>getProgress(w.id).status==='mastered').length;
@@ -7808,6 +7811,7 @@ function updatePickerSub(){
   el.textContent = cat==='all'
     ? due+' words due · '+all.length+' total in library'
     : due+' due · '+known+' known · '+scope.length+' in '+(t?t.label.replace(/^\S+\s/,''):cat);
+  if(waiting)el.textContent+=' · '+waiting+' waiting for Hebrew (Add tab)';
   updateMigrateHint();
 }
 
@@ -8097,6 +8101,7 @@ function renderRecent(){
 
 function studyOne(id){
   const w=allWords().find(x=>x.id===id);if(!w)return;
+  if(!hasHe(w)){toast('קודם תרגום לעברית (בלשונית Add)','err');return;}
   session={queue:[w],idx:0,known:0,almost:0,learning:0,start:Date.now(),mode:'single'};
   undoStack=[];showTab('study');
   document.getElementById('sPicker').style.display='none';
@@ -8475,7 +8480,7 @@ function importHandler(e){
 }
 // Redraw everything that shows stored data (header, streak, study picker, settings, open tab).
 function refreshAfterDataChange(){
-  updateDirBtns();updateHeaderCount();updateStreak();renderTopicChips();updatePickerSub();loadSettings();
+  updateDirBtns();updateHeaderCount();updateStreak();renderTopicChips();updatePickerSub();loadSettings();renderNeedHe();
   if(document.getElementById('tab-progress').classList.contains('active'))renderProgress();
   if(document.getElementById('tab-words').classList.contains('active')&&wlFiltersBuilt)renderWL();
 }
@@ -8539,7 +8544,9 @@ function sanitizeWord(w){
   if(!w||typeof w!=='object')return null;
   const str=(v,max)=>typeof v==='string'?v.replace(/[<>]/g,'').trim().slice(0,max):'';
   const en=str(w.en,80), he=str(w.he,120);
-  if(!en||!he)return null;
+  // Hebrew may be empty: a word saved from the site's Add box comes with the English only.
+  // It is kept (so sync never drops it) and waits for a translation — see WAITING FOR HEBREW.
+  if(!en)return null;
   return {
     id:   /^[\w.-]{1,40}$/.test(String(w.id||'')) ? String(w.id) : 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
     en, he,
@@ -8552,6 +8559,40 @@ function sanitizeWord(w){
     addedAt: Number(w.addedAt)||Date.now(),
     source:'user'
   };
+}
+
+// ── WAITING FOR HEBREW ──
+// Words without a translation are not studied yet. The Hebrew is filled from what the app knows
+// (lookupHe), otherwise asked for on the Add tab. Filling gives the word a new addedAt, so the
+// translated copy wins over the empty one when devices merge (same id → newer addedAt wins).
+function hasHe(w){return !!(w&&typeof w.he==='string'&&w.he.trim());}
+function needHe(){return (appData.userAddedWords||[]).filter(w=>!hasHe(w));}
+function fillMissingHe(){
+  let n=0;
+  needHe().forEach(w=>{const h=lookupHe(w.en);if(h){w.he=String(h).replace(/[<>]/g,'').trim().slice(0,120);w.addedAt=Date.now();n++;}});
+  return n>0;
+}
+function renderNeedHe(){
+  const box=document.getElementById('needHe');if(!box)return;
+  const list=needHe();
+  box.style.display=list.length?'':'none';
+  if(!list.length){box.innerHTML='';return;}
+  box.innerHTML='<div class="lw-head"><h3>✍️ מחכות לתרגום</h3></div>'+
+    '<div class="lw-sub">מילים שנשמרו מהאתר בלי תרגום. כתוב תרגום ולחץ "שמור", והמילה נכנסת ללימוד.</div>'+
+    list.map((w,i)=>{const id=esc(w.id);return '<div class="lw-item"><div class="lw-top"><span class="lw-en">'+esc(w.en)+'</span>'+
+      '<button class="lw-x" onclick="speak(needHe()['+i+'].en)" aria-label="השמע" title="השמע">🔊</button></div>'+
+      '<div class="lw-row"><input class="lw-he" id="nh_'+id+'" dir="rtl" placeholder="תרגום לעברית">'+
+      '<a class="lw-tr" href="https://translate.google.com/?sl=en&tl=iw&text='+encodeURIComponent(w.en)+'" target="_blank" rel="noopener">תרגם ↗</a>'+
+      '<button class="btn btn-gold" onclick="saveNeedHe(\''+id+'\')">שמור</button>'+
+      '<button class="lw-x" onclick="deleteWord(\''+id+'\',event);renderNeedHe();" aria-label="מחק" title="מחק">✕</button></div></div>';}).join('');
+}
+function saveNeedHe(id){
+  const w=(appData.userAddedWords||[]).find(x=>x.id===id);if(!w)return;
+  const inp=document.getElementById('nh_'+id), he=(inp&&inp.value||'').replace(/[<>]/g,'').trim().slice(0,120);
+  if(!he){toast('כתוב קודם תרגום לעברית','err');if(inp)inp.focus();return;}
+  w.he=he;w.addedAt=Date.now();saveData();
+  toast('✅ "'+w.en+'" נכנסה ללימוד');
+  renderNeedHe();renderRecent();updatePickerSub();
 }
 
 // ── TOAST ──
@@ -8787,7 +8828,7 @@ const READ_SKIP = new Set(('a an the and or but if of to in on at for with from 
 // ── בונה מילון חיפוש: אוצר המילים + המילון של המאמר ──
 function readLex(art){
   const m=new Map();
-  allWords().forEach(w=>m.set(w.en.trim().toLowerCase(),{en:w.en,he:w.he,ph:w.ph||'',ex:w.ex||'',id:w.id,src:'vocab'}));
+  allWords().filter(hasHe).forEach(w=>m.set(w.en.trim().toLowerCase(),{en:w.en,he:w.he,ph:w.ph||'',ex:w.ex||'',id:w.id,src:'vocab'}));
   // המילון של המאמר גובר על המילון הכללי — כי משמעות תלויה בהקשר.
   // "fund" באוצר המילים הוא לממן, אבל במאמר הוא קרן.
   if(art&&art.gloss)Object.entries(art.gloss).forEach(([k,v])=>{
@@ -8970,13 +9011,15 @@ function readPasted(){
 //  Contract: GET /api/store?key=english → 200 {data,updatedAt} | 404 (empty)
 //            PUT /api/store?key=english  {data} → 200 {updatedAt}
 //  Every sync is pull → merge (mergeIntoApp, sync rules) → push only if the cloud differs.
+//  The push names the copy it merged (If-Match: <etag>). If the site wrote meanwhile (e.g. a "word of the day"
+//  answer or a word saved from its Add box) the store answers 409 and nothing is overwritten: we pull and merge again.
 //  Local data is always kept: a failed request changes nothing here, and the next sync retries.
 // ══════════════════════════════════════════════════════════════
 var SYNC_URL='/api/store?key=english', SYNC_META_KEY='englishSyncMeta';
 // Only over http(s) (inside the site). Opened as a local file there is no server to talk to.
 var syncEnabled=/^https?:$/.test(location.protocol);
 var syncState='idle';          // idle | syncing | ok | auth | offline | down | disabled
-var syncTimer=null, syncBusy=false, syncAgain=false, syncSuppress=false, syncDirty=false, syncLastTry=0;
+var syncTimer=null, syncBusy=false, syncAgain=false, syncSuppress=false, syncDirty=false, syncLastTry=0, syncConflicts=0;
 var syncMeta=(function(){try{const m=JSON.parse(localStorage.getItem(SYNC_META_KEY)||'{}');return isObj(m)?m:{};}catch(e){return{};}})();
 function saveSyncMeta(){try{localStorage.setItem(SYNC_META_KEY,JSON.stringify(syncMeta));}catch(e){}}
 // Everything that belongs in the cloud copy (the Gemini key stays on the device).
@@ -8999,7 +9042,17 @@ function trimPayload(o){
   return o;
 }
 // A few exact numbers for the site (Today page, weekly push), computed with this app's own logic.
-function syncSummary(){return {due:countDue(allWords()),streak:computeStreak(),updatedAt:new Date().toISOString()};}
+function syncSummary(){return {due:countDue(allWords().filter(hasHe)),streak:computeStreak(),words:reviewWords(),updatedAt:new Date().toISOString()};}
+// For the site's "word of the day" (one word by notification, answered on the site): the studied words whose
+// review comes first, with what the site needs to show them (it has no copy of the built-in word list).
+// The site picks from these by the progress it reads, and writes the answer into progress like a study card.
+function reviewWords(){
+  return allWords().filter(hasHe).map(w=>({w,p:appData.progress[w.id]}))
+    .filter(x=>x.p&&x.p.lastReviewedAt&&x.p.status!=='new')
+    .sort((a,b)=>((+a.p.nextReviewAt||0)-(+b.p.nextReviewAt||0))||(String(a.w.id)<String(b.w.id)?-1:1))
+    .slice(0,40)
+    .map(({w})=>({id:String(w.id),en:w.en,he:w.he,ph:w.ph||'',ex:String(w.ex||'').slice(0,140)}));
+}
 // Order-free fingerprint of a copy: tells whether the cloud already holds exactly what we have.
 function syncCanon(d){
   if(!isObj(d))return '';
@@ -9025,19 +9078,21 @@ async function syncNow(opts){
   const fail=kind=>{const e=new Error(kind);e.kind=kind;return e;};
   try{
     // 1. Pull
-    let cloud=null, cloudSummary=null;
+    let cloud=null, cloudSummary=null, cloudTag=null;
     const r=await fetch(SYNC_URL,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
     if(r.status===401||r.status===403)throw fail('auth');
     if(r.ok){
       let j=null;try{j=await r.json();}catch(e){throw fail('down');}
       cloud=isObj(j)&&isObj(j.data)?j.data:null;
       cloudSummary=isObj(j)&&isObj(j.summary)?j.summary:null;
+      cloudTag=(isObj(j)&&typeof j.etag==='string'&&j.etag)||r.headers.get('ETag')||null;
     }else if(r.status!==404)throw fail('down');
     // 2. Merge the cloud copy into ours (a clone — the original is compared below)
     if(cloud){
       if(hasRealData(cloud))syncMeta.cloudHasData=true;
       const before=JSON.stringify(appData);
       mergeIntoApp(JSON.parse(JSON.stringify(cloud)),{sync:true});
+      fillMissingHe();     // a word saved on the site without Hebrew: fill it when the app knows it
       if(JSON.stringify(appData)!==before){
         syncSuppress=true;
         try{saveData();refreshAfterDataChange();if(document.getElementById('tab-add').classList.contains('active'))renderRecent();}
@@ -9048,24 +9103,32 @@ async function syncNow(opts){
     syncDirty=false;
     const payload=trimPayload(syncPayload(appData)), summary=syncSummary();
     // Also re-upload when the site's summary is out of date (e.g. more words came due since the last upload)
-    const summaryStale=!!cloudSummary&&(cloudSummary.due!==summary.due||cloudSummary.streak!==summary.streak);
+    const summaryStale=!!cloudSummary&&(cloudSummary.due!==summary.due||cloudSummary.streak!==summary.streak||
+      stableStringify(cloudSummary.words||null)!==stableStringify(summary.words));
     if(!cloud||summaryStale||syncCanon(payload)!==syncCanon(cloud)){
       const body=JSON.stringify({data:payload,summary});
+      const headers={'Content-Type':'application/json'};
+      if(cloudTag)headers['If-Match']=cloudTag;     // only replace the copy we merged
       let pr;
       try{
         pr=await fetch(SYNC_URL,{method:'PUT',credentials:'same-origin',cache:'no-store',
-          headers:{'Content-Type':'application/json'},body,keepalive:!!opts.keepalive&&body.length<60000});
+          headers,body,keepalive:!!opts.keepalive&&body.length<60000});
       }catch(e){syncDirty=true;throw e;}
       if(!pr.ok)syncDirty=true;
+      if(pr.status===409)throw fail('conflict');     // changed meanwhile: pull + merge again (below)
       if(pr.status===401||pr.status===403)throw fail('auth');
       if(!pr.ok)throw fail('down');
       if(hasRealData(payload))syncMeta.cloudHasData=true;
     }
     syncMeta.okAt=Date.now();saveSyncMeta();
+    syncConflicts=0;
     setSyncState('ok');
     if(opts.manual)toast('☁️ מסונכרן');
   }catch(e){
     syncDirty=true;
+    // Someone wrote between our pull and push: sync again right away (a few times), keeping everything here.
+    if(e&&e.kind==='conflict'&&syncConflicts<3){syncConflicts++;syncAgain=true;return;}
+    if(e&&e.kind==='conflict'){syncConflicts=0;e.kind='down';}
     setSyncState(e&&e.kind==='auth'?'auth':e&&e.kind==='down'?'down':'offline');
     if(opts.manual)toast(syncStatusText(),'err');
   }finally{
@@ -9479,6 +9542,7 @@ try{ if(BUILD.indexOf('_')<0){ const _b=document.getElementById('buildId'); if(_
 // ── INIT ──
 function init(){
   appData=loadData();
+  if(fillMissingHe())saveData();
   updateDirBtns();
   updateHeaderCount();
   updateStreak();
