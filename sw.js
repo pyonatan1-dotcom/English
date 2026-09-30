@@ -1,11 +1,11 @@
 // Service Worker — מאפשר לאפליקציה לעבוד בלי אינטרנט, ומוודא שהיא תמיד מתעדכנת.
 // המחרוזת הבאה מוחלפת אוטומטית בכל העלאה ע"י deploy-english.sh:
-const VERSION = 'word-of-day-1';
+const VERSION = 'escape-1';
 const CACHE = 'english-' + VERSION;
 
 // The page is cached under './' only. Inside the personal site (Vercel, cleanUrls) './index.html' answers
 // with a 308 redirect to './'; a cached *redirected* response can't be used to answer a navigation, so the
-// offline fallback would fail there. './' is a plain 200 on both GitHub Pages and the Vercel proxy.
+// offline fallback would fail there. './' is a plain 200 on both GitHub Pages and the site.
 const CORE = ['./', './manifest.json',
               './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 

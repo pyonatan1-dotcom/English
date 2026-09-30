@@ -3,7 +3,7 @@
 <head>
 <script>
 // This app now lives inside the personal site; opening its old GitHub address goes there instead.
-// (The site itself loads this page through its server, where this script doesn't run.)
+// (The site serves its own copy of this page; the hostname differs there, so nothing happens.)
 if (location.hostname === 'pyonatan1-dotcom.github.io') location.replace('https://yonatan-prins.vercel.app/english/');
 </script>
 
@@ -780,7 +780,9 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 </nav>
 
 <script>
-window.onerror=function(msg,src,line,col,err){document.body.insertAdjacentHTML('afterbegin','<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#900;color:#fff;padding:10px;font-size:12px;word-break:break-all">PARSE/RUNTIME ERROR line '+line+': '+msg+'</div>');return false;};
+// Error banner as text (an error message can quote data, so it never goes through innerHTML).
+function showErrorBanner(text){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#900;color:#fff;padding:10px;font-size:12px;word-break:break-all;white-space:pre-wrap';d.textContent=text;document.body.prepend(d);}
+window.onerror=function(msg,src,line,col,err){showErrorBanner('PARSE/RUNTIME ERROR line '+line+': '+msg);return false;};
 document.getElementById('pickerSub').textContent='JS started...';
 // ── WORDS ARRAY ──
 const WORDS = [
@@ -7866,12 +7868,22 @@ function renderCard(){
   renderExPanel(w);
 }
 
+// Marks the word (and its forms) in a sentence, as HTML. The match runs on the raw text and every
+// piece is escaped, so neither the sentence nor the word (which may come from sync) can add markup.
 function highlightWord(sentence, w){
-  const allForms=[w.en];
-  if(w.forms)w.forms.split('/').forEach(f=>{const t=f.trim();if(t&&t!=='→')allForms.push(t);});
-  const pat=allForms.map(f=>f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
-  try{return sentence.replace(new RegExp('('+pat+')','gi'),'<span class="hi">$1</span>');}
-  catch(e){return sentence;}
+  const text=String(sentence==null?'':sentence);
+  const allForms=[String(w.en||'')];
+  if(w.forms)String(w.forms).split('/').forEach(f=>{const t=f.trim();if(t&&t!=='→')allForms.push(t);});
+  const pat=allForms.filter(Boolean).map(f=>f.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+  if(!pat)return esc(text);
+  try{return text.split(new RegExp('('+pat+')','i')).map((part,i)=>i%2?'<span class="hi">'+esc(part)+'</span>':esc(part)).join('');}
+  catch(e){return esc(text);}
+}
+// The example sentences of a word. Own keys only: a word called "constructor" must not find Object's.
+function examplesFor(en){
+  const has=k=>Object.prototype.hasOwnProperty.call(EXTRA_EXAMPLES,k)&&Array.isArray(EXTRA_EXAMPLES[k]);
+  const k=String(en==null?'':en), k2=k.replace(/ if\.\.\.$/,'').replace(/\.\.\.$/,'');
+  return has(k)?EXTRA_EXAMPLES[k]:has(k2)?EXTRA_EXAMPLES[k2]:[];
 }
 
 function speakEx(txt,e){if(e&&e.stopPropagation)e.stopPropagation();speak(txt);}
@@ -7899,7 +7911,7 @@ function renderExPanel(w){
   const lvlLabel={1:'A1',2:'A2',3:'B1',4:'B2',5:'C1'};
   // build item list from EXTRA_EXAMPLES only
   const items=[];
-  const extras=EXTRA_EXAMPLES[w.en]||EXTRA_EXAMPLES[w.en.replace(/ if\.\.\.$/,'').replace(/\.\.\.$/,'')]||[];
+  const extras=examplesFor(w.en);
   extras.forEach(e=>{
     const txt=typeof e==='string'?e:e.s;
     if(!items.some(i=>i.s===txt))items.push(typeof e==='string'?{s:txt,l:3}:e);
@@ -7912,19 +7924,18 @@ function renderExPanel(w){
   }
   const spkIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>';
   listEl.innerHTML=items.map(item=>{
-    const safe=item.s.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const lv=item.l||3;
-    // בורח גם מהמחרוזת של JavaScript וגם ממאפיין ה-HTML, אחרת גרש או מרכאה שוברים החוצה
-    const escaped=esc(item.s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"));
+    const lv=esc(item.l||3);
+    // The sentence goes into a data- attribute (escaped once, read back as plain text), never into the
+    // handler's code — so a quote in it cannot break out of the string or the attribute.
     const heBtn=item.he?'<button class="exp-he-btn" onclick="toggleExpHe(this)" title="תרגום עברי">🇮🇱</button>':'';
     const heTxt=item.he?'<div class="exp-he">'+esc(item.he)+'</div>':'';
     return '<div class="exp-item">'
       +'<div class="exp-item-top">'
-      +'<span class="exp-lvl lvl-'+lv+'">'+lvlLabel[lv]+'</span>'
+      +'<span class="exp-lvl lvl-'+lv+'">'+esc(lvlLabel[item.l||3]||'')+'</span>'
       +heBtn
-      +'<button class="exp-speak" onclick="speakEx(\''+escaped+'\')" title="Listen">'+spkIcon+'</button>'
+      +'<button class="exp-speak" data-s="'+esc(item.s)+'" onclick="speakEx(this.dataset.s)" title="Listen">'+spkIcon+'</button>'
       +'</div>'
-      +highlightWord(safe,w)
+      +highlightWord(item.s,w)
       +heTxt
       +'</div>';
   }).join('');
@@ -8096,7 +8107,8 @@ function renderRecent(){
   const el=document.getElementById('recentlyAdded');if(!el)return;
   const items=[...appData.userAddedWords].reverse().slice(0,10);
   if(!items.length){el.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:8px 0;">No words added yet.</div>';return;}
-  el.innerHTML=items.map(w=>'<div class="recent-item"><span class="ri-en">'+esc(w.emoji||'📝')+' '+esc(w.en)+'</span><span class="ri-he">'+esc(w.he)+'</span><span class="ri-date">'+new Date(w.addedAt).toLocaleDateString('en',{month:'short',day:'numeric'})+'</span><button onclick="studyOne(\''+esc(String(w.id)).replace(/\x27/g,'')+'\')" class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:.7rem;">▶</button></div>').join('');
+  // Ids go into data- attributes (escaped, read back as text), never into the onclick code.
+  el.innerHTML=items.map(w=>'<div class="recent-item"><span class="ri-en">'+esc(w.emoji||'📝')+' '+esc(w.en)+'</span><span class="ri-he">'+esc(w.he)+'</span><span class="ri-date">'+esc(new Date(w.addedAt).toLocaleDateString('en',{month:'short',day:'numeric'}))+'</span><button data-id="'+esc(w.id)+'" onclick="studyOne(this.dataset.id)" class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:.7rem;">▶</button></div>').join('');
 }
 
 function studyOne(id){
@@ -8152,7 +8164,10 @@ function renderWL(){
     const p=getProgress(w.id);
     const card=document.createElement('div');card.className='word-card';
     const formsHtml=w.forms?'<div class="wc-forms">'+esc(w.forms)+'</div>':'';
-    card.innerHTML='<div class="wc-top"><div class="wc-en">'+esc(w.emoji||'📝')+' '+esc(w.en)+'</div><div class="wc-status-dot" style="background:'+(statusColors[p.status||'new'])+'"></div></div><div class="wc-he">'+esc(w.he)+'</div>'+formsHtml+'<div class="wc-meta"><span>'+esc(w.cat)+(w.type!=='word'?' · '+esc(w.type):'')+'</span><span>'+(p.streak?'🔥'+p.streak:'')+'</span></div>'+(w.source==='user'?'<button class="wc-del" onclick="deleteWord(\''+esc(String(w.id)).replace(/\x27/g,'')+'\',event)">🗑</button>':'');
+    // Progress comes from other devices too: its fields are escaped like the word's.
+    const dot=Object.prototype.hasOwnProperty.call(statusColors,p.status||'new')?statusColors[p.status||'new']:statusColors.new;
+    const streak=+p.streak||0;
+    card.innerHTML='<div class="wc-top"><div class="wc-en">'+esc(w.emoji||'📝')+' '+esc(w.en)+'</div><div class="wc-status-dot" style="background:'+dot+'"></div></div><div class="wc-he">'+esc(w.he)+'</div>'+formsHtml+'<div class="wc-meta"><span>'+esc(w.cat)+(w.type!=='word'?' · '+esc(w.type):'')+'</span><span>'+(streak?'🔥'+esc(streak):'')+'</span></div>'+(w.source==='user'?'<button class="wc-del" data-id="'+esc(w.id)+'" onclick="deleteWord(this.dataset.id,event)">🗑</button>':'');
     card.onclick=()=>studyOne(w.id);
     grid.appendChild(card);
   });
@@ -8197,33 +8212,35 @@ function renderProgress(){
   const reviewing=progs.filter(p=>p.status==='reviewing').length;
   const learning=progs.filter(p=>p.status==='learning').length;
   const newW=progs.filter(p=>!p.lastReviewedAt||p.status==='new').length;
-  const totalSeen=progs.reduce((s,p)=>s+(p.timesSeen||0),0);
-  const totalKnown=progs.reduce((s,p)=>s+(p.timesKnown||0),0);
+  // Progress and history also arrive from other devices (sync, import): counts are read as numbers.
+  const totalSeen=progs.reduce((s,p)=>s+(+p.timesSeen||0),0);
+  const totalKnown=progs.reduce((s,p)=>s+(+p.timesKnown||0),0);
   const acc=totalSeen?Math.round(totalKnown/totalSeen*100):0;
   const streak=computeStreak();
-  const todayH=appData.history[todayKey()]||{seen:0};
-  const goal=appData.settings.dailyGoal||20;
+  const todayH={seen:+(appData.history[todayKey()]||{}).seen||0};
+  const goal=+appData.settings.dailyGoal||20;
   const goalPct=Math.min(100,Math.round(todayH.seen/goal*100));
   const weak=all.filter(w=>{const p=getProgress(w.id);return(p.timesLearning||0)>(p.timesKnown||0)&&(p.timesLearning||0)>0;}).length;
   const userW=(appData.userAddedWords||[]).length;
   document.getElementById('statsGrid').innerHTML=[
     {n:mastered,l:'Mastered',c:'var(--green-l)'},{n:reviewing,l:'Reviewing',c:'var(--blue-l)'},
     {n:learning,l:'Learning',c:'var(--orange-l)'},{n:newW,l:'Not started',c:'var(--muted)'},
-    {n:streak+'🔥',l:'Day streak',c:'var(--orange-l)'},{n:appData.longestStreak||streak,l:'Best streak',c:'var(--gold)'},
+    {n:streak+'🔥',l:'Day streak',c:'var(--orange-l)'},{n:+appData.longestStreak||streak,l:'Best streak',c:'var(--gold)'},
     {n:acc+'%',l:'Accuracy',c:'var(--gold)'},{n:todayH.seen,l:"Today's reviews",c:'var(--text)'},
     {n:goalPct+'%',l:'Daily goal',c:'var(--gold)'},{n:weak,l:'Weak words',c:'var(--red-l)'},
     {n:totalSeen,l:'Total reviews',c:'var(--muted)'},{n:userW,l:'My words',c:'var(--teal-l)'}
-  ].map(({n,l,c})=>'<div class="stat-card"><div class="sc-n" style="color:'+c+'">'+n+'</div><div class="sc-l">'+l+'</div></div>').join('');
+  ].map(({n,l,c})=>'<div class="stat-card"><div class="sc-n" style="color:'+c+'">'+esc(n)+'</div><div class="sc-l">'+l+'</div></div>').join('');
   const chart=document.getElementById('barChart');chart.innerHTML='';
   const days=[];
   for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
-  const maxV=Math.max(1,...days.map(d=>(appData.history[d]?.seen||0)));
+  const seenOn=d=>+(appData.history[d]?.seen)||0;
+  const maxV=Math.max(1,...days.map(seenOn));
   days.forEach(d=>{
-    const v=appData.history[d]?.seen||0;
+    const v=seenOn(d);
     const label=new Date(d+'T12:00:00').toLocaleDateString('en',{weekday:'short'});
     const pct=Math.round(v/maxV*100);
     const col=document.createElement('div');col.className='bar-col';
-    col.innerHTML='<div class="bar-val">'+(v||'')+'</div><div class="bar-fill" style="height:'+Math.max(4,pct)+'%;"></div><div class="bar-day">'+label+'</div>';
+    col.innerHTML='<div class="bar-val">'+esc(v||'')+'</div><div class="bar-fill" style="height:'+Math.max(4,pct)+'%;"></div><div class="bar-day">'+esc(label)+'</div>';
     chart.appendChild(col);
   });
   renderLevelCard();renderGrowthChart();renderWeekChart();renderTalkSessions();
@@ -8579,12 +8596,13 @@ function renderNeedHe(){
   if(!list.length){box.innerHTML='';return;}
   box.innerHTML='<div class="lw-head"><h3>✍️ מחכות לתרגום</h3></div>'+
     '<div class="lw-sub">מילים שנשמרו מהאתר בלי תרגום. כתוב תרגום ולחץ "שמור", והמילה נכנסת ללימוד.</div>'+
+    // The id is only ever in attributes (escaped) and read back with this.dataset — never inside the handler code.
     list.map((w,i)=>{const id=esc(w.id);return '<div class="lw-item"><div class="lw-top"><span class="lw-en">'+esc(w.en)+'</span>'+
       '<button class="lw-x" onclick="speak(needHe()['+i+'].en)" aria-label="השמע" title="השמע">🔊</button></div>'+
       '<div class="lw-row"><input class="lw-he" id="nh_'+id+'" dir="rtl" placeholder="תרגום לעברית">'+
-      '<a class="lw-tr" href="https://translate.google.com/?sl=en&tl=iw&text='+encodeURIComponent(w.en)+'" target="_blank" rel="noopener">תרגם ↗</a>'+
-      '<button class="btn btn-gold" onclick="saveNeedHe(\''+id+'\')">שמור</button>'+
-      '<button class="lw-x" onclick="deleteWord(\''+id+'\',event);renderNeedHe();" aria-label="מחק" title="מחק">✕</button></div></div>';}).join('');
+      '<a class="lw-tr" href="https://translate.google.com/?sl=en&amp;tl=iw&amp;text='+esc(encodeURIComponent(w.en))+'" target="_blank" rel="noopener">תרגם ↗</a>'+
+      '<button class="btn btn-gold" data-id="'+id+'" onclick="saveNeedHe(this.dataset.id)">שמור</button>'+
+      '<button class="lw-x" data-id="'+id+'" onclick="deleteWord(this.dataset.id,event);renderNeedHe();" aria-label="מחק" title="מחק">✕</button></div></div>';}).join('');
 }
 function saveNeedHe(id){
   const w=(appData.userAddedWords||[]).find(x=>x.id===id);if(!w)return;
@@ -8856,7 +8874,7 @@ function lexLookup(m,w){
   return null;
 }
 
-let curArticle=null, tappedWords=new Set();
+let curArticle=null, tappedWords=new Set(), rwEn='';
 
 function renderArtList(){
   const el=document.getElementById('artList');if(!el)return;
@@ -8871,11 +8889,11 @@ function renderArtList(){
       if(e&&(e.src==='gloss'||getProgress(e.id).status!=='mastered'))unknown++;
     });
     const lvl={1:'A1',2:'A2',3:'B1',4:'B2',5:'C1'}[a.level||3];
-    return '<div class="art-card" onclick="openArticle('+(a.saved?'\'s'+i+'\'':'\''+a.id+'\'')+')">'+
+    return '<div class="art-card" data-art="'+esc(a.saved?'s'+i:a.id)+'" onclick="openArticle(this.dataset.art)">'+
       '<div class="art-emoji">'+esc(a.emoji||'📄')+'</div>'+
       '<div class="art-title">'+esc(a.title)+'</div>'+
       (a.sub?'<div class="art-sub">'+esc(a.sub)+'</div>':'')+
-      '<div class="art-meta"><span>'+esc(a.topic||'My text')+'</span><span>'+lvl+'</span><span>'+
+      '<div class="art-meta"><span>'+esc(a.topic||'My text')+'</span><span>'+esc(lvl||'')+'</span><span>'+
         a.text.split(/\s+/).length+' words</span><span>'+unknown+' to learn</span></div></div>';
   }).join('')||'<div style="color:var(--muted);font-size:.85rem;">No articles yet.</div>';
 }
@@ -8915,10 +8933,10 @@ function toggleReadHe(){document.getElementById('readHe').classList.toggle('on')
 function markupText(a){
   const lex=readLex(a);
   const parts=a.text.split(/([A-Za-z][A-Za-z'-]*)/g);   // זוגי=מפריד, אי-זוגי=מילה
+  // The word goes into a data- attribute (escaped, read back as text) — never inside the handler code.
   const span=(e,raw)=>{
     const known=e.src==='vocab'&&getProgress(e.id).status==='mastered';
-    return '<span class="rw'+(known?' known':'')+'" onclick="openRW(\''+
-      esc(e.en).replace(/'/g,'&#39;')+'\')">'+esc(raw)+'</span>';
+    return '<span class="rw'+(known?' known':'')+'" data-en="'+esc(e.en)+'" onclick="openRW(this.dataset.en)">'+esc(raw)+'</span>';
   };
   const out=[];
   for(let i=0;i<parts.length;i++){
@@ -8948,19 +8966,21 @@ function openRW(en){
   const e=lexLookup(lex,en)||lex.get(en.toLowerCase());
   if(!e)return;
   tappedWords.add(e.en); updateTapped();
-  const ex=(EXTRA_EXAMPLES[e.en]&&EXTRA_EXAMPLES[e.en][1])||null;
+  const ex=examplesFor(e.en)[1]||null;
   const sample=ex?ex.s:(e.ex||'');
   const sampleHe=ex?ex.he:'';
   const known=e.src==='vocab'&&getProgress(e.id).status==='mastered';
+  // The buttons act on rwEn (the word open in this card); the word itself is never put into handler code.
+  rwEn=e.en;
   document.getElementById('rwBody').innerHTML=
-    '<div class="rw-word">'+esc(e.en)+' <button class="exp-speak" onclick="speak('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')" title="Listen">🔊</button></div>'+
+    '<div class="rw-word">'+esc(e.en)+' <button class="exp-speak" onclick="speak(rwEn)" title="Listen">🔊</button></div>'+
     (e.ph?'<div class="rw-ph">'+esc(e.ph)+'</div>':'')+
     '<div class="rw-he">'+esc(e.he)+'</div>'+
     (sample?'<div class="rw-ex">'+esc(sample)+(sampleHe?'<br><span style="color:var(--muted);opacity:.8;">'+esc(sampleHe)+'</span>':'')+'</div>':'')+
     '<div style="display:flex;gap:8px;margin-top:14px;">'+
-      (known?'<button class="btn btn-outline btn-sm" style="flex:1;" onclick="rwLearn('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')">↩︎ Study again</button>'
-            :'<button class="btn btn-gold btn-sm" style="flex:1;" onclick="rwLearn('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')">+ Add to study</button>')+
-      '<button class="btn btn-outline btn-sm" style="flex:1;" onclick="rwKnow('+JSON.stringify(e.en).replace(/"/g,'&quot;')+')">✓ I know it</button>'+
+      (known?'<button class="btn btn-outline btn-sm" style="flex:1;" onclick="rwLearn(rwEn)">↩︎ Study again</button>'
+            :'<button class="btn btn-gold btn-sm" style="flex:1;" onclick="rwLearn(rwEn)">+ Add to study</button>')+
+      '<button class="btn btn-outline btn-sm" style="flex:1;" onclick="rwKnow(rwEn)">✓ I know it</button>'+
     '</div>';
   document.getElementById('rwModal').classList.add('active');
 }
@@ -9550,7 +9570,7 @@ function init(){
   updatePickerSub();
 }
 try{init();receiveMove();initSync();quickAddFromUrl();}catch(err){
-  document.body.insertAdjacentHTML('afterbegin','<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#c00;color:#fff;padding:12px;font-size:13px;word-break:break-all;">JS ERROR: '+err.message+' — '+err.stack+'</div>');
+  showErrorBanner('JS ERROR: '+(err&&err.message)+' — '+(err&&err.stack));
 }
 
 // ── אפליקציה (PWA): רישום ה-Service Worker ──
