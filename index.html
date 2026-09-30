@@ -8680,5 +8680,15 @@ if('serviceWorker' in navigator && location.protocol === 'https:'){
   });
 }
 </script>
+<script>
+// אתר יונתן: when this app is opened inside the personal site (/english/ on Vercel), show the site's shared menu.
+// On its own address (GitHub Pages) or as an installed app, nothing changes.
+(function(){
+  if (!location.pathname.startsWith('/english') || matchMedia('(display-mode: standalone)').matches) return;
+  var l=document.createElement('link'); l.rel='stylesheet'; l.href='/site.css'; document.head.appendChild(l);
+  var n=document.createElement('nav'); n.className='site-nav flow dark'; n.id='siteNav'; document.body.insertBefore(n, document.body.firstChild);
+  var s=document.createElement('script'); s.src='/site.js'; document.body.appendChild(s);
+})();
+</script>
 </body>
 </html>
