@@ -9,7 +9,7 @@ const PAGE_TIMEOUT = 3500;   // ms to wait for the page before opening the saved
 // offline fallback would fail there. './' is a plain 200 on both GitHub Pages and the site.
 // words.js?v=<hash> is the word library (thousands of words + sentences, see tools/data.mjs). Its name
 // changes with its content, so a cached copy never needs checking: it is precached here with the page.
-const DATA = './words.js?v=2fecc4e3b1';
+const DATA = './words.js?v=31be1ea2ea';
 const CORE = ['./', './manifest.json',
               './icon-192.png', './icon-512.png', './apple-touch-icon.png', DATA];
 

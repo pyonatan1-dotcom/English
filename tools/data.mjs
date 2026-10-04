@@ -30,7 +30,7 @@ export const exampleKey = en => String(en);
 // Duplicate check: case, spaces, "to ", "...", punctuation and British/American spelling don't make a new word.
 export const norm = s => String(s || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/\.\.\.|…/g, ' ').replace(/[?!.,;:"()]/g, ' ')
   .replace(/^\s*to\s+/, '').replace(/\s+/g, ' ').trim()
-  .replace(/isation\b/g, 'ization').replace(/ise\b/g, 'ize').replace(/yse\b/g, 'yze').replace(/our\b/g, 'or');
+  .replace(/isation\b/g, 'ization').replace(/ise\b/g, 'ize').replace(/yse\b/g, 'yze').replace(/([a-z]{2,})our\b/g, '$1or');   // colour→color, but not four→for
 
 export function parseData(text) {
   const t = String(text);

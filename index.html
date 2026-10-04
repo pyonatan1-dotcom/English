@@ -875,7 +875,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 </nav>
 
 <!-- The word library (see tools/data.mjs). ?v= is its content hash, stamped by "node tools/data.mjs stamp". -->
-<script src="words.js?v=2fecc4e3b1"></script>
+<script src="words.js?v=31be1ea2ea"></script>
 <script>
 // Error banner as text (an error message can quote data, so it never goes through innerHTML).
 function showErrorBanner(text){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#900;color:#fff;padding:10px;font-size:12px;word-break:break-all;white-space:pre-wrap';d.textContent=text;document.body.prepend(d);}
@@ -2320,8 +2320,8 @@ function updateMigrateHint(){
   // still running (it would flash), and never again once the cloud has held real progress.
   const syncPending=syncEnabled&&(syncState==='idle'||syncState==='syncing')&&!syncMeta.okAt;
   if(syncMeta.cloudHasData||syncPending){el.style.display='none';return;}
-  tx.innerHTML='למדת בכתובת הקודמת? פתח את <a href="https://'+OLD_HOST+'/english/" style="color:var(--gold);text-decoration:underline;">'+OLD_HOST+'/english</a> ולחץ שם על "העבר את ההתקדמות". '
-    +'או ייבא קובץ גיבוי: <a href="#" onclick="document.getElementById(\'importFile\').click();return false;" style="color:var(--gold);text-decoration:underline;">ייבוא גיבוי</a>.';
+  // The old address now forwards here, so there is nothing to "move" any more: only a backup file can be brought in.
+  tx.innerHTML='יש לך קובץ גיבוי מהאפליקציה? <a href="#" onclick="document.getElementById(\'importFile\').click();return false;" style="color:var(--gold);text-decoration:underline;">ייבוא גיבוי</a>.';
   el.style.display=(inSite&&empty&&!dismissed)?'':'none';
 }
 function moveToNewAddress(){
