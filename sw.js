@@ -1,5 +1,5 @@
 // Service Worker — מאפשר לאפליקציה לעבוד בלי אינטרנט, ומוודא שהיא תמיד מתעדכנת.
-// המחרוזת הבאה מוחלפת אוטומטית בכל העלאה ע"י deploy-english.sh:
+// The site stamps VERSION when it copies the app in (scripts/sync-english.sh in the site repo):
 const VERSION = 'escape-1';
 const CACHE = 'english-' + VERSION;
 const PAGE_TIMEOUT = 3500;   // ms to wait for the page before opening the saved copy (weak signal)
@@ -7,8 +7,11 @@ const PAGE_TIMEOUT = 3500;   // ms to wait for the page before opening the saved
 // The page is cached under './' only. Inside the personal site (Vercel, cleanUrls) './index.html' answers
 // with a 308 redirect to './'; a cached *redirected* response can't be used to answer a navigation, so the
 // offline fallback would fail there. './' is a plain 200 on both GitHub Pages and the site.
+// words.js?v=<hash> is the word library (thousands of words + sentences, see tools/data.mjs). Its name
+// changes with its content, so a cached copy never needs checking: it is precached here with the page.
+const DATA = './words.js?v=2fecc4e3b1';
 const CORE = ['./', './manifest.json',
-              './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
+              './icon-192.png', './icon-512.png', './apple-touch-icon.png', DATA];
 
 self.addEventListener('install', e => {
   // מוריד את הגרסה החדשה ומיד תופס פיקוד — בלי להמתין לסגירת האפליקציה
@@ -61,6 +64,15 @@ self.addEventListener('fetch', e => {
       return Promise.race([net.then(res => { clearTimeout(timer); return res; }, () => { clearTimeout(timer); return saved; }), slow]);
     }));
     e.waitUntil(net.then(() => {}, () => {}));
+    return;
+  }
+
+  // The word library: its address carries its content hash, so the saved copy is always right — no refresh.
+  if (url.origin === self.location.origin && /\/words\.js$/.test(url.pathname) && url.searchParams.has('v')) {
+    e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
+      if (res.ok && !res.redirected) { const cp = res.clone(); caches.open(CACHE).then(c => c.put(req, cp)).catch(() => {}); }
+      return res;
+    })));
     return;
   }
 
