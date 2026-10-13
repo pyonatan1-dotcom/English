@@ -2330,13 +2330,33 @@ function moveToNewAddress(){
   const b64=btoa(unescape(encodeURIComponent(JSON.stringify(appData)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   location.href='https://'+NEW_HOST+'/english/#move='+b64;
 }
+// What a #move link would bring in, in plain Hebrew, for the question before anything is merged.
+function moveSummary(d){
+  const n=o=>isObj(o)?Object.keys(o).filter(k=>!BAD_KEY(k)).length:0;
+  const words=(Array.isArray(d.userAddedWords)?d.userAddedWords:[]).map(sanitizeWord).filter(Boolean);
+  const lines=['• '+n(d.progress)+' מילים עם התקדמות','• '+n(d.history)+' ימי לימוד','• '+words.length+' מילים שהוספת'];
+  if(words.length){
+    const show=words.slice(0,8).map(w=>w.en+(w.he?' = '+w.he:''));
+    lines.push('   '+show.join(', ')+(words.length>show.length?' ועוד '+(words.length-show.length):''));
+  }
+  if(isObj(d.settings)&&n(d.settings))lines.push('• הגדרות: רק במקום שכאן עדיין ברירת המחדל');
+  return lines.join('\n');
+}
 // Receiving side: merge what the old address sent, then drop it from the address bar.
+// A #move link can come from anyone (a link in a message opens this page with it), so nothing is
+// merged before he sees what it holds and says yes; and a link never deletes: its deletion marks
+// and reset epoch are left out.
 function receiveMove(){
   const m=/^#move=([A-Za-z0-9_-]+)$/.exec(location.hash||'');if(!m)return;
   history.replaceState(null,'',location.pathname+location.search);
   let d=null;
   try{d=JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/')))));}catch(e){}
   if(!isObj(d)){toast('ההעברה נכשלה: הנתונים לא נקראו. נסה שוב מהכתובת הקודמת.','err');return;}
+  d=Object.assign({},d);delete d.deletedWords;delete d.baseAt;
+  if(!confirm('קישור להעברת התקדמות מהכתובת הקודמת של האתר.\n\nמה יתווסף כאן:\n'+moveSummary(d)+
+    '\n\nהמיזוג לא מוחק כלום ממה שיש כאן (התקדמות של מילה מתעדכנת רק כשזו שבקישור חדשה יותר).\nלא לחצת עכשיו "העבר את ההתקדמות" בכתובת הקודמת? לחץ ביטול.\n\nלמזג?')){
+    toast('ההעברה בוטלה — לא נוסף כלום.');return;
+  }
   const before=JSON.stringify(appData);
   mergeIntoApp(d);
   if(!saveData()){appData=JSON.parse(before);toast('ההעברה נכשלה: הדפדפן לא הצליח לשמור','err');return;}
