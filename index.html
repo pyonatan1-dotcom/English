@@ -875,7 +875,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 </nav>
 
 <!-- The word library (see tools/data.mjs). ?v= is its content hash, stamped by "node tools/data.mjs stamp". -->
-<script src="words.js?v=31be1ea2ea"></script>
+<script src="words.js?v=ff4de39aaa"></script>
 <script>
 // Error banner as text (an error message can quote data, so it never goes through innerHTML).
 function showErrorBanner(text){var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#900;color:#fff;padding:10px;font-size:12px;word-break:break-all;white-space:pre-wrap';d.textContent=text;document.body.prepend(d);}
@@ -1506,7 +1506,9 @@ function renderExPanel(w){
   // His own sentence (typed on the Add tab, or the event a word came from) comes first;
   // a built-in word's own short example counts as an easy one.
   const own=String(w.ex==null?'':w.ex).trim();
-  if(own)items.push(w.source==='user'?{s:own,he:String(w.exHe||''),l:0,own:true}:{s:own,l:2});
+  // A built-in word's own example has its Hebrew in the library's examples (2026-10: every sentence is translated).
+  const ownEx=own&&w.source!=='user'?examplesFor(w.en).find(e=>e&&typeof e==='object'&&e.s===own):null;
+  if(own)items.push(w.source==='user'?{s:own,he:String(w.exHe||''),l:0,own:true}:{s:own,he:ownEx?String(ownEx.he||''):String(w.exHe||''),l:ownEx?(+ownEx.l||2):2});
   examplesFor(w.en).forEach(e=>{
     const txt=typeof e==='string'?e:e.s;
     if(!items.some(i=>i.s===txt))items.push(typeof e==='string'?{s:txt,l:3}:e);
