@@ -530,7 +530,7 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
           <div class="card-face card-front">
             <div class="card-badge" id="cBadge"></div>
             <div class="c-status-dot" id="cStatusDot"></div>
-            <div class="card-word" id="cWord"></div>
+            <div class="card-word" id="cWord" data-keep></div>
             <div class="card-phonetic" id="cPhonetic"></div>
             <div class="card-hint-he" id="cHintHe" dir="rtl" lang="he"></div>
             <button class="c-ph-btn" id="cPhBtn" onclick="togglePh(event)" lang="he">הגייה בעברית</button>
@@ -545,8 +545,8 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="22" height="22" stroke-width="2" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </button>
             <button class="c-slow-btn" onclick="speakCurrent(event,true)" aria-label="השמע לאט" title="השמע לאט" lang="he"><span class="ic" aria-hidden="true">🐢</span>לאט</button>
-            <div class="card-answer" id="cAnswer"></div>
-            <div class="card-en-small" id="cEnSmall"></div>
+            <div class="card-answer" id="cAnswer" data-keep></div>
+            <div class="card-en-small" id="cEnSmall" data-keep></div>
             <div class="card-hint" lang="he">✓ התשובה</div>
           </div>
         </div>
@@ -1306,9 +1306,13 @@ function startPlan(){
 
 // ── STUDY MODES ── cards (the default) · type the English · listen and recall · fill the gap in a sentence.
 const STUDY_MODES=[{id:'cards',emoji:'🃏',he:'כרטיסיות'},{id:'type',emoji:'⌨️',he:'הקלדה'},{id:'listen',emoji:'🎧',he:'האזנה'},{id:'fill',emoji:'✍️',he:'השלמת משפט'}];
-function studyMode(){const m=appData&&appData.settings&&appData.settings.studyMode;return STUDY_MODES.some(x=>x.id===m)?m:'cards';}
+// The way of studying is a choice for this visit only, and every visit opens on the cards: the English word on the
+// front, the Hebrew after a tap. It is NOT saved or synced - a "type" mode saved by one device (Hebrew on the front)
+// once made every other device show the Hebrew word first (2026-10-14).
+let studyModeNow='cards';
+function studyMode(){return STUDY_MODES.some(x=>x.id===studyModeNow)?studyModeNow:'cards';}
 function setStudyMode(m){
-  appData.settings.studyMode=STUDY_MODES.some(x=>x.id===m)?m:'cards';appData.settingsAt=Date.now();saveData();
+  studyModeNow=STUDY_MODES.some(x=>x.id===m)?m:'cards';
   renderModeChips();
 }
 function renderModeChips(){
@@ -1417,7 +1421,14 @@ function renderCard(){
   // המתג "Show examples" שולט על פאנל המשפטים בצד
   const exPanel=document.getElementById('exPanel');
   if(exPanel){exPanel.style.display=(s.showExamples!==false)?'':'none';exPanel.classList.toggle('concealed',!enFront);}
-  document.getElementById('cardScene').classList.remove('flipped');
+  // The new card appears on its English front at once: turning the old card back with the animation showed the
+  // NEW word's Hebrew back for half a second on every next / skip (2026-10-14).
+  const scn=document.getElementById('cardScene'),inn=scn.querySelector('.card-inner');
+  if(scn.classList.contains('flipped')){
+    if(inn)inn.style.transition='none';
+    scn.classList.remove('flipped');
+    if(inn){void inn.offsetWidth;inn.style.transition='';}
+  }
   document.getElementById('cPhonetic').classList.remove('vis');
   phBtn.classList.remove('on');phBtn.textContent='הגייה בעברית';
   showPh=false;
@@ -1528,14 +1539,14 @@ function renderExPanel(w){
     // The sentence goes into a data- attribute (escaped once, read back as plain text), never into the
     // handler's code — so a quote in it cannot break out of the string or the attribute.
     const heBtn=item.he?'<button class="exp-he-btn" onclick="toggleExpHe(this)" aria-label="הצג תרגום לעברית" title="תרגום לעברית">🇮🇱</button>':'';
-    const heTxt=item.he?'<div class="exp-he" lang="he" dir="rtl">'+esc(item.he)+'</div>':'';
+    const heTxt=item.he?'<div class="exp-he" lang="he" dir="rtl" data-keep>'+esc(item.he)+'</div>':'';
     return '<div class="exp-item">'
       +'<div class="exp-item-top">'
       +(item.own?'<span class="exp-lvl lvl-own" lang="he">שלך</span>':'<span class="exp-lvl lvl-'+lvn+'">'+esc(lvlLabel[lvn])+'</span>')
       +heBtn
       +'<button class="exp-speak" data-s="'+esc(item.s)+'" onclick="speakEx(this.dataset.s)" aria-label="השמע את המשפט" title="השמע">'+spkIcon+'</button>'
       +'</div>'
-      +'<div lang="en">'+highlightWord(item.s,w)+'</div>'
+      +'<div lang="en" data-keep>'+highlightWord(item.s,w)+'</div>'
       +heTxt
       +'</div>';
   }).join('')+(hidden?'<button class="exp-more" onclick="showMoreEx()" dir="rtl" lang="he">עוד '+Number(hidden)+' משפטים (רמות קשות יותר)</button>':'');
