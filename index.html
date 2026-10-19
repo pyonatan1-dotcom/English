@@ -206,6 +206,35 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
 .cs{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;min-width:80px;}
 .csn{font-size:1.8rem;font-weight:700;}
 .csl{font-size:.72rem;color:var(--muted);margin-top:2px;}
+/* before the meeting: a lesson from the personal site (see BEFORE THE MEETING) */
+.lesson-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-inline-start:4px solid var(--teal);border-radius:16px;padding:12px 16px;display:none;flex-direction:column;gap:8px;}
+.lesson-card.on{display:flex;}
+.lc-top{font-size:.74rem;color:var(--teal-l);font-weight:700;letter-spacing:.02em;}
+.lc-title{font-family:'Frank Ruhl Libre',serif;font-size:1.15rem;color:var(--gold);font-weight:700;line-height:1.3;}
+.lc-sub{font-size:.78rem;color:var(--muted);}
+.lc-more{font-size:.74rem;color:var(--muted);}
+.lesson-view{position:fixed;inset:0;z-index:160;background:var(--bg);overflow-y:auto;padding:0 0 calc(24px + env(safe-area-inset-bottom));}
+.lv-bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;}
+.lv-bar h2{font-family:'Frank Ruhl Libre',serif;font-size:1.05rem;color:var(--gold);font-weight:700;min-width:0;}
+.lv-x{background:none;border:none;color:var(--muted);font-size:1.3rem;padding:4px 10px;min-height:44px;}
+.lv-body{max-width:560px;margin:0 auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;}
+.lv-sec h3{font-size:.8rem;color:var(--teal-l);font-weight:700;margin-bottom:6px;}
+.lv-row{display:flex;gap:8px;align-items:flex-start;border-bottom:1px solid var(--border);padding:9px 0;}
+.lv-row:last-child{border-bottom:none;}
+.lv-txt{flex:1;min-width:0;}
+.lv-en{direction:ltr;text-align:left;font-size:1.02rem;line-height:1.45;color:var(--text);}
+.lv-he{font-size:.84rem;color:var(--muted);margin-top:2px;}
+.lv-ex{direction:ltr;text-align:left;font-size:.82rem;color:var(--gold-l);margin-top:3px;font-style:italic;}
+.lv-sp{display:flex;gap:4px;flex-shrink:0;}
+.lv-sp button,.lv-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:10px;min-width:44px;min-height:44px;font-size:1rem;}
+.lv-drill{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.lv-prompt{font-size:1.15rem;line-height:1.5;text-align:center;}
+.lv-ans{direction:ltr;text-align:left;font-size:1.05rem;color:var(--gold-l);}
+.lv-heard{direction:ltr;text-align:left;font-size:.88rem;color:var(--muted);}
+.lv-res{font-size:.9rem;font-weight:700;text-align:center;}
+.lv-res.good{color:var(--green-l);}.lv-res.close{color:var(--orange-l);}.lv-res.miss{color:var(--red-l);}
+.lv-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.lv-input{direction:ltr;text-align:left;}
 </style>
 <style>
 /* ─── ADD TAB ─── */
@@ -488,6 +517,8 @@ kbd{background:var(--bg3);border:1px solid var(--bg4);border-radius:4px;padding:
   <button onclick="dismissMigrateHint()" aria-label="סגור" style="background:none;border:none;color:var(--muted);font-size:.85rem;margin-right:6px;">✕</button>
 </div>
     <!-- The daily plan: due reviews + today's new words, time, and today's goal (see THE DAILY PLAN) -->
+    <!-- "Before the meeting": shown only when the personal site has a lesson for his next English meeting (see BEFORE THE MEETING) -->
+    <div class="lesson-card" id="lessonCard" dir="rtl" lang="he"></div>
     <div class="plan" id="planCard" dir="rtl" lang="he">
       <div class="plan-top"><span class="plan-title">התוכנית להיום</span><span class="plan-time" id="planTime"></span></div>
       <div class="plan-nums">
@@ -1761,6 +1792,189 @@ function speakCurrent(e,slow){
   if(e&&e.stopPropagation)e.stopPropagation();
   if(session&&session.queue[session.idx])speak(session.queue[session.idx].en,!!slow);
 }
+
+// ── BEFORE THE MEETING ── "לקראת הפגישה עם …": an English lesson for his next English-language meeting or event.
+// The lesson is NOT in this repo and never can be: it is private (a person's name, his field, the questions to ask him).
+// It lives in the personal site's private store (key `english-lesson`, written by the site's agent) and this page reads it
+// from the same-origin /api/store with his login cookie — the same way it syncs his progress. Served anywhere else (the
+// public GitHub Pages address, a logged-out browser) the request fails or is empty and the card simply never shows.
+// Contract: GET /api/store?key=english-lesson → 200 {data:{updatedAt, lessons:[{id, kind:'meeting'|'event', with, startAt,
+//   terms:[{en,he,ex?}], phrases:[{en,he}], opener:{en,he}|null, questions:[{en,he}]}]}} | 404 (none) | 401/403 (not signed in).
+// This code is generic: it draws whatever list it is given, and holds no name, company or term of its own.
+var LESSON_URL='/api/store?key=english-lesson', LESSON_CACHE='englishLessonCache', LESSON_SHOW_MS=3*3600000;
+var lessons=[], lessonOpen=null, lessonItems=[], lessonDrill=null;
+function lessonClean(v,max){return typeof v==='string'?v.replace(/[<>\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max):'';}
+function lessonPair(p,withEx){
+  if(!isObj(p))return null;
+  const en=lessonClean(p.en,300), he=lessonClean(p.he,240);
+  if(!en||!he)return null;
+  const o={en:en,he:he};if(withEx){const ex=lessonClean(p.ex,300);if(ex)o.ex=ex;}
+  return o;
+}
+// Whatever came back → a list of safe, current lessons (soonest first); anything malformed is dropped.
+function lessonParse(doc,now){
+  const raw=isObj(doc)&&Array.isArray(doc.lessons)?doc.lessons:[];
+  return raw.map(l=>{
+    if(!isObj(l))return null;
+    const t=Date.parse(l.startAt), who=lessonClean(l.with,120);
+    if(!who||!isFinite(t)||t+LESSON_SHOW_MS<=now)return null;
+    const arr=(a,ex)=>(Array.isArray(a)?a:[]).map(x=>lessonPair(x,ex)).filter(Boolean).slice(0,20);
+    const terms=arr(l.terms,true), questions=arr(l.questions,false), phrases=arr(l.phrases,false), opener=lessonPair(l.opener,false);
+    if(!opener&&!questions.length&&!terms.length)return null;
+    return {id:lessonClean(String(l.id==null?'':l.id),40),kind:l.kind==='event'?'event':'meeting',who:who,t:t,terms:terms,phrases:phrases,questions:questions,opener:opener};
+  }).filter(Boolean).sort((a,b)=>a.t-b.t).slice(0,6);
+}
+async function loadLesson(){
+  let doc=null;
+  try{
+    const r=await fetch(LESSON_URL,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+    if(r.ok){const j=await r.json();doc=isObj(j)&&isObj(j.data)?j.data:null;try{localStorage.setItem(LESSON_CACHE,JSON.stringify(doc));}catch(e){}}
+    else{try{localStorage.removeItem(LESSON_CACHE);}catch(e){}}      // none, or signed out: nothing stays on the device
+  }catch(e){                                                          // offline: the last copy he already had
+    try{doc=JSON.parse(localStorage.getItem(LESSON_CACHE)||'null');}catch(e2){doc=null;}
+  }
+  lessons=lessonParse(doc,Date.now());
+  renderLessonCard();
+}
+function lessonWhen(t){
+  try{
+    const il=ms=>new Date(ms).toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});
+    const hm=new Date(t).toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',hour12:false});
+    const d=Math.round((Date.parse(il(t))-Date.parse(il(Date.now())))/86400000);
+    if(d<=0)return 'היום '+hm;if(d===1)return 'מחר '+hm;
+    return new Date(t).toLocaleDateString('he-IL',{timeZone:'Asia/Jerusalem',weekday:'long',day:'numeric',month:'numeric'})+' '+hm;
+  }catch(e){return '';}
+}
+const lessonHead=l=>(l.kind==='event'?'לקראת האירוע ':'לקראת הפגישה עם ')+l.who;
+function renderLessonCard(){
+  const c=document.getElementById('lessonCard');if(!c)return;
+  const l=lessons[0];
+  if(!l){c.className='lesson-card';c.innerHTML='';return;}
+  const n=(l.terms.length?l.terms.length+' מונחים':'')+(l.questions.length?(l.terms.length?' · ':'')+l.questions.length+' שאלות':'');
+  c.className='lesson-card on';
+  c.innerHTML='<div class="lc-top">🎯 אנגלית לפני הפגישה</div>'+
+    '<div class="lc-title" dir="auto">'+esc(lessonHead(l))+'</div>'+
+    '<div class="lc-sub">'+esc(lessonWhen(l.t))+(n?' · '+esc(n):'')+'</div>'+
+    '<button class="btn btn-gold plan-go" onclick="openLesson(0)">▶ בוא נתכונן</button>'+
+    (lessons.length>1?'<div class="lc-more">ועוד '+(lessons.length-1)+' בדרך</div>':'');
+}
+function lessonRow(en,he,ex){
+  const i=lessonItems.push(en)-1;
+  return '<div class="lv-row"><div class="lv-txt"><div class="lv-en" lang="en">'+esc(en)+'</div><div class="lv-he" dir="rtl" lang="he">'+esc(he)+'</div>'+
+    (ex?'<div class="lv-ex" lang="en">'+esc(ex)+'</div>':'')+'</div>'+
+    '<div class="lv-sp"><button data-say="'+i+'" aria-label="האזן">🔊</button><button data-say="'+i+'" data-slow="1" aria-label="האזן לאט">🐢</button></div></div>';
+}
+function openLesson(i){
+  const l=lessons[i];if(!l)return;
+  lessonOpen=l;lessonItems=[];lessonDrill=null;
+  let v=document.getElementById('lessonView');
+  if(!v){v=document.createElement('div');v.id='lessonView';v.className='lesson-view';v.setAttribute('role','dialog');v.setAttribute('dir','rtl');v.setAttribute('lang','he');document.body.appendChild(v);v.addEventListener('click',lessonClick);}
+  v.style.display='block';document.body.style.overflow='hidden';
+  drawLesson();
+  try{v.scrollTop=0;}catch(e){}
+}
+function closeLesson(){
+  const v=document.getElementById('lessonView');if(v)v.style.display='none';
+  document.body.style.overflow='';lessonDrill=null;
+  try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+}
+function drawLesson(){
+  const v=document.getElementById('lessonView'), l=lessonOpen;if(!v||!l)return;
+  if(lessonDrill){drawDrill(v,l);return;}
+  lessonItems=[];
+  const sec=(title,rows)=>rows?'<div class="lv-sec"><h3>'+title+'</h3>'+rows+'</div>':'';
+  const body=
+    '<button class="btn btn-gold" data-act="drill" style="min-height:48px;">🎤 תרגול: אמור בקול</button>'+
+    sec('הפתיחה',l.opener?lessonRow(l.opener.en,l.opener.he):'')+
+    sec('השאלות ששווה לשאול',l.questions.map(q=>lessonRow(q.en,q.he)).join(''))+
+    sec('מונחים מרכזיים',l.terms.map(t=>lessonRow(t.en,t.he,t.ex)).join(''))+
+    sec('משפטים שימושיים',l.phrases.map(p=>lessonRow(p.en,p.he)).join(''));
+  v.innerHTML='<div class="lv-bar"><h2 dir="auto">'+esc(lessonHead(l))+'</h2><button class="lv-x" data-act="close" aria-label="סגור">✕</button></div><div class="lv-body">'+body+'</div>';
+}
+function lessonClick(e){
+  const b=e.target.closest&&e.target.closest('button');if(!b)return;
+  if(b.dataset.say!=null){speak(b.dataset.say==='cur'&&lessonDrill?lessonDrill.deck[lessonDrill.i].en:lessonItems[+b.dataset.say],b.dataset.slow==='1');return;}
+  const a=b.dataset.act;
+  if(a==='close')closeLesson();
+  else if(a==='drill')startLessonDrill();
+  else if(a==='back'){lessonDrill=null;drawLesson();}
+  else if(a==='mic')drillListen();
+  else if(a==='check'){const el=document.getElementById('lvInput');drillScore(el?el.value:'');}
+  else if(a==='show')drillReveal();
+  else if(a==='next')drillNext();
+  else if(a==='again'){lessonDrill.res=null;lessonDrill.heard='';lessonDrill.shown=false;drawLesson();}
+}
+// ── the say-it-back drill: Hebrew on screen → he says (or types) the English → compared word by word, then heard once more
+function lessonSim(target,heard){
+  const t=normAns(target).split(' ').filter(Boolean), h=normAns(heard).split(' ').filter(Boolean);
+  if(!t.length||!h.length)return 0;
+  let hit=0;
+  t.forEach(w=>{if(h.some(x=>x===w||(w.length>3&&editDist(x,w)<=1)))hit++;});
+  return hit/t.length;
+}
+function startLessonDrill(){
+  const l=lessonOpen, deck=[];
+  if(l.opener)deck.push(l.opener);
+  l.questions.forEach(q=>deck.push(q));
+  l.phrases.forEach(p=>deck.push(p));
+  l.terms.forEach(t=>deck.push({en:t.en,he:t.he}));
+  lessonDrill={deck:deck,i:0,res:null,heard:'',shown:false,good:0,counted:false,mic:!!(window.SpeechRecognition||window.webkitSpeechRecognition),listening:false};
+  drawLesson();
+}
+function drawDrill(v,l){
+  const d=lessonDrill;
+  if(d.i>=d.deck.length){
+    v.innerHTML='<div class="lv-bar"><h2>'+esc(lessonHead(l))+'</h2><button class="lv-x" data-act="close" aria-label="סגור">✕</button></div>'+
+      '<div class="lv-body"><div class="lv-drill"><div class="lv-prompt">סיימת! 👏<br>'+d.good+' מתוך '+d.deck.length+' יצאו טוב</div>'+
+      '<div class="lv-acts"><button class="btn btn-gold" data-act="drill">שוב</button><button class="btn btn-outline" data-act="back">חזרה לשיעור</button></div></div></div>';
+    return;
+  }
+  const c=d.deck[d.i], done=!!(d.res||d.shown);
+  v.innerHTML='<div class="lv-bar"><h2>'+(d.i+1)+' / '+d.deck.length+'</h2><button class="lv-x" data-act="back" aria-label="חזרה">✕</button></div>'+
+    '<div class="lv-body"><div class="lv-drill">'+
+    '<div class="lv-prompt" dir="rtl" lang="he">'+esc(c.he)+'</div>'+
+    (done?'<div class="lv-ans" lang="en">'+esc(c.en)+'</div><div class="lv-acts"><button class="lv-btn" data-say="cur" aria-label="האזן">🔊</button><button class="lv-btn" data-say="cur" data-slow="1" aria-label="האזן לאט">🐢</button></div>':'')+
+    (d.heard?'<div class="lv-heard">'+esc(d.heard)+'</div>':'')+
+    (d.res?'<div class="lv-res '+d.res+'">'+(d.res==='good'?'✔ מצוין':d.res==='close'?'כמעט — נסה שוב':'לא בדיוק — האזן ונסה שוב')+'</div>':'')+
+    (done?'':'<input class="lv-input" id="lvInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Say it, or type it…" enterkeyhint="done">')+
+    '<div class="lv-acts">'+
+      (done?'<button class="btn btn-outline btn-sm" data-act="again">🔁 עוד פעם</button><button class="btn btn-gold btn-sm" data-act="next">הבא ›</button>'
+           :(d.mic?'<button class="btn btn-gold btn-sm" data-act="mic">'+(d.listening?'מקשיב…':'🎤 אמור')+'</button>':'')+
+            '<button class="btn btn-outline btn-sm" data-act="check">בדוק</button><button class="btn btn-outline btn-sm" data-act="show">👁 הצג</button>')+
+    '</div></div></div>';
+  const inp=document.getElementById('lvInput');
+  if(inp)inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();drillScore(inp.value);}});
+}
+function drillScore(heard){
+  const d=lessonDrill;if(!d||!String(heard).trim())return;
+  const c=d.deck[d.i], s=lessonSim(c.en,heard);
+  d.heard=String(heard).trim();d.res=s>=0.8?'good':s>=0.5?'close':'miss';
+  if(d.res==='good'&&!d.counted){d.good++;d.counted=true;}
+  drawLesson();
+  if(d.res==='good')speak(c.en,false);
+}
+function drillReveal(){const d=lessonDrill;if(!d)return;d.shown=true;drawLesson();speak(d.deck[d.i].en,false);}
+function drillNext(){const d=lessonDrill;if(!d)return;d.i++;d.res=null;d.heard='';d.shown=false;d.counted=false;drawLesson();}
+function drillListen(){
+  const d=lessonDrill, SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!d||!SR||d.listening)return;
+  try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+  const r=new SR();r.lang='en-US';r.interimResults=false;r.maxAlternatives=3;r.continuous=false;
+  const target=d.deck[d.i].en;
+  d.listening=true;drawLesson();
+  r.onresult=function(ev){
+    d.listening=false;
+    const alts=Array.from(ev.results[0]||[]).map(a=>a.transcript);
+    let best=alts[0]||'', bs=-1;alts.forEach(a=>{const s=lessonSim(target,a);if(s>bs){bs=s;best=a;}});
+    drillScore(best);
+  };
+  r.onerror=function(ev){d.listening=false;drawLesson();toast(ev&&ev.error==='not-allowed'?'צריך אישור למיקרופון — או פשוט הקלד':'לא שמעתי — נסה שוב או הקלד','err');};
+  r.onend=function(){if(d.listening){d.listening=false;drawLesson();}};
+  try{r.start();}catch(e){d.listening=false;drawLesson();}
+}
+document.addEventListener('keydown',function(e){const v=document.getElementById('lessonView');if(e.key==='Escape'&&v&&v.style.display==='block')closeLesson();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden)loadLesson();});
+window.addEventListener('load',function(){loadLesson();});
 
 // ── TYPING MODE ── he sees the Hebrew and types the English
 function normAns(s){return String(s==null?'':s).toLowerCase().replace(/[’‘`]/g,"'").replace(/\.{2,}|…/g,' ').replace(/-/g,' ').replace(/[^a-z0-9' ]+/g,' ').replace(/\s+/g,' ').trim();}
