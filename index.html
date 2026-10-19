@@ -1925,17 +1925,17 @@ function drawDrill(v,l){
   const d=lessonDrill;
   if(d.i>=d.deck.length){
     v.innerHTML='<div class="lv-bar"><h2>'+esc(lessonHead(l))+'</h2><button class="lv-x" data-act="close" aria-label="סגור">✕</button></div>'+
-      '<div class="lv-body"><div class="lv-drill"><div class="lv-prompt">סיימת! 👏<br>'+d.good+' מתוך '+d.deck.length+' יצאו טוב</div>'+
+      '<div class="lv-body"><div class="lv-drill"><div class="lv-prompt">סיימת! 👏<br>'+esc(d.good)+' מתוך '+esc(d.deck.length)+' יצאו טוב</div>'+
       '<div class="lv-acts"><button class="btn btn-gold" data-act="drill">שוב</button><button class="btn btn-outline" data-act="back">חזרה לשיעור</button></div></div></div>';
     return;
   }
   const c=d.deck[d.i], done=!!(d.res||d.shown);
-  v.innerHTML='<div class="lv-bar"><h2>'+(d.i+1)+' / '+d.deck.length+'</h2><button class="lv-x" data-act="back" aria-label="חזרה">✕</button></div>'+
+  v.innerHTML='<div class="lv-bar"><h2>'+esc(d.i+1)+' / '+esc(d.deck.length)+'</h2><button class="lv-x" data-act="back" aria-label="חזרה">✕</button></div>'+
     '<div class="lv-body"><div class="lv-drill">'+
     '<div class="lv-prompt" dir="rtl" lang="he">'+esc(c.he)+'</div>'+
     (done?'<div class="lv-ans" lang="en">'+esc(c.en)+'</div><div class="lv-acts"><button class="lv-btn" data-say="cur" aria-label="האזן">🔊</button><button class="lv-btn" data-say="cur" data-slow="1" aria-label="האזן לאט">🐢</button></div>':'')+
     (d.heard?'<div class="lv-heard">'+esc(d.heard)+'</div>':'')+
-    (d.res?'<div class="lv-res '+d.res+'">'+(d.res==='good'?'✔ מצוין':d.res==='close'?'כמעט — נסה שוב':'לא בדיוק — האזן ונסה שוב')+'</div>':'')+
+    (d.res?'<div class="lv-res '+esc(d.res)+'">'+(d.res==='good'?'✔ מצוין':d.res==='close'?'כמעט — נסה שוב':'לא בדיוק — האזן ונסה שוב')+'</div>':'')+
     (done?'':'<input class="lv-input" id="lvInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Say it, or type it…" enterkeyhint="done">')+
     '<div class="lv-acts">'+
       (done?'<button class="btn btn-outline btn-sm" data-act="again">🔁 עוד פעם</button><button class="btn btn-gold btn-sm" data-act="next">הבא ›</button>'
